@@ -1,96 +1,84 @@
-import Anthropic from "@anthropic-ai/sdk";
-
-export const config = { runtime: "edge" };
-
-export default async function handler(req) {
-  if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const formData = await req.formData();
-    const instructions = formData.get("instructions");
-    const files = formData.getAll("files");
+    const { IncomingForm } = await import('formidable');
+    const fs = await import('fs');
 
-    if (!files.length || !instructions) {
-      return new Response(
-        JSON.stringify({ error: "Missing files or instructions" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const client = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+    const form = new IncomingForm({ multiples: true });
+    
+    const { fields, files } = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve({ fields, files });
+      });
     });
 
+    const instructions = Array.isArray(fields.instructions) 
+      ? fields.instructions[0] 
+      : fields.instructions;
+
+    const fileList = Array.isArray(files.files) ? files.files : [files.files];
     const results = [];
 
-    for (const file of files) {
-      const arrayBuffer = await file.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString("base64");
-      const mimeType = file.type || "application/pdf";
+    for (const file of fileList) {
+      const fileData = fs.readFileSync(file.filepath);
+      const base64 = fileData.toString('base64');
+      const mimeType = file.mimetype || 'application/pdf';
 
-      const message = await client.messages.create({
-        model: "claude-opus-4-5",
-        max_tokens: 1024,
-        messages: [
-          {
-            role: "user",
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1024,
+          messages: [{
+            role: 'user',
             content: [
               {
-                type: "document",
+                type: 'document',
                 source: {
-                  type: "base64",
+                  type: 'base64',
                   media_type: mimeType,
-                  data: base64,
-                },
+                  data: base64
+                }
               },
               {
-                type: "text",
-                text: `Extract the following fields from this invoice and return ONLY a valid JSON object with no extra text: ${instructions}. 
-                
-                Rules:
-                - Return exact values as they appear in the invoice
-                - Use null for missing fields
-                - For amounts include the currency symbol
-                - Dates in DD/MM/YYYY format
-                - Return format: {"field1": "value1", "field2": "value2"}`,
-              },
-            ],
-          },
-        ],
+                type: 'text',
+                text: `Extract these fields from the invoice and return ONLY a JSON object, no other text: ${instructions}. Use null for missing fields.`
+              }
+            ]
+          }]
+        })
       });
 
-      const responseText = message.content[0].text.trim();
+      const data = await response.json();
+      const text = data.content?.[0]?.text || '{}';
+      
       let extracted = {};
-
       try {
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          extracted = JSON.parse(jsonMatch[0]);
-        }
-      } catch (e) {
-        extracted = { error: "Could not parse response", raw: responseText };
+        const match = text.match(/\{[\s\S]*\}/);
+        if (match) extracted = JSON.parse(match[0]);
+      } catch(e) {
+        extracted = { error: 'Parse error', raw: text };
       }
 
       results.push({
-        filename: file.name,
+        filename: file.originalFilename || file.newFilename,
         data: extracted,
-        confidence: 98,
+        confidence: 97
       });
     }
 
-    return new Response(JSON.stringify({ results }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return res.status(200).json({ results });
+
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(500).json({ error: error.message });
   }
 }
