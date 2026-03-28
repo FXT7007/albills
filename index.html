@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AlBills — AI Invoice Data Extraction</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#161b27;--bg2:#1c2333;--bg3:#222a3f;
+  --surface:#1e2638;--surface2:#252f47;--surface3:#2d3859;
+  --border:rgba(130,160,255,0.09);--border2:rgba(130,160,255,0.16);--border3:rgba(130,160,255,0.26);
+  --accent:#5b8dee;--accent2:#8b6fee;--accent3:#4dd9c0;
+  --glow:rgba(91,141,238,0.14);
+  --text:#e8eaf6;--text2:#9aabcc;--text3:#5a6b90;
+  --white:#fff;--green:#4dd9c0;--green-bg:rgba(77,217,192,0.1);
+  --amber:#f0a500;--amber-bg:rgba(240,165,0,0.1);
+  --red:#ff6b7a;--red-bg:rgba(255,107,122,0.1);
+  --font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* BG */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-grad{position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(91,141,238,0.07),transparent 60%),radial-gradient(ellipse 50% 35% at 85% 80%,rgba(139,111,238,0.05),transparent 60%)}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(91,141,238,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(91,141,238,0.035) 1px,transparent 1px);background-size:44px 44px}
+.particles{position:absolute;inset:0;overflow:hidden}
+.p{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--accent);animation:pfloat linear infinite}
+@keyframes pfloat{0%{transform:translateY(105vh);opacity:0}10%{opacity:.35}90%{opacity:.15}100%{transform:translateY(-5vh);opacity:0}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(22,27,39,0.82);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.logo{font-family:var(--font-d);font-weight:800;font-size:20px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 18px rgba(91,141,238,0.45);animation:lp 3s ease-in-out infinite}
+@keyframes lp{0%,100%{box-shadow:0 0 18px rgba(91,141,238,0.4)}50%{box-shadow:0 0 32px rgba(91,141,238,0.7)}}
+.nav-r{display:flex;align-items:center;gap:6px}
+.nav-link{padding:7px 14px;color:var(--text2);font-size:13px;text-decoration:none;border-radius:7px;transition:all .2s}
+.nav-link:hover{color:var(--text);background:var(--surface)}
+.nbtn{padding:8px 18px;background:transparent;border:1px solid var(--border3);color:var(--text);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.nbtn:hover{background:var(--surface2);border-color:var(--accent)}
+.nbtn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 4px 18px rgba(91,141,238,0.3)}
+.nbtn-p:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(91,141,238,0.45)}
+
+/* PAGES */
+main{position:relative;z-index:1}
+.page{display:none;min-height:100vh;padding-top:64px}
+.page.active{display:block}
+#login.active{display:flex;align-items:center;justify-content:center}
+
+/* ===== HOME ===== */
+.hero{max-width:820px;margin:0 auto;padding:80px 1.5rem 50px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--text2);margin-bottom:28px;animation:fu .7s ease both}
+.edot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:var(--font-d);font-size:clamp(34px,6vw,66px);font-weight:800;line-height:1.08;letter-spacing:-.025em;margin-bottom:20px;animation:fu .7s .1s ease both}
+.grad-text{background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% auto;animation:gs 4s linear infinite}
+@keyframes gs{0%{background-position:0% center}100%{background-position:200% center}}
+.hero-sub{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 36px;font-weight:300;line-height:1.7;animation:fu .7s .2s ease both}
+.hero-cta{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;animation:fu .7s .3s ease both}
+.btn-p{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-family:var(--font-d);font-size:15px;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 5px 26px rgba(91,141,238,0.32)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 9px 36px rgba(91,141,238,0.48)}
+.btn-s{display:inline-flex;align-items:center;gap:9px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);padding:14px 24px;border-radius:11px;font-family:var(--font-b);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-s:hover{border-color:var(--accent);background:var(--surface3)}
+
+/* MOCK VISUAL */
+.hero-visual{max-width:680px;margin:52px auto 0;position:relative;animation:fu .7s .4s ease both}
+.mock{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.mock-bar{background:var(--surface2);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.mock-dots{display:flex;gap:5px}
+.md{width:10px;height:10px;border-radius:50%}
+.mock-title-bar{font-size:12px;color:var(--text3);margin-left:8px}
+.mock-body{padding:16px}
+.mock-files-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.mf{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:7px 10px;animation:fu .4s ease both}
+.mf:nth-child(2){animation-delay:.1s}.mf:nth-child(3){animation-delay:.2s}
+.mf-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mf-name{font-size:12px;color:var(--text2);flex:1}
+.mf-ok{color:var(--green);font-size:11px}
+.mock-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.mock-tbl th{background:var(--surface3);padding:7px 10px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.mock-tbl td{padding:7px 10px;color:var(--text2);border-top:1px solid var(--border)}
+.tg{color:var(--green);font-weight:500}
+
+/* STATS */
+.stats{display:flex;max-width:640px;margin:48px auto 0;background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;animation:fu .7s .5s ease both}
+.si{flex:1;padding:20px 12px;text-align:center;border-right:1px solid var(--border)}
+.si:last-child{border-right:none}
+.sv{font-family:var(--font-d);font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* SECTIONS */
+.section{max-width:880px;margin:0 auto;padding:70px 1.5rem}
+.sec-head{text-align:center;margin-bottom:44px}
+.sec-tag{display:inline-block;background:rgba(91,141,238,0.09);color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 13px;border-radius:100px;border:1px solid rgba(91,141,238,0.18);margin-bottom:12px}
+.sec-title{font-family:var(--font-d);font-size:clamp(24px,4vw,38px);font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+.sec-sub{font-size:15px;color:var(--text2);font-weight:300}
+
+/* HOW */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);border-radius:18px;overflow:hidden;border:1px solid var(--border2)}
+.step{background:var(--surface);padding:24px 18px;position:relative;transition:background .2s}
+.step:hover{background:var(--surface2)}
+.step-arr{position:absolute;top:50%;right:-1px;transform:translateY(-50%);color:var(--text3);font-size:14px;z-index:1}
+.step:last-child .step-arr{display:none}
+.step-ico{width:40px;height:40px;border-radius:11px;background:rgba(91,141,238,0.09);border:1px solid rgba(91,141,238,0.18);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
+.step-n{font-family:var(--font-d);font-size:10px;font-weight:600;color:var(--text3);margin-bottom:5px;letter-spacing:.06em}
+.step-t{font-family:var(--font-d);font-size:14px;font-weight:600;margin-bottom:5px}
+.step-d{font-size:12px;color:var(--text3);line-height:1.5}
+
+/* FEATURES */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 18px;transition:all .25s;position:relative;overflow:hidden}
+.feat::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,238,0.05),transparent);opacity:0;transition:opacity .3s}
+.feat:hover{border-color:var(--border3);transform:translateY(-3px)}
+.feat:hover::after{opacity:1}
+.feat-ico{font-size:24px;margin-bottom:12px}
+.feat-t{font-family:var(--font-d);font-size:14px;font-weight:600;margin-bottom:6px}
+.feat-d{font-size:13px;color:var(--text3);line-height:1.5}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:680px;margin:0 auto}
+.price-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px;position:relative;overflow:hidden}
+.price-card.featured{border-color:var(--accent)}
+.price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.pc-badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 11px;border-radius:100px;margin-bottom:14px}
+.badge-free{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
+.badge-paid{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2)}
+.pc-title{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:5px}
+.pc-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
+.pc-price{font-family:var(--font-d);font-size:42px;font-weight:800;line-height:1;margin-bottom:4px}
+.pc-price.free-price{color:var(--green)}
+.pc-price.paid-price{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pc-per{font-size:13px;color:var(--text3);margin-bottom:22px}
+.pc-feats{list-style:none;margin-bottom:24px}
+.pc-feats li{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+.pc-feats li:last-child{border-bottom:none}
+.pfc{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.pfc-g{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
+.pfc-b{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2)}
+.pc-btn{width:100%;padding:13px;border:none;border-radius:10px;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s}
+.pc-btn-free{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.3)}
+.pc-btn-free:hover{background:rgba(77,217,192,0.18)}
+.pc-btn-paid{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(91,141,238,0.3)}
+.pc-btn-paid:hover{transform:translateY(-1px);box-shadow:0 7px 28px rgba(91,141,238,0.45)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px 1.5rem;text-align:center;font-size:12px;color:var(--text3);position:relative;z-index:1}
+footer strong{color:var(--text2)}
+.copyright{margin-top:6px;font-size:11px}
+
+/* ===== APP PAGE ===== */
+.app-wrap{max-width:960px;margin:0 auto;padding:32px 1.5rem 80px}
+.app-hd{text-align:center;margin-bottom:32px}
+.app-hd h2{font-family:var(--font-d);font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.app-hd p{font-size:14px;color:var(--text2)}
+
+/* FREE BADGE */
+.free-banner{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--green-bg);border:1px solid rgba(77,217,192,0.2);
+  border-radius:11px;padding:12px 18px;margin-bottom:20px;flex-wrap:wrap;gap:8px;
+}
+.fb-left{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--green);font-weight:500}
+.fb-used{display:flex;gap:6px}
+.fb-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.fb-dot.used{background:var(--surface3);box-shadow:none}
+.fb-right{font-size:12px;color:var(--text3)}
+
+/* TABS */
+.atabs{display:flex;background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.atab{flex:1;padding:12px 10px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:500;color:var(--text3);border-right:1px solid var(--border);transition:all .2s;position:relative}
+.atab:last-child{border-right:none}
+.atab.active{color:var(--text);background:rgba(91,141,238,0.07)}
+.atab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.atab.done{color:var(--green)}
+.tnum{width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all .2s}
+.atab.active .tnum{background:var(--accent);border-color:var(--accent);color:#fff}
+.atab.done .tnum{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+
+/* UPLOAD CARD */
+.ucard{background:var(--surface);border:1px solid var(--border2);border-radius:18px;overflow:hidden}
+
+.uzone{border:2px dashed var(--border3);border-radius:12px;margin:20px;padding:44px 24px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(91,141,238,0.02);position:relative;overflow:hidden}
+.uzone::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(91,141,238,0.07),transparent 70%);opacity:0;transition:opacity .3s}
+.uzone:hover,.uzone.drag{border-color:var(--accent);background:rgba(91,141,238,0.04)}
+.uzone:hover::before,.uzone.drag::before{opacity:1}
+.u-icon{width:56px;height:56px;border-radius:14px;background:rgba(91,141,238,0.09);border:1px solid rgba(91,141,238,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;transition:all .3s}
+.uzone:hover .u-icon{background:rgba(91,141,238,0.16);box-shadow:0 0 22px rgba(91,141,238,0.2)}
+.uzone h3{font-family:var(--font-d);font-size:17px;font-weight:600;margin-bottom:5px}
+.uzone p{font-size:13px;color:var(--text3);margin-bottom:18px}
+.uchoose{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.uchoose:hover{border-color:var(--accent);color:var(--accent)}
+.fmts{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:16px}
+.fmt{background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 9px;font-size:11px;color:var(--text3);font-weight:500}
+
+/* file list */
+.flist{display:flex;flex-direction:column;gap:7px;padding:0 20px}
+.frow{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;animation:fu .3s ease both}
+.fico{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fico.pdf{background:rgba(255,100,100,0.1)}.fico.img{background:rgba(91,141,238,0.12)}.fico.doc{background:rgba(77,217,192,0.1)}
+.fn{font-size:13px;font-weight:500;flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fs{font-size:11px;color:var(--text3);flex-shrink:0}
+.frm{width:24px;height:24px;border-radius:6px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.frm:hover{background:var(--red-bg);color:var(--red)}
+
+/* EMAIL field */
+.email-section{padding:16px 20px 0}
+.field-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.email-row{display:flex;gap:10px;align-items:center}
+.email-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s}
+.email-input:focus{border-color:var(--accent)}
+.email-input::placeholder{color:var(--text3)}
+.email-note{font-size:11px;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:5px}
+
+/* instructions */
+.isec{padding:14px 20px}
+.ibox{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.6;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+.ibox:focus{border-color:var(--accent)}
+.ibox::placeholder{color:var(--text3)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.chip{background:var(--surface3);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(91,141,238,0.07)}
+
+/* process btn */
+.proc-btn{width:calc(100% - 40px);margin:16px 20px;padding:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:11px;color:#fff;font-family:var(--font-d);font-size:15px;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:9px}
+.proc-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(91,141,238,0.4)}
+.proc-btn:disabled{opacity:.3;cursor:not-allowed}
+.sec-note{text-align:center;padding-bottom:18px;font-size:12px;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:5px}
+.sg{color:var(--green);font-weight:500}
+
+/* processing */
+.pstate{display:none;padding:48px 20px;text-align:center}
+.spin{width:52px;height:52px;margin:0 auto 20px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pstate h3{font-family:var(--font-d);font-size:19px;font-weight:600;margin-bottom:7px}
+.pstate p{font-size:13px;color:var(--text3);margin-bottom:22px}
+.pbar{width:240px;height:3px;background:var(--border2);border-radius:100px;margin:0 auto;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .4s ease;width:0%}
+.pinvoices{display:flex;flex-direction:column;gap:6px;max-width:340px;margin:20px auto 0}
+.pinv{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text3)}
+.pinv.done{color:var(--green)}.pinv.active{color:var(--text)}
+.pinv-ico{font-size:13px}
+.pinv-bar{flex:1;height:2px;background:var(--border2);border-radius:100px;overflow:hidden}
+.pinv-fill{height:100%;background:var(--accent);width:0%;transition:width .3s}
+.pinv.done .pinv-fill{width:100%;background:var(--green)}
+
+/* ===== RESULTS ===== */
+.results-page{display:none}
+.results-wrap{max-width:960px;margin:0 auto;padding:32px 1.5rem 80px}
+
+.results-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.results-title{display:flex;align-items:center;gap:10px}
+.results-title h2{font-family:var(--font-d);font-size:22px;font-weight:700}
+.rcheck{width:28px;height:28px;border-radius:50%;background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.25);display:flex;align-items:center;justify-content:center;font-size:13px}
+.results-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+.raction-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s;border:none}
+.dl-excel{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 18px rgba(91,141,238,0.3)}
+.dl-excel:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(91,141,238,0.45)}
+.dl-csv{background:var(--surface2);border:1px solid var(--border2) !important;color:var(--text)}
+.dl-csv:hover{border-color:var(--accent) !important;color:var(--accent)}
+.email-btn{background:var(--green-bg);border:1px solid rgba(77,217,192,0.3) !important;color:var(--green)}
+.email-btn:hover{background:rgba(77,217,192,0.18)}
+
+/* SUMMARY CARDS */
+.summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.sc-val{font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:3px}
+.sc-val.green{color:var(--green)}.sc-val.blue{color:var(--accent)}.sc-val.amber{color:var(--amber)}
+.sc-label{font-size:11px;color:var(--text3)}
+
+/* EMAIL TO RECEIVE */
+.email-receive{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.er-icon{width:44px;height:44px;border-radius:11px;background:rgba(91,141,238,0.1);border:1px solid rgba(91,141,238,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.er-text{flex:1;min-width:200px}
+.er-text h4{font-family:var(--font-d);font-size:14px;font-weight:600;margin-bottom:3px}
+.er-text p{font-size:12px;color:var(--text3)}
+.er-form{display:flex;gap:8px;flex:2;min-width:240px}
+.er-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;transition:border-color .2s}
+.er-input:focus{border-color:var(--accent)}
+.er-input::placeholder{color:var(--text3)}
+.er-send{padding:10px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s;white-space:nowrap}
+.er-send:hover{transform:translateY(-1px)}
+.er-sent{display:none;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:500}
+
+/* RESULTS TABLE */
+.rtable-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.rtable-toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.rt-title{font-family:var(--font-d);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.rt-count{background:rgba(91,141,238,0.1);color:var(--accent);font-size:11px;font-weight:600;padding:2px 9px;border-radius:100px;border:1px solid rgba(91,141,238,0.2)}
+.rt-search{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;width:200px;transition:border-color .2s}
+.rt-search:focus{border-color:var(--accent)}
+.rt-search::placeholder{color:var(--text3)}
+.rtable-scroll{overflow-x:auto}
+.rtable{width:100%;border-collapse:collapse;font-size:13px;min-width:500px}
+.rtable thead tr{background:var(--surface3)}
+.rtable th{padding:11px 14px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border2)}
+.rtable td{padding:11px 14px;color:var(--text2);border-bottom:1px solid var(--border);transition:background .15s}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(255,255,255,0.025)}
+.rtable .td-num{color:var(--text3);font-size:11px;width:32px}
+.rtable .td-file{color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-amt{color:var(--green);font-weight:500}
+.td-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px}
+.status-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
+.status-review{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,165,0,0.2)}
+
+/* confidence */
+.conf{display:flex;align-items:center;gap:6px}
+.conf-bar{width:48px;height:4px;background:var(--border2);border-radius:100px;overflow:hidden}
+.conf-fill{height:100%;border-radius:100px}
+.conf-high{background:var(--green)}.conf-med{background:var(--amber)}.conf-low{background:var(--red)}
+.conf-val{font-size:11px;color:var(--text3)}
+
+.more-btn{width:100%;padding:13px;background:transparent;border:none;border-top:1px solid var(--border);color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.more-btn:hover{background:rgba(91,141,238,0.05)}
+
+.back-btn{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:9px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s;margin-top:20px;border-width:1px;border-style:solid}
+.back-btn:hover{border-color:var(--border3);color:var(--text)}
+
+/* ===== LOGIN ===== */
+.auth-card{background:var(--surface);border:1px solid var(--border2);border-radius:22px;padding:36px 32px;width:100%;max-width:420px;position:relative;overflow:hidden}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.auth-logo{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:24px}
+.al-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 22px rgba(91,141,238,0.4)}
+.al-text{font-family:var(--font-d);font-size:21px;font-weight:800;color:var(--white)}
+.auth-title{font-family:var(--font-d);font-size:22px;font-weight:700;text-align:center;margin-bottom:5px}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:26px}
+.atabs2{display:flex;background:var(--surface2);border-radius:9px;padding:3px;margin-bottom:24px;gap:3px}
+.atab2{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text3);border-radius:7px;cursor:pointer;transition:all .2s;border:none;background:transparent;font-family:var(--font-b)}
+.atab2.active{background:var(--surface3);color:var(--text);box-shadow:0 2px 7px rgba(0,0,0,0.2)}
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:11px 13px;color:var(--text);font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--text3)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.auth-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;margin-top:2px}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 5px 24px rgba(91,141,238,0.4)}
+.adiv{display:flex;align-items:center;gap:10px;margin:18px 0}
+.adiv::before,.adiv::after{content:'';flex:1;height:1px;background:var(--border)}
+.adiv span{font-size:11px;color:var(--text3)}
+.soc-btn{width:100%;padding:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px}
+.soc-btn:hover{border-color:var(--border3);background:var(--surface3)}
+.auth-fn{text-align:center;font-size:12px;color:var(--text3);margin-top:18px}
+.auth-fn a{color:var(--accent);text-decoration:none}
+.auth-fn a:hover{text-decoration:underline}
+
+/* ANIMATIONS */
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(28px);transition:all .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media(max-width:768px){
+  .steps{grid-template-columns:1fr 1fr}
+  .feats{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .summary-cards{grid-template-columns:1fr 1fr}
+  .nav-link{display:none}
+  .hero h1{font-size:32px}
+  .stats{flex-wrap:wrap}
+  .si{min-width:50%}
+  .frow2{grid-template-columns:1fr}
+  .results-hd{flex-direction:column;align-items:flex-start}
+  .results-actions{width:100%}
+  .raction-btn{flex:1;justify-content:center}
+  .rtable-toolbar{flex-direction:column;align-items:flex-start}
+  .rt-search{width:100%}
+  .email-receive{flex-direction:column}
+  .er-form{width:100%}
+  .step-arr{display:none}
+}
+@media(max-width:480px){
+  .summary-cards{grid-template-columns:1fr 1fr}
+  .hero-cta{flex-direction:column;align-items:center}
+  .auth-card{padding:24px 18px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-wrap">
+  <div class="bg-grad"></div>
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<nav>
+  <a class="logo" href="#" onclick="showPage('home')">
+    <div class="logo-icon">⚡</div>AlBills
+  </a>
+  <div class="nav-r">
+    <a class="nav-link" href="#" onclick="showPage('home');goTo('how')">How it works</a>
+    <a class="nav-link" href="#" onclick="showPage('home');goTo('pricing')">Pricing</a>
+    <button class="nbtn" onclick="showPage('login');setTab('login')">Sign in</button>
+    <button class="nbtn nbtn-p" onclick="showPage('login');setTab('signup')">Start free</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===== HOME ===== -->
+<div id="home" class="page active">
+  <section class="hero">
+    <div class="eyebrow"><div class="edot"></div>Trusted by bookkeepers worldwide · Powered by Claude AI</div>
+    <h1>Stop typing invoices<br><span class="grad-text">manually. Forever.</span></h1>
+    <p class="hero-sub">Upload up to 25 invoices at once — PDF, image, or document. Tell AlBills what data you need. Get a clean Excel file in seconds.</p>
+    <div class="hero-cta">
+      <button class="btn-p" onclick="showPage('app')">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Try free — 3 invoices
+      </button>
+      <button class="btn-s" onclick="showPage('home');goTo('how')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        See how it works
+      </button>
+    </div>
+    <div class="hero-visual">
+      <div class="mock">
+        <div class="mock-bar">
+          <div class="mock-dots"><div class="md" style="background:#ff5f57"></div><div class="md" style="background:#ffbd2e"></div><div class="md" style="background:#28c840"></div></div>
+          <span class="mock-title-bar">AlBills — Processing 3 invoices</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-files-row">
+            <div class="mf"><div class="mf-icon" style="background:rgba(255,100,100,.1)">📄</div><span class="mf-name">Gulf_Supplies_Oct.pdf</span><span class="mf-ok">✓ Done</span></div>
+            <div class="mf"><div class="mf-icon" style="background:rgba(91,141,238,.12)">🖼️</div><span class="mf-name">receipt_scan_020.jpg</span><span class="mf-ok">✓ Done</span></div>
+            <div class="mf"><div class="mf-icon" style="background:rgba(77,217,192,.1)">📝</div><span class="mf-name">Emirates_Trading.docx</span><span class="mf-ok">✓ Done</span></div>
+          </div>
+          <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+            <table class="mock-tbl">
+              <thead><tr><th>Vendor</th><th>Date</th><th>Total</th><th>VAT</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Gulf Supplies Ltd</td><td>01/10/2025</td><td class="tg">AED 3,850</td><td>TRN100234</td><td><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:2px 7px;border-radius:100px">✓ 98%</span></td></tr>
+                <tr><td>Receipt #020</td><td>15/10/2025</td><td class="tg">AED 720</td><td>—</td><td><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:2px 7px;border-radius:100px">✓ 95%</span></td></tr>
+                <tr><td>Emirates Trading</td><td>02/11/2025</td><td class="tg">AED 5,100</td><td>TRN200891</td><td><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:2px 7px;border-radius:100px">✓ 99%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="max-width:880px;margin:0 auto;padding:0 1.5rem">
+    <div class="stats reveal">
+      <div class="si"><div class="sv">3 Free</div><div class="sl">Invoices every month</div></div>
+      <div class="si"><div class="sv">$0.50</div><div class="sl">Per invoice after free</div></div>
+      <div class="si"><div class="sv">&lt;30s</div><div class="sl">Processing time</div></div>
+      <div class="si"><div class="sv">99%</div><div class="sl">Extraction accuracy</div></div>
+    </div>
+  </div>
+
+  <section class="section" id="how">
+    <div class="sec-head reveal"><div class="sec-tag">How it works</div><h2 class="sec-title">Four steps from invoice to Excel</h2><p class="sec-sub">No setup. No training. No technical knowledge needed.</p></div>
+    <div class="steps reveal">
+      <div class="step"><div class="step-ico">📤</div><div class="step-n">Step 01</div><div class="step-t">Upload</div><div class="step-d">Drop up to 25 invoices — PDF, JPG, PNG, DOCX, any format</div><div class="step-arr">›</div></div>
+      <div class="step"><div class="step-ico">💬</div><div class="step-n">Step 02</div><div class="step-t">Instruct</div><div class="step-d">Type what you need in plain English — "vendor, date, total, VAT"</div><div class="step-arr">›</div></div>
+      <div class="step"><div class="step-ico">🤖</div><div class="step-n">Step 03</div><div class="step-t">AI extracts</div><div class="step-d">Claude AI reads every document and finds your exact fields</div><div class="step-arr">›</div></div>
+      <div class="step"><div class="step-ico">📊</div><div class="step-n">Step 04</div><div class="step-t">Download</div><div class="step-d">Get Excel by download or sent directly to your email</div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="sec-head reveal"><div class="sec-tag">Features</div><h2 class="sec-title">Built for real bookkeepers</h2><p class="sec-sub">Every feature designed to save you hours every week</p></div>
+    <div class="feats reveal">
+      <div class="feat"><div class="feat-ico">⚡</div><div class="feat-t">Bulk processing</div><div class="feat-d">Upload 25 invoices at once and process them all in under 30 seconds.</div></div>
+      <div class="feat"><div class="feat-ico">🧠</div><div class="feat-t">Natural language</div><div class="feat-d">Just type what you need in plain English. No templates, no setup.</div></div>
+      <div class="feat"><div class="feat-ico">📱</div><div class="feat-t">Works on mobile</div><div class="feat-d">Fully responsive — use AlBills on your phone, tablet, or desktop.</div></div>
+      <div class="feat"><div class="feat-ico">📧</div><div class="feat-t">Email delivery</div><div class="feat-d">Enter your email and receive the Excel file directly in your inbox.</div></div>
+      <div class="feat"><div class="feat-ico">📄</div><div class="feat-t">Any file format</div><div class="feat-d">PDF, scanned images, photos, Word documents — all supported.</div></div>
+      <div class="feat"><div class="feat-ico">🔒</div><div class="feat-t">Secure & private</div><div class="feat-d">Your documents are processed securely and never stored or shared.</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing" style="padding-top:0">
+    <div class="sec-head reveal"><div class="sec-tag">Pricing</div><h2 class="sec-title">Start free. Pay only when you need more.</h2><p class="sec-sub">No subscriptions. No commitments. No surprises.</p></div>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="pc-badge badge-free">Free forever</div>
+        <div class="pc-title">Free plan</div>
+        <div class="pc-sub">Perfect to try AlBills risk-free</div>
+        <div class="pc-price free-price">$0</div>
+        <div class="pc-per">3 invoices every month · no credit card</div>
+        <ul class="pc-feats">
+          <li><div class="pfc pfc-g">✓</div> 3 invoices per month free</li>
+          <li><div class="pfc pfc-g">✓</div> All file formats supported</li>
+          <li><div class="pfc pfc-g">✓</div> Custom extraction instructions</li>
+          <li><div class="pfc pfc-g">✓</div> Excel & CSV download</li>
+          <li><div class="pfc pfc-g">✓</div> Email delivery of results</li>
+        </ul>
+        <button class="pc-btn pc-btn-free" onclick="showPage('login');setTab('signup')">Start free — no card needed</button>
+      </div>
+      <div class="price-card featured">
+        <div class="pc-badge badge-paid">Pay as you go</div>
+        <div class="pc-title">Pro plan</div>
+        <div class="pc-sub">For bookkeepers & businesses</div>
+        <div class="pc-price paid-price">$0.50</div>
+        <div class="pc-per">per invoice · no monthly fee</div>
+        <ul class="pc-feats">
+          <li><div class="pfc pfc-b">✓</div> Unlimited invoices</li>
+          <li><div class="pfc pfc-b">✓</div> Up to 25 invoices per batch</li>
+          <li><div class="pfc pfc-b">✓</div> All file formats supported</li>
+          <li><div class="pfc pfc-b">✓</div> Priority processing</li>
+          <li><div class="pfc pfc-b">✓</div> Excel, CSV & email delivery</li>
+        </ul>
+        <button class="pc-btn pc-btn-paid" onclick="showPage('login');setTab('signup')">Get started — pay as you go</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <strong>AlBills</strong> · AI Invoice Data Extraction · albills.com<br>
+    <div class="copyright">© 2025 AlBills. All rights reserved. AlBills™ is a trademark. Powered by Claude AI. · <a href="#" style="color:var(--accent);text-decoration:none">Privacy Policy</a> · <a href="#" style="color:var(--accent);text-decoration:none">Terms of Service</a></div>
+  </footer>
+</div>
+
+<!-- ===== APP PAGE ===== -->
+<div id="app" class="page">
+  <div class="app-wrap">
+    <div class="app-hd">
+      <h2>Extract invoice data</h2>
+      <p>Upload your invoices, describe what to extract, get your Excel file</p>
+    </div>
+
+    <div class="free-banner">
+      <div class="fb-left">
+        <div class="fb-used" id="freeDots">
+          <div class="fb-dot"></div><div class="fb-dot"></div><div class="fb-dot"></div>
+        </div>
+        <span id="freeText">3 free invoices remaining this month</span>
+      </div>
+      <div class="fb-right">Free plan · <a href="#" onclick="showPage('home');goTo('pricing')" style="color:var(--accent);text-decoration:none">Upgrade for more →</a></div>
+    </div>
+
+    <div class="atabs">
+      <div class="atab active" id="tab1"><div class="tnum">1</div> Upload files</div>
+      <div class="atab" id="tab2"><div class="tnum">2</div> Instructions</div>
+      <div class="atab" id="tab3"><div class="tnum">3</div> Results</div>
+    </div>
+
+    <div class="ucard">
+      <div id="uploadState">
+        <div class="uzone" id="dropZone" onclick="document.getElementById('fi').click()">
+          <div class="u-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h3>Drop your invoices here</h3>
+          <p>Drag & drop up to 25 files, or tap to browse</p>
+          <div class="uchoose" onclick="event.stopPropagation();document.getElementById('fi').click()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose files
+          </div>
+          <div class="fmts"><span class="fmt">PDF</span><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">DOCX</span><span class="fmt">XLSX</span><span class="fmt">TIFF</span></div>
+        </div>
+        <div class="flist" id="fileList"></div>
+
+        <div class="email-section">
+          <div class="field-label">📧 Send results to email</div>
+          <div class="email-row">
+            <input class="email-input" type="email" id="userEmail" placeholder="your@email.com — receive Excel in your inbox">
+          </div>
+          <div class="email-note">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Optional — you can also download directly after processing
+          </div>
+        </div>
+
+        <div class="isec">
+          <div class="field-label">What do you want to extract?</div>
+          <textarea class="ibox" id="instructions" placeholder="e.g. vendor name, invoice number, date, total amount, VAT number, currency, due date"></textarea>
+          <div class="chips">
+            <span class="chip" onclick="setChip('vendor name, invoice date, total amount, VAT number')">📄 Basic</span>
+            <span class="chip" onclick="setChip('vendor, invoice number, line items, unit price, quantity, subtotal, total')">🧾 Line items</span>
+            <span class="chip" onclick="setChip('supplier, PO number, payment terms, bank details, due date')">🏦 Payment</span>
+            <span class="chip" onclick="setChip('vendor, date, amount, currency, category, notes')">📁 Expenses</span>
+          </div>
+        </div>
+
+        <button class="proc-btn" id="procBtn" onclick="startProc()" disabled>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Extract data — $0.50 per invoice
+        </button>
+        <div class="sec-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Secure · Private · <span class="sg">First 3 invoices free</span>
+        </div>
+      </div>
+
+      <!-- Processing -->
+      <div class="pstate" id="procState">
+        <div class="spin"></div>
+        <h3>Reading your invoices...</h3>
+        <p id="procMsg">Extracting data — please wait</p>
+        <div class="pbar"><div class="pfill" id="progFill"></div></div>
+        <div class="pinvoices" id="pinvoices"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULTS PAGE ===== -->
+<div id="results" class="page">
+  <div class="results-wrap">
+    <div class="results-hd">
+      <div class="results-title">
+        <div class="rcheck">✓</div>
+        <h2>Extraction complete</h2>
+      </div>
+      <div class="results-actions">
+        <button class="raction-btn dl-excel" onclick="doDownload('excel')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Excel
+        </button>
+        <button class="raction-btn dl-csv" style="border:1px solid var(--border2)" onclick="doDownload('csv')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-cards" id="summaryCards"></div>
+
+    <!-- Email delivery -->
+    <div class="email-receive">
+      <div class="er-icon">📧</div>
+      <div class="er-text">
+        <h4>Receive Excel by email</h4>
+        <p>Enter your email and we'll send the file directly to your inbox</p>
+      </div>
+      <div class="er-form" id="erForm">
+        <input class="er-input" type="email" id="erEmail" placeholder="your@email.com">
+        <button class="er-send" onclick="sendEmail()">Send now</button>
+      </div>
+      <div class="er-sent" id="erSent">
+        <span style="font-size:18px">✅</span> Excel sent to your inbox!
+      </div>
+    </div>
+
+    <!-- Results table -->
+    <div class="rtable-card">
+      <div class="rtable-toolbar">
+        <div class="rt-title">
+          Extracted data
+          <span class="rt-count" id="rowCount">0 rows</span>
+        </div>
+        <input class="rt-search" type="text" placeholder="🔍 Search results..." oninput="filterTable(this.value)">
+      </div>
+      <div class="rtable-scroll">
+        <table class="rtable" id="resTable">
+          <thead><tr id="resHead"></tr></thead>
+          <tbody id="resBody"></tbody>
+        </table>
+      </div>
+      <button class="more-btn" onclick="resetAll()">⟳ Process more invoices</button>
+    </div>
+
+    <button class="back-btn" onclick="resetAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to upload
+    </button>
+  </div>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div id="login" class="page" style="padding:1rem">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="al-icon">⚡</div>
+      <div class="al-text">AlBills</div>
+    </div>
+    <div id="lf">
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to your AlBills account</p>
+      <div class="atabs2">
+        <button class="atab2 active" onclick="setTab('login')">Sign in</button>
+        <button class="atab2" onclick="setTab('signup')">Create account</button>
+      </div>
+      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" placeholder="you@company.com"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="••••••••"></div>
+      <button class="auth-btn" onclick="showPage('app')">Sign in to AlBills</button>
+      <div class="adiv"><span>or continue with</span></div>
+      <button class="soc-btn" onclick="showPage('app')">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-fn">No account? <a href="#" onclick="setTab('signup')">Sign up free</a> · <a href="#">Forgot password?</a></div>
+    </div>
+    <div id="sf" style="display:none">
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub">Start with 3 free invoices — no card needed</p>
+      <div class="atabs2">
+        <button class="atab2" onclick="setTab('login')">Sign in</button>
+        <button class="atab2 active" onclick="setTab('signup')">Create account</button>
+      </div>
+      <div class="frow2">
+        <div class="fg"><label class="fl">First name</label><input class="fi" type="text" placeholder="Mohammed"></div>
+        <div class="fg"><label class="fl">Last name</label><input class="fi" type="text" placeholder="Al Rashidi"></div>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="you@company.com"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="At least 8 characters"></div>
+      <button class="auth-btn" onclick="showPage('app')">Create free account</button>
+      <div class="adiv"><span>or</span></div>
+      <button class="soc-btn" onclick="showPage('app')">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Sign up with Google
+      </button>
+      <div class="auth-fn">Already have an account? <a href="#" onclick="setTab('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+</main>
+<input type="file" id="fi" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx,.tiff">
+
+<script>
+// PARTICLES
+const pc=document.getElementById('particles');
+for(let i=0;i<16;i++){
+  const p=document.createElement('div');p.className='p';
+  p.style.left=Math.random()*100+'%';
+  p.style.animationDuration=(14+Math.random()*18)+'s';
+  p.style.animationDelay=(Math.random()*16)+'s';
+  if(Math.random()>.65)p.style.background='var(--accent3)';
+  pc.appendChild(p);
+}
+
+// REVEAL
+const obs=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// PAGES
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('active');
+    p.style.display='none';
+  });
+  const pg=document.getElementById(id);
+  if(id==='login'){pg.style.display='flex';pg.classList.add('active')}
+  else{pg.style.display='block';pg.classList.add('active')}
+  window.scrollTo(0,0);
+}
+function goTo(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'})},80)}
+function setTab(t){
+  document.getElementById('lf').style.display=t==='login'?'block':'none';
+  document.getElementById('sf').style.display=t==='signup'?'block':'none';
+}
+
+// FREE COUNTER
+let freeLeft=3;
+function updateFreeBanner(){
+  const dots=document.getElementById('freeDots');
+  const txt=document.getElementById('freeText');
+  dots.innerHTML='';
+  for(let i=0;i<3;i++){
+    const d=document.createElement('div');
+    d.className='fb-dot'+(i>=freeLeft?' used':'');
+    dots.appendChild(d);
+  }
+  txt.textContent=freeLeft>0?`${freeLeft} free invoice${freeLeft!==1?'s':''} remaining this month`:'Free invoices used — $0.50 per invoice';
+}
+
+// FILES
+let files=[];
+const fi=document.getElementById('fi');
+const dz=document.getElementById('dropZone');
+const fl2=document.getElementById('fileList');
+const pb=document.getElementById('procBtn');
+const instr=document.getElementById('instructions');
+
+fi.addEventListener('change',e=>addFiles(Array.from(e.target.files)));
+instr.addEventListener('input',updateBtn);
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');addFiles(Array.from(e.dataTransfer.files))});
+
+function addFiles(nf){files=[...files,...nf].slice(0,25);renderFiles();updateBtn()}
+function getIcon(n){const e=n.split('.').pop().toLowerCase();if(e==='pdf')return{i:'📄',c:'pdf'};if(['jpg','jpeg','png','tiff'].includes(e))return{i:'🖼️',c:'img'};return{i:'📝',c:'doc'}}
+function fmtSz(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+
+function renderFiles(){
+  fl2.innerHTML='';
+  files.forEach((f,i)=>{
+    const{i:ico,c:cls}=getIcon(f.name);
+    const d=document.createElement('div');d.className='frow';
+    d.innerHTML=`<div class="fico ${cls}">${ico}</div><span class="fn">${f.name}</span><span class="fs">${fmtSz(f.size)}</span><button class="frm" onclick="rmFile(${i})">×</button>`;
+    fl2.appendChild(d);
+  });
+}
+function rmFile(i){files.splice(i,1);renderFiles();updateBtn()}
+function updateBtn(){
+  const ok=files.length>0&&instr.value.trim()!=='';
+  pb.disabled=!ok;
+  if(ok){
+    const cnt=Math.min(files.length,freeLeft);
+    const paid=files.length-cnt;
+    const cost=paid*0.50;
+    pb.innerHTML=`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Extract ${files.length} invoice${files.length>1?'s':''} ${paid>0?' — $'+cost.toFixed(2):' — Free!'}`;
+  } else {
+    pb.innerHTML=`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Extract data`;
+  }
+}
+function setChip(t){instr.value=t;updateBtn();instr.focus()}
+
+// PROCESSING
+let extractedData=[];
+function startProc(){
+  const email=document.getElementById('userEmail').value;
+  document.getElementById('uploadState').style.display='none';
+  document.getElementById('procState').style.display='block';
+  document.getElementById('tab1').className='atab done';
+  document.getElementById('tab2').className='atab active';
+
+  // build per-invoice list
+  const pi=document.getElementById('pinvoices');
+  pi.innerHTML='';
+  files.forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.className='pinv';d.id='pinv'+i;
+    d.innerHTML=`<span class="pinv-ico">📄</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span><div class="pinv-bar"><div class="pinv-fill" id="pf${i}"></div></div>`;
+    pi.appendChild(d);
+  });
+
+  let prog=0;let done=0;
+  const fill=document.getElementById('progFill');
+  const msg=document.getElementById('procMsg');
+
+  const iv=setInterval(()=>{
+    prog+=Math.random()*14+6;
+    if(prog>100)prog=100;
+    fill.style.width=prog+'%';
+    const nowDone=Math.floor(prog/100*files.length);
+    for(let i=0;i<files.length;i++){
+      const pf=document.getElementById('pf'+i);
+      const pinv=document.getElementById('pinv'+i);
+      if(i<nowDone){pinv.className='pinv done';if(pf)pf.style.width='100%'}
+      else if(i===nowDone){pinv.className='pinv active';if(pf)pf.style.width=(prog%100*files.length%100)+'%'}
+    }
+    if(nowDone>done){done=nowDone;msg.textContent=`Processing invoice ${Math.min(done,files.length)} of ${files.length}...`}
+    if(prog>=100){clearInterval(iv);msg.textContent='Finalising your data...';
+      setTimeout(()=>showResults(email),800)}
+  },350);
+}
+
+// RESULTS
+const vendors=['Gulf Supplies Ltd','Acme International','Emirates Trading Co','Al Noor Group','Bright Tech FZE','Dubai Office Supplies','Carrefour UAE'];
+const amounts=['AED 3,850.00','AED 1,240.50','AED 5,100.75','AED 720.00','AED 2,980.25','AED 4,350.00','AED 890.50'];
+const confs=[98,95,99,92,97,94,99];
+
+function showResults(email){
+  // update free counter
+  freeLeft=Math.max(0,freeLeft-files.length);
+  updateFreeBanner();
+
+  const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
+  extractedData=[];
+
+  files.forEach((f,i)=>{
+    const row={_file:f.name,_conf:confs[i%confs.length]};
+    fields.forEach(field=>{
+      const fl=field.toLowerCase();
+      if(fl.includes('vendor')||fl.includes('supplier')||fl.includes('company'))row[field]=vendors[i%vendors.length];
+      else if(fl.includes('date')&&!fl.includes('due')){const d=new Date();d.setDate(d.getDate()-i*7);row[field]=d.toLocaleDateString('en-GB')}
+      else if(fl.includes('due')){const d=new Date();d.setDate(d.getDate()+(30-i*4));row[field]=d.toLocaleDateString('en-GB')}
+      else if(fl.includes('amount')||fl.includes('total')||fl.includes('price')||fl.includes('subtotal'))row[field]=amounts[i%amounts.length];
+      else if(fl.includes('number')||fl.includes('inv#')||fl.includes('inv '))row[field]='INV-'+(2025100+i+1);
+      else if(fl.includes('vat'))row[field]='TRN'+(100000000+i);
+      else if(fl.includes('currency'))row[field]='AED';
+      else if(fl.includes('category'))row[field]=['Supplies','Services','Equipment','Office','Utilities'][i%5];
+      else if(fl.includes('notes'))row[field]='Verified OK';
+      else row[field]='—';
+    });
+    extractedData.push(row);
+  });
+
+  // fill results page
+  // summary cards
+  const sc=document.getElementById('summaryCards');
+  const totalAmt=extractedData.filter(r=>r['total amount']||r['total']).length;
+  sc.innerHTML=`
+    <div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div>
+    <div class="scard"><div class="sc-val blue">${fields.length}</div><div class="sc-label">Fields extracted</div></div>
+    <div class="scard"><div class="sc-val green">${Math.round(confs.slice(0,files.length).reduce((a,b)=>a+b,0)/Math.min(files.length,confs.length))}%</div><div class="sc-label">Avg accuracy</div></div>
+    <div class="scard"><div class="sc-val amber">${Math.max(0,files.length-freeLeft-Math.max(0,3-freeLeft-files.length))===0?'Free':'$'+(files.length*0.50).toFixed(2)}</div><div class="sc-label">Cost</div></div>
+  `;
+
+  // prefill email
+  if(email){document.getElementById('erEmail').value=email}
+
+  // table
+  const head=document.getElementById('resHead');
+  const body=document.getElementById('resBody');
+  head.innerHTML='<th class="td-num">#</th><th>Source file</th>'+fields.map(f=>`<th>${f}</th>`).join('')+'<th>Confidence</th><th>Status</th>';
+  body.innerHTML='';
+  extractedData.forEach((row,i)=>{
+    const tr=document.createElement('tr');tr.setAttribute('data-search',JSON.stringify(row).toLowerCase());
+    const conf=row._conf;
+    const confCls=conf>=95?'conf-high':conf>=85?'conf-med':'conf-low';
+    const statusCls=conf>=90?'status-ok':'status-review';
+    const statusTxt=conf>=90?'✓ Verified':'⚠ Review';
+    let cells=`<td class="td-num">${i+1}</td><td class="td-file">${row._file}</td>`;
+    fields.forEach(f=>{
+      const v=row[f];
+      const isAmt=f.toLowerCase().includes('amount')||f.toLowerCase().includes('total')||f.toLowerCase().includes('price');
+      cells+=`<td ${isAmt?'class="td-amt"':''}>${v}</td>`;
+    });
+    cells+=`<td><div class="conf"><div class="conf-bar"><div class="conf-fill ${confCls}" style="width:${conf}%"></div></div><span class="conf-val">${conf}%</span></div></td>`;
+    cells+=`<td><span class="td-badge ${statusCls}">${statusTxt}</span></td>`;
+    tr.innerHTML=cells;body.appendChild(tr);
+  });
+  document.getElementById('rowCount').textContent=files.length+' row'+(files.length!==1?'s':'');
+
+  // show results page
+  showPage('results');
+  document.getElementById('tab3').className='atab done';
+}
+
+function filterTable(q){
+  const rows=document.querySelectorAll('#resBody tr');
+  rows.forEach(r=>{r.style.display=q===''||r.getAttribute('data-search').includes(q.toLowerCase())?'':'none'});
+}
+
+function sendEmail(){
+  const email=document.getElementById('erEmail').value;
+  if(!email||!email.includes('@')){alert('Please enter a valid email address');return}
+  document.getElementById('erForm').style.display='none';
+  document.getElementById('erSent').style.display='flex';
+}
+
+function doDownload(type){
+  alert(`✅ In the live version, this downloads your ${type.toUpperCase()} file!\n\nThis is the UI demo — connect the Claude API to make it fully functional.`);
+}
+
+function resetAll(){
+  files=[];document.getElementById('fileList').innerHTML='';
+  document.getElementById('instructions').value='';
+  document.getElementById('userEmail').value='';
+  document.getElementById('procBtn').disabled=true;
+  document.getElementById('uploadState').style.display='block';
+  document.getElementById('procState').style.display='none';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('pinvoices').innerHTML='';
+  document.getElementById('erForm').style.display='flex';
+  document.getElementById('erSent').style.display='none';
+  document.getElementById('tab1').className='atab active';
+  document.getElementById('tab2').className='atab';
+  document.getElementById('tab3').className='atab';
+  updateBtn();showPage('app');
+}
+
+// init
+updateFreeBanner();
+</script>
+</body>
+</html>
