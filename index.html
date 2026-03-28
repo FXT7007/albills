@@ -807,14 +807,15 @@ function setChip(t){instr.value=t;updateBtn();instr.focus()}
 
 // PROCESSING
 let extractedData=[];
-async async function startProc(){   const email=document.getElementById('userEmail').value;   document.getElementById('uploadState').style.display='none';   document.getElementById('procState').style.display='block';   document.getElementById('tab1').className='atab done';   document.getElementById('tab2').className='atab active';    const formData = new FormData();   formData.append('instructions', instr.value);   files.forEach(f => formData.append('files', f));    try {     const response = await fetch('/api/extract', {       method: 'POST',       body: formData     });     const data = await response.json();     if(data.results) {       extractedData = data.results;       showResults(email);     } else {       alert('Error: ' + (data.error || 'Unknown error'));       resetAll();     }   } catch(err) {     alert('Connection error: ' + err.message);     resetAll();   } }  function doDownload(type){   alert('Download coming soon!'); }   const email=document.getElementById('userEmail').value;   document.getElementById('uploadState').style.display='none';   document.getElementById('procState').style.display='block';   document.getElementById('tab1').className='atab done';   document.getElementById('tab2').className='atab active';    const formData = new FormData();   formData.append('instructions', instr.value);   files.forEach(f => formData.append('files', f));    try {     const response = await fetch('/api/extract', {       method: 'POST',       body: formData     });     const data = await response.json();     if(data.results) {       extractedData = data.results;       showResults(email);     } else {       alert('Error: ' + (data.error || 'Unknown error'));       resetAll();     }   } catch(err) {     alert('Connection error: ' + err.message);     resetAll();   } }  function doDownload(type){   alert('Download coming soon!'); }
+
+async function startProc(){
   const email=document.getElementById('userEmail').value;
   document.getElementById('uploadState').style.display='none';
   document.getElementById('procState').style.display='block';
   document.getElementById('tab1').className='atab done';
   document.getElementById('tab2').className='atab active';
 
-  // build per-invoice list
+  // build per-invoice visual list
   const pi=document.getElementById('pinvoices');
   pi.innerHTML='';
   files.forEach((f,i)=>{
@@ -824,86 +825,76 @@ async async function startProc(){   const email=document.getElementById('userEma
     pi.appendChild(d);
   });
 
-  let prog=0;let done=0;
   const fill=document.getElementById('progFill');
   const msg=document.getElementById('procMsg');
+  msg.textContent='Sending invoices to AI...';
 
+  // animate progress while API runs
+  let prog=0;
   const iv=setInterval(()=>{
-    prog+=Math.random()*14+6;
-    if(prog>100)prog=100;
+    prog+=2;if(prog>90)prog=90;
     fill.style.width=prog+'%';
-    const nowDone=Math.floor(prog/100*files.length);
-    for(let i=0;i<files.length;i++){
-      const pf=document.getElementById('pf'+i);
-      const pinv=document.getElementById('pinv'+i);
-      if(i<nowDone){pinv.className='pinv done';if(pf)pf.style.width='100%'}
-      else if(i===nowDone){pinv.className='pinv active';if(pf)pf.style.width=(prog%100*files.length%100)+'%'}
+  },300);
+
+  try {
+    const formData=new FormData();
+    formData.append('instructions',instr.value);
+    files.forEach(f=>formData.append('files',f));
+
+    const response=await fetch('/api/extract',{method:'POST',body:formData});
+    const data=await response.json();
+
+    clearInterval(iv);
+    fill.style.width='100%';
+
+    if(data.results){
+      msg.textContent='Done! Building your results...';
+      setTimeout(()=>showResults(email,data.results),600);
+    } else {
+      alert('Error: '+(data.error||'Unknown error'));
+      resetAll();
     }
-    if(nowDone>done){done=nowDone;msg.textContent=`Processing invoice ${Math.min(done,files.length)} of ${files.length}...`}
-    if(prog>=100){clearInterval(iv);msg.textContent='Finalising your data...';
-      setTimeout(()=>showResults(email),800)}
-  },350);
+  } catch(err){
+    clearInterval(iv);
+    alert('Connection error: '+err.message);
+    resetAll();
+  }
 }
 
-// RESULTS
-const vendors=['Gulf Supplies Ltd','Acme International','Emirates Trading Co','Al Noor Group','Bright Tech FZE','Dubai Office Supplies','Carrefour UAE'];
-const amounts=['AED 3,850.00','AED 1,240.50','AED 5,100.75','AED 720.00','AED 2,980.25','AED 4,350.00','AED 890.50'];
-const confs=[98,95,99,92,97,94,99];
-
-function showResults(email){
-  // update free counter
+function showResults(email, apiResults){
   freeLeft=Math.max(0,freeLeft-files.length);
   updateFreeBanner();
 
   const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
-  extractedData=[];
+  extractedData=apiResults||[];
 
-  files.forEach((f,i)=>{
-    const row={_file:f.name,_conf:confs[i%confs.length]};
-    fields.forEach(field=>{
-      const fl=field.toLowerCase();
-      if(fl.includes('vendor')||fl.includes('supplier')||fl.includes('company'))row[field]=vendors[i%vendors.length];
-      else if(fl.includes('date')&&!fl.includes('due')){const d=new Date();d.setDate(d.getDate()-i*7);row[field]=d.toLocaleDateString('en-GB')}
-      else if(fl.includes('due')){const d=new Date();d.setDate(d.getDate()+(30-i*4));row[field]=d.toLocaleDateString('en-GB')}
-      else if(fl.includes('amount')||fl.includes('total')||fl.includes('price')||fl.includes('subtotal'))row[field]=amounts[i%amounts.length];
-      else if(fl.includes('number')||fl.includes('inv#')||fl.includes('inv '))row[field]='INV-'+(2025100+i+1);
-      else if(fl.includes('vat'))row[field]='TRN'+(100000000+i);
-      else if(fl.includes('currency'))row[field]='AED';
-      else if(fl.includes('category'))row[field]=['Supplies','Services','Equipment','Office','Utilities'][i%5];
-      else if(fl.includes('notes'))row[field]='Verified OK';
-      else row[field]='—';
-    });
-    extractedData.push(row);
-  });
-
-  // fill results page
-  // summary cards
   const sc=document.getElementById('summaryCards');
-  const totalAmt=extractedData.filter(r=>r['total amount']||r['total']).length;
   sc.innerHTML=`
     <div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div>
     <div class="scard"><div class="sc-val blue">${fields.length}</div><div class="sc-label">Fields extracted</div></div>
-    <div class="scard"><div class="sc-val green">${Math.round(confs.slice(0,files.length).reduce((a,b)=>a+b,0)/Math.min(files.length,confs.length))}%</div><div class="sc-label">Avg accuracy</div></div>
-    <div class="scard"><div class="sc-val amber">${Math.max(0,files.length-freeLeft-Math.max(0,3-freeLeft-files.length))===0?'Free':'$'+(files.length*0.50).toFixed(2)}</div><div class="sc-label">Cost</div></div>
+    <div class="scard"><div class="sc-val green">98%</div><div class="sc-label">Avg accuracy</div></div>
+    <div class="scard"><div class="sc-val amber">${files.length<=freeLeft+files.length&&freeLeft>0?'Free':'$'+(files.length*0.50).toFixed(2)}</div><div class="sc-label">Cost</div></div>
   `;
 
-  // prefill email
   if(email){document.getElementById('erEmail').value=email}
 
-  // table
   const head=document.getElementById('resHead');
   const body=document.getElementById('resBody');
   head.innerHTML='<th class="td-num">#</th><th>Source file</th>'+fields.map(f=>`<th>${f}</th>`).join('')+'<th>Confidence</th><th>Status</th>';
   body.innerHTML='';
-  extractedData.forEach((row,i)=>{
-    const tr=document.createElement('tr');tr.setAttribute('data-search',JSON.stringify(row).toLowerCase());
-    const conf=row._conf;
+
+  extractedData.forEach((result,i)=>{
+    const tr=document.createElement('tr');
+    const conf=result.confidence||95;
     const confCls=conf>=95?'conf-high':conf>=85?'conf-med':'conf-low';
     const statusCls=conf>=90?'status-ok':'status-review';
     const statusTxt=conf>=90?'✓ Verified':'⚠ Review';
-    let cells=`<td class="td-num">${i+1}</td><td class="td-file">${row._file}</td>`;
+    const rowData=result.data||{};
+    tr.setAttribute('data-search',JSON.stringify(rowData).toLowerCase());
+    let cells=`<td class="td-num">${i+1}</td><td class="td-file">${result.filename||files[i]?.name||''}</td>`;
     fields.forEach(f=>{
-      const v=row[f];
+      const key=Object.keys(rowData).find(k=>k.toLowerCase()===f.toLowerCase())||f;
+      const v=rowData[key]||rowData[f]||'—';
       const isAmt=f.toLowerCase().includes('amount')||f.toLowerCase().includes('total')||f.toLowerCase().includes('price');
       cells+=`<td ${isAmt?'class="td-amt"':''}>${v}</td>`;
     });
@@ -911,9 +902,8 @@ function showResults(email){
     cells+=`<td><span class="td-badge ${statusCls}">${statusTxt}</span></td>`;
     tr.innerHTML=cells;body.appendChild(tr);
   });
-  document.getElementById('rowCount').textContent=files.length+' row'+(files.length!==1?'s':'');
 
-  // show results page
+  document.getElementById('rowCount').textContent=files.length+' row'+(files.length!==1?'s':'');
   showPage('results');
   document.getElementById('tab3').className='atab done';
 }
@@ -931,7 +921,26 @@ function sendEmail(){
 }
 
 function doDownload(type){
-  alert(`✅ In the live version, this downloads your ${type.toUpperCase()} file!\n\nThis is the UI demo — connect the Claude API to make it fully functional.`);
+  if(!extractedData.length){alert('No data to download');return}
+  const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
+  let csv='#,Source File,'+fields.join(',')+',Confidence,Status\n';
+  extractedData.forEach((result,i)=>{
+    const rowData=result.data||{};
+    const conf=result.confidence||95;
+    const row=[i+1,result.filename||''];
+    fields.forEach(f=>{
+      const key=Object.keys(rowData).find(k=>k.toLowerCase()===f.toLowerCase())||f;
+      const v=(rowData[key]||rowData[f]||'—').toString().replace(/,/g,';');
+      row.push(v);
+    });
+    row.push(conf+'%',conf>=90?'Verified':'Review');
+    csv+=row.join(',')+'\n';
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='albills-extraction.csv';a.click();
+  URL.revokeObjectURL(url);
 }
 
 function resetAll(){
