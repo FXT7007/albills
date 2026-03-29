@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAT Calculator — UAE, Saudi Arabia, UK, EU | Free | AlBills</title>
+<meta name="description" content="Free VAT calculator for UAE (5%), Saudi Arabia (15%), UK (20%), Germany, France, India GST and 15+ countries. Add or extract VAT instantly. No signup required.">
+<meta name="keywords" content="vat calculator, UAE vat calculator, saudi vat calculator, VAT 5%, VAT 15%, VAT 20%, add vat, remove vat, extract vat, GST calculator">
+<link rel="canonical" href="https://www.albills.com/tools/vat-calculator">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#161b27;--surface:#1e2638;--surface2:#252f47;--surface3:#2d3859;--border:rgba(130,160,255,0.12);--border2:rgba(130,160,255,0.2);--accent:#5b8dee;--accent2:#8b6fee;--accent3:#4dd9c0;--text:#e8eaf6;--text2:#9aabcc;--text3:#5a6b90;--green:#4dd9c0;--green-bg:rgba(77,217,192,0.1);--red:#ff6b7a;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.6;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(91,141,238,0.07),transparent 60%)}
+nav{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(22,27,39,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.logo{font-family:var(--font-d);font-weight:800;font-size:20px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-link{color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:7px;transition:all .2s}
+.nav-link:hover{color:var(--text);background:var(--surface)}
+.nbtn{padding:8px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);text-decoration:none}
+.wrap{max-width:860px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+.breadcrumb{padding:20px 0 0;font-size:13px;color:var(--text3)}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.breadcrumb span{margin:0 6px}
+.hero{padding:32px 0 28px}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--text2);margin-bottom:16px}
+.hero h1{font-family:var(--font-d);font-size:clamp(26px,4vw,42px);font-weight:800;line-height:1.1;letter-spacing:-.025em;margin-bottom:12px}
+.grad{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:15px;color:var(--text2);max-width:600px}
+/* CALCULATOR */
+.calc-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;margin-bottom:32px}
+.calc-card::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.calc-body{padding:28px}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:15px;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--text3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.results-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.result-box.main{border-color:var(--accent);background:rgba(91,141,238,0.06)}
+.result-label{font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.result-value{font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--green)}
+.result-value.main{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* RATES TABLE */
+.rates-table{width:100%;border-collapse:collapse;margin-top:12px}
+.rates-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.rates-table td{padding:10px 14px;border-top:1px solid var(--border);font-size:14px;color:var(--text2)}
+.rates-table tr:hover td{background:rgba(255,255,255,0.02)}
+.rate-badge{display:inline-block;background:rgba(91,141,238,0.1);color:var(--accent);font-size:12px;font-weight:600;padding:2px 9px;border-radius:100px;border:1px solid rgba(91,141,238,0.2)}
+/* CONTENT */
+.content-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;margin-bottom:24px}
+.content-card h2{font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:14px}
+.content-card h3{font-family:var(--font-d);font-size:16px;font-weight:600;margin:20px 0 10px}
+.content-card p{color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:12px}
+.content-card ul{color:var(--text2);font-size:14px;line-height:1.7;padding-left:20px}
+.content-card ul li{margin-bottom:6px}
+.content-card .highlight{background:rgba(77,217,192,0.08);border:1px solid rgba(77,217,192,0.15);border-radius:10px;padding:14px 16px;color:var(--green);font-size:14px;margin:14px 0}
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--border);padding:18px 0}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-family:var(--font-d);font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;cursor:pointer}
+.faq-a{font-size:14px;color:var(--text2);line-height:1.7}
+/* CTA */
+.cta-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;text-align:center;margin-bottom:40px}
+.cta-box h3{font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:8px}
+.cta-box p{color:var(--text2);margin-bottom:18px;font-size:14px}
+.btn-p{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:13px 24px;border-radius:10px;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(91,141,238,0.4)}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 0 20px;position:relative;z-index:1;margin-top:20px}
+.footer-tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.footer-tool-link{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text3);text-decoration:none;transition:all .2s}
+.footer-tool-link:hover{border-color:var(--accent);color:var(--accent)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--text3);border-top:1px solid var(--border);padding-top:16px;margin-top:16px}
+@media(max-width:600px){.field-row{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<nav>
+  <a class="logo" href="/"><div class="logo-icon">⚡</div>AlBills</a>
+  <div class="nav-r">
+    <a class="nav-link" href="/">Invoice Extractor</a>
+    <a class="nav-link" href="/tools">All Tools</a>
+    <a class="nbtn" href="/">Try Free →</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="breadcrumb">
+    <a href="/">AlBills</a><span>›</span>
+    <a href="/tools">Free Tools</a><span>›</span>
+    VAT Calculator
+  </div>
+
+  <div class="hero">
+    <div class="hero-tag">🧮 Free VAT Calculator — No signup required</div>
+    <h1>VAT Calculator — <span class="grad">All Countries</span></h1>
+    <p>Calculate VAT for UAE, Saudi Arabia, UK, EU and 15+ countries. Add VAT to a price or extract VAT from a total. Instant results, completely free.</p>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="calc-card">
+    <div class="calc-body">
+      <div class="field">
+        <label>Country / VAT Rate</label>
+        <select id="vat-country" onchange="updateVatRate()">
+          <option value="5">🇦🇪 UAE — VAT 5%</option>
+          <option value="15">🇸🇦 Saudi Arabia — VAT 15%</option>
+          <option value="10">🇧🇭 Bahrain — VAT 10%</option>
+          <option value="5">🇶🇦 Qatar — VAT 0% (planned)</option>
+          <option value="5">🇰🇼 Kuwait — VAT 0%</option>
+          <option value="20">🇬🇧 UK — VAT 20%</option>
+          <option value="20">🇫🇷 France — TVA 20%</option>
+          <option value="19">🇩🇪 Germany — MwSt 19%</option>
+          <option value="22">🇮🇹 Italy — IVA 22%</option>
+          <option value="21">🇳🇱 Netherlands — BTW 21%</option>
+          <option value="21">🇧🇪 Belgium — BTW 21%</option>
+          <option value="23">🇵🇹 Portugal — IVA 23%</option>
+          <option value="21">🇪🇸 Spain — IVA 21%</option>
+          <option value="18">🇮🇳 India — GST 18%</option>
+          <option value="12">🇮🇳 India — GST 12%</option>
+          <option value="5">🇮🇳 India — GST 5%</option>
+          <option value="10">🇦🇺 Australia — GST 10%</option>
+          <option value="13">🇨🇦 Canada — HST 13%</option>
+          <option value="5">🇨🇦 Canada — GST 5%</option>
+          <option value="9">🇸🇬 Singapore — GST 9%</option>
+          <option value="10">🇯🇵 Japan — 消費税 10%</option>
+          <option value="7.5">🇳🇬 Nigeria — VAT 7.5%</option>
+          <option value="15">🇿🇦 South Africa — VAT 15%</option>
+          <option value="16">🇲🇽 Mexico — IVA 16%</option>
+          <option value="20">🇹🇷 Turkey — KDV 20%</option>
+          <option value="custom">✏️ Custom Rate</option>
+        </select>
+      </div>
+      <div class="field" id="custom-rate-field" style="display:none">
+        <label>Custom VAT Rate (%)</label>
+        <input type="number" id="vat-custom" placeholder="Enter VAT rate" min="0" max="100" step="0.1" oninput="calcVAT()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Amount</label>
+          <input type="number" id="vat-amount" placeholder="Enter amount" min="0" step="0.01" oninput="calcVAT()">
+        </div>
+        <div class="field">
+          <label>Calculation Type</label>
+          <select id="vat-type" onchange="calcVAT()">
+            <option value="excl">Add VAT to price (excl. VAT)</option>
+            <option value="incl">Extract VAT from total (incl. VAT)</option>
+          </select>
+        </div>
+      </div>
+      <div class="results-grid">
+        <div class="result-box">
+          <div class="result-label">Net Amount (excl. VAT)</div>
+          <div class="result-value" id="r-net">0.00</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">VAT Amount</div>
+          <div class="result-value" id="r-vat">0.00</div>
+        </div>
+        <div class="result-box main">
+          <div class="result-label">Total (incl. VAT)</div>
+          <div class="result-value main" id="r-total">0.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAT RATES TABLE -->
+  <div class="content-card">
+    <h2>VAT Rates by Country — 2025</h2>
+    <p>Current standard VAT rates for major countries. Click any row to calculate.</p>
+    <div style="overflow-x:auto">
+    <table class="rates-table">
+      <thead><tr><th>Country</th><th>Tax Name</th><th>Standard Rate</th><th>Reduced Rate</th></tr></thead>
+      <tbody>
+        <tr onclick="setCountry(5,'🇦🇪 UAE')"><td>🇦🇪 United Arab Emirates</td><td>VAT</td><td><span class="rate-badge">5%</span></td><td>0% (exempt categories)</td></tr>
+        <tr onclick="setCountry(15,'🇸🇦 Saudi Arabia')"><td>🇸🇦 Saudi Arabia</td><td>VAT</td><td><span class="rate-badge">15%</span></td><td>0% (basic food, medicine)</td></tr>
+        <tr onclick="setCountry(10,'🇧🇭 Bahrain')"><td>🇧🇭 Bahrain</td><td>VAT</td><td><span class="rate-badge">10%</span></td><td>0% (essentials)</td></tr>
+        <tr onclick="setCountry(20,'🇬🇧 UK')"><td>🇬🇧 United Kingdom</td><td>VAT</td><td><span class="rate-badge">20%</span></td><td>5% (energy), 0% (food)</td></tr>
+        <tr onclick="setCountry(20,'🇫🇷 France')"><td>🇫🇷 France</td><td>TVA</td><td><span class="rate-badge">20%</span></td><td>5.5%, 10%</td></tr>
+        <tr onclick="setCountry(19,'🇩🇪 Germany')"><td>🇩🇪 Germany</td><td>MwSt</td><td><span class="rate-badge">19%</span></td><td>7%</td></tr>
+        <tr onclick="setCountry(22,'🇮🇹 Italy')"><td>🇮🇹 Italy</td><td>IVA</td><td><span class="rate-badge">22%</span></td><td>4%, 5%, 10%</td></tr>
+        <tr onclick="setCountry(18,'🇮🇳 India')"><td>🇮🇳 India</td><td>GST</td><td><span class="rate-badge">18%</span></td><td>5%, 12%, 28%</td></tr>
+        <tr onclick="setCountry(10,'🇦🇺 Australia')"><td>🇦🇺 Australia</td><td>GST</td><td><span class="rate-badge">10%</span></td><td>0% (food, health)</td></tr>
+        <tr onclick="setCountry(9,'🇸🇬 Singapore')"><td>🇸🇬 Singapore</td><td>GST</td><td><span class="rate-badge">9%</span></td><td>—</td></tr>
+        <tr onclick="setCountry(10,'🇯🇵 Japan')"><td>🇯🇵 Japan</td><td>消費税</td><td><span class="rate-badge">10%</span></td><td>8% (food)</td></tr>
+        <tr onclick="setCountry(15,'🇿🇦 South Africa')"><td>🇿🇦 South Africa</td><td>VAT</td><td><span class="rate-badge">15%</span></td><td>0% (basic foods)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="content-card">
+    <h2>How to Use the VAT Calculator</h2>
+    <p>Our free VAT calculator makes it simple to calculate VAT for any country in seconds. Here is how to use it:</p>
+    <h3>Adding VAT to a price (exclusive VAT)</h3>
+    <p>If you have a net price (before VAT) and need to calculate the final price including VAT:</p>
+    <ul>
+      <li>Select your country or enter a custom VAT rate</li>
+      <li>Enter the net amount in the Amount field</li>
+      <li>Select "Add VAT to price" from the Calculation Type</li>
+      <li>The calculator instantly shows net amount, VAT amount, and total</li>
+    </ul>
+    <h3>Extracting VAT from a total (inclusive VAT)</h3>
+    <p>If you have a total price that includes VAT and need to find the net amount and VAT portion:</p>
+    <ul>
+      <li>Select your country or enter a custom VAT rate</li>
+      <li>Enter the total amount (including VAT)</li>
+      <li>Select "Extract VAT from total" from the Calculation Type</li>
+      <li>The calculator shows what portion is net price and what is VAT</li>
+    </ul>
+    <div class="highlight">💡 Tip: Use this calculator for invoices, expense reports, and price quotes. For bulk invoice data extraction, use AlBills AI Invoice Extractor to process hundreds of invoices at once.</div>
+    <h3>VAT Formula</h3>
+    <p><strong>Adding VAT:</strong> Total = Net Price × (1 + VAT Rate / 100)</p>
+    <p><strong>Extracting VAT:</strong> Net Price = Total Price / (1 + VAT Rate / 100)</p>
+    <p><strong>VAT Amount:</strong> VAT = Total Price − Net Price</p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="content-card">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-q">What is VAT?</div>
+      <div class="faq-a">VAT (Value Added Tax) is a consumption tax placed on goods and services at each stage of production or distribution. Businesses collect VAT on behalf of the government and can reclaim VAT paid on business expenses. In the UAE it is called VAT at 5%, in Saudi Arabia it is 15%, and in the UK it is 20%.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is the VAT rate in the UAE?</div>
+      <div class="faq-a">The UAE introduced VAT at a standard rate of 5% on 1 January 2018. This applies to most goods and services. Some categories are zero-rated (0%) including certain food items, healthcare and education, and some are exempt including financial services and residential properties.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is the VAT rate in Saudi Arabia?</div>
+      <div class="faq-a">Saudi Arabia's VAT rate was increased from 5% to 15% on 1 July 2020 as part of fiscal measures. This applies to most goods and services. Essential goods, healthcare and education may be zero-rated or exempt.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How do I calculate VAT in the UAE?</div>
+      <div class="faq-a">To calculate UAE VAT at 5%: multiply the net price by 1.05 to get the total including VAT. For example, AED 100 × 1.05 = AED 105 total. To extract VAT from a total: divide by 1.05. For example, AED 105 ÷ 1.05 = AED 100 net, and AED 5 is the VAT.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is this VAT calculator free?</div>
+      <div class="faq-a">Yes, this VAT calculator is completely free to use with no registration or signup required. Calculate VAT for any country or enter a custom rate. AlBills provides this tool free as part of our suite of financial tools for businesses.</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h3>⚡ Need to extract VAT from invoices automatically?</h3>
+    <p>AlBills reads your invoices using AI and extracts VAT numbers, amounts, and all other data into a clean Excel file. Upload unlimited invoices from any country.</p>
+    <a class="btn-p" href="/">Try AlBills Free — 3 invoices free, no card needed</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;font-family:var(--font-d);font-weight:600">More Free Financial Tools</div>
+    <div class="footer-tools">
+      <a class="footer-tool-link" href="/tools/vat-calculator">🧮 VAT Calculator</a>
+      <a class="footer-tool-link" href="/tools/gold-price-calculator">🏅 Gold Price</a>
+      <a class="footer-tool-link" href="/tools/currency-converter">💱 Currency Converter</a>
+      <a class="footer-tool-link" href="/tools/late-payment-calculator">📅 Late Payment</a>
+      <a class="footer-tool-link" href="/tools/profit-margin-calculator">📈 Profit Margin</a>
+      <a class="footer-tool-link" href="/tools/loan-calculator">🏦 Loan Calculator</a>
+      <a class="footer-tool-link" href="/tools/uae-corporate-tax">🇦🇪 UAE Corp Tax</a>
+      <a class="footer-tool-link" href="/tools/invoice-due-date">🗓️ Due Date</a>
+      <a class="footer-tool-link" href="/tools/zakat-calculator">☪️ Zakat</a>
+      <a class="footer-tool-link" href="/tools/salary-calculator">💼 Salary</a>
+      <a class="footer-tool-link" href="/tools/break-even-calculator">⚖️ Break-Even</a>
+      <a class="footer-tool-link" href="/tools/invoice-number-generator">📄 Invoice Numbers</a>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 <strong>AlBills™</strong> · Free VAT Calculator · albills.com</span>
+      <span><a href="/" style="color:var(--accent);text-decoration:none">Invoice Extractor</a> · <a href="/tools" style="color:var(--accent);text-decoration:none">All Tools</a> · <a href="/privacy" style="color:var(--accent);text-decoration:none">Privacy</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function updateVatRate(){
+  const sel=document.getElementById('vat-country');
+  document.getElementById('custom-rate-field').style.display=sel.value==='custom'?'block':'none';
+  calcVAT();
+}
+function setCountry(rate,name){
+  document.getElementById('vat-country').value=rate;
+  calcVAT();
+}
+function calcVAT(){
+  const sel=document.getElementById('vat-country');
+  let rate=sel.value==='custom'?parseFloat(document.getElementById('vat-custom').value)||0:parseFloat(sel.value)||0;
+  const amount=parseFloat(document.getElementById('vat-amount').value)||0;
+  const type=document.getElementById('vat-type').value;
+  let net,vat,total;
+  if(type==='excl'){net=amount;vat=amount*rate/100;total=amount+vat;}
+  else{total=amount;net=amount/(1+rate/100);vat=total-net;}
+  document.getElementById('r-net').textContent=fmt(net);
+  document.getElementById('r-vat').textContent=fmt(vat);
+  document.getElementById('r-total').textContent=fmt(total);
+}
+function fmt(n){return(n||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}
+</script>
+</body>
+</html>

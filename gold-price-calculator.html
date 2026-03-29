@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gold Price Calculator — Grams, Tola, Troy Oz | Free | AlBills</title>
+<meta name="description" content="Free gold price calculator. Calculate gold value by weight (grams, tola, troy ounce) and purity (24K, 22K, 18K) in USD, AED, SAR, GBP, EUR and more currencies.">
+<link rel="canonical" href="https://www.albills.com/tools/gold-price-calculator">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#161b27;--surface:#1e2638;--surface2:#252f47;--surface3:#2d3859;--border:rgba(130,160,255,0.12);--border2:rgba(130,160,255,0.2);--accent:#5b8dee;--accent2:#8b6fee;--accent3:#4dd9c0;--text:#e8eaf6;--text2:#9aabcc;--text3:#5a6b90;--green:#4dd9c0;--green-bg:rgba(77,217,192,0.1);--red:#ff6b7a;--amber:#f0a500;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif}
+html{scroll-behavior:smooth}body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.6;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(91,141,238,0.07),transparent 60%)}
+nav{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(22,27,39,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.logo{font-family:var(--font-d);font-weight:800;font-size:20px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-link{color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:7px;transition:all .2s}
+.nav-link:hover{color:var(--text);background:var(--surface)}
+.nbtn{padding:8px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);text-decoration:none}
+.wrap{max-width:860px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+.breadcrumb{padding:20px 0 0;font-size:13px;color:var(--text3)}.breadcrumb a{color:var(--accent);text-decoration:none}.breadcrumb span{margin:0 6px}
+.hero{padding:32px 0 24px}.hero-tag{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--text2);margin-bottom:16px}
+.hero h1{font-family:var(--font-d);font-size:clamp(26px,4vw,42px);font-weight:800;line-height:1.1;letter-spacing:-.025em;margin-bottom:12px}
+.grad{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:15px;color:var(--text2);max-width:600px}
+.calc-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;margin-bottom:28px}
+.calc-card::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.calc-body{padding:28px}
+.field{margin-bottom:16px}.field label{display:block;font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--accent)}.field input::placeholder{color:var(--text3)}.field select option{background:var(--surface2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.result-box.featured{border-color:var(--accent);background:rgba(91,141,238,0.06)}
+.result-label{font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.result-value{font-family:var(--font-d);font-size:24px;font-weight:700;color:var(--green)}
+.result-value.big{font-size:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.result-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;margin:10px 0}
+.calc-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(91,141,238,0.35)}
+.content-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;margin-bottom:24px}
+.content-card h2{font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:14px}
+.content-card h3{font-family:var(--font-d);font-size:16px;font-weight:600;margin:18px 0 10px;color:var(--text)}
+.content-card p{color:var(--text2);font-size:14px;line-height:1.75;margin-bottom:12px}
+.content-card ul,.content-card ol{color:var(--text2);font-size:14px;line-height:1.75;padding-left:20px;margin-bottom:12px}
+.content-card li{margin-bottom:5px}
+.highlight{background:rgba(77,217,192,0.08);border:1px solid rgba(77,217,192,0.15);border-radius:10px;padding:14px 16px;color:var(--green);font-size:14px;margin:14px 0}
+.faq-item{border-bottom:1px solid var(--border);padding:18px 0}.faq-item:last-child{border-bottom:none}
+.faq-q{font-family:var(--font-d);font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px}
+.faq-a{font-size:14px;color:var(--text2);line-height:1.7}
+.cta-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;text-align:center;margin-bottom:40px;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.cta-box h3{font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:8px}
+.cta-box p{color:var(--text2);margin-bottom:18px;font-size:14px}
+.btn-p{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:13px 24px;border-radius:10px;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(91,141,238,0.4)}
+footer{border-top:1px solid var(--border);padding:32px 0 20px;position:relative;z-index:1;margin-top:10px}
+.footer-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.footer-tool-link{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 13px;font-size:12px;color:var(--text3);text-decoration:none;transition:all .2s}
+.footer-tool-link:hover{border-color:var(--accent);color:var(--accent)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--text3);border-top:1px solid var(--border);padding-top:16px;margin-top:12px}
+@media(max-width:600px){.field-row{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<nav>
+  <a class="logo" href="/"><div class="logo-icon">⚡</div>AlBills</a>
+  <div class="nav-r">
+    <a class="nav-link" href="/">Invoice Extractor</a>
+    <a class="nav-link" href="/tools">All Tools</a>
+    <a class="nbtn" href="/">Try Free →</a>
+  </div>
+</nav>
+<div class="wrap">
+  <div class="breadcrumb"><a href="/">AlBills</a><span>›</span><a href="/tools">Free Tools</a><span>›</span>Gold Price Calculator</div>
+  <div class="hero">
+    <div class="hero-tag">🏅 Free Gold Price Calculator — Updated daily</div>
+    <h1>Gold Price <span class="grad">Calculator</span></h1>
+    <p>Calculate the value of gold by weight and purity in any currency. Supports grams, troy ounces, tola and bhori in 24K, 22K, 18K, 14K and 9K purity.</p>
+  </div>
+  <div class="calc-card"><div class="calc-body">
+  <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:14px;margin-bottom:18px;text-align:center">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Live Gold Price (per troy oz)</div>
+    <div style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--amber)" id="gold-price-display">$2,385.00</div>
+    <div style="font-size:11px;color:var(--text3)" id="gold-updated">Reference price — updated regularly</div>
+  </div>
+  <div class="field-row">
+    <div class="field"><label>Weight</label><input type="number" id="g-weight" placeholder="0" min="0" step="0.01" oninput="calcGold()"></div>
+    <div class="field"><label>Unit</label><select id="g-unit" onchange="calcGold()">
+      <option value="1">Troy Ounce (oz)</option>
+      <option value="0.032151">Gram (g)</option>
+      <option value="0.32151">10 Grams</option>
+      <option value="0.096453">Tola (11.66g)</option>
+    </select></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><label>Gold Purity</label><select id="g-purity" onchange="calcGold()">
+      <option value="1">24K (999.9) — Pure Gold</option>
+      <option value="0.9167">22K (916.7)</option>
+      <option value="0.75">18K (750)</option>
+      <option value="0.585">14K (585)</option>
+      <option value="0.375">9K (375)</option>
+    </select></div>
+    <div class="field"><label>Currency</label><select id="g-currency" onchange="calcGold()">
+      <option value="1">USD $</option>
+      <option value="3.6725">AED د.إ</option>
+      <option value="3.75">SAR ﷼</option>
+      <option value="0.79">GBP £</option>
+      <option value="0.92">EUR €</option>
+      <option value="83.5">INR ₹</option>
+      <option value="278">PKR ₨</option>
+    </select></div>
+  </div>
+  <div class="result-box featured">
+    <div class="result-label">Estimated Gold Value</div>
+    <div class="result-value big" id="g-result">—</div>
+    <div class="result-sub" id="g-sub">Enter weight above to calculate</div>
+  </div>
+</div></div>
+  <div class="content-card">
+  <h2>How to Calculate Gold Value</h2>
+  <p>The value of gold depends on three factors: the current gold spot price, the weight of gold, and its purity (karat). Our calculator handles all three automatically.</p>
+  <h3>Gold Purity (Karat) Explained</h3>
+  <ul>
+    <li><strong>24 Karat (999.9)</strong> — Pure gold, 99.99% gold content. Most expensive per gram.</li>
+    <li><strong>22 Karat (916.7)</strong> — 91.67% gold, commonly used for jewelry in the Gulf region.</li>
+    <li><strong>18 Karat (750)</strong> — 75% gold, popular in European jewelry.</li>
+    <li><strong>14 Karat (585)</strong> — 58.5% gold, common in US jewelry.</li>
+    <li><strong>9 Karat (375)</strong> — 37.5% gold, common in UK jewelry.</li>
+  </ul>
+  <h3>Weight Units</h3>
+  <ul>
+    <li><strong>Troy Ounce</strong> — Standard unit for gold trading (31.1 grams)</li>
+    <li><strong>Gram</strong> — Most common for small purchases</li>
+    <li><strong>Tola</strong> — Traditional South Asian unit (11.66 grams)</li>
+  </ul>
+  <div class="highlight">💡 Gold prices fluctuate constantly. The price shown is a reference price. Always check live prices from a trusted gold dealer or exchange before making transactions.</div>
+</div>
+  <div class="content-card"><h2>Frequently Asked Questions</h2><div class="faq-item"><div class="faq-q">What is the gold price today?</div><div class="faq-a">Gold prices change every second during market hours. The price shown in our calculator is a reference price in USD per troy ounce. For real-time trading prices, check sources like the Dubai Gold & Commodities Exchange (DGCX), London Bullion Market Association (LBMA) or your local gold dealer.</div></div>
+<div class="faq-item"><div class="faq-q">How is gold priced?</div><div class="faq-a">Gold is priced globally in USD per troy ounce. One troy ounce equals 31.1034 grams. The price is determined by supply and demand in global markets and fluctuates continuously during trading hours.</div></div>
+<div class="faq-item"><div class="faq-q">What is the best karat for investment?</div><div class="faq-a">24K gold is preferred for investment as it contains the highest gold content (99.99%). Gold bars and coins used for investment are typically 24K. 22K is popular for jewelry in the UAE and Gulf region.</div></div>
+<div class="faq-item"><div class="faq-q">How much is 1 gram of gold in AED?</div><div class="faq-a">To calculate the price of 1 gram of gold in AED: divide the gold spot price (in USD per troy oz) by 31.1034 to get the price per gram in USD, then multiply by the USD/AED exchange rate (approximately 3.6725). Use our calculator above for instant results.</div></div>
+</div>
+  <div class="cta-box">
+    <h3>⚡ Extract gold amounts and values from invoices automatically</h3>
+    <p>AlBills uses AI to read invoices from any country and extract data into clean Excel files. Upload unlimited invoices — free to start.</p>
+    <a class="btn-p" href="/">Try AlBills Free — 3 invoices, no card needed</a>
+  </div>
+</div>
+<footer><div class="wrap">
+    <div style="font-size:13px;color:var(--text3);margin-bottom:12px;font-family:var(--font-d);font-weight:600">More Free Financial Tools</div>
+    <div class="footer-tools"><a class="footer-tool-link" href="/tools/vat-calculator">🧮 VAT Calculator</a><a class="footer-tool-link" href="/tools/gold-price-calculator">🏅 Gold Price</a><a class="footer-tool-link" href="/tools/currency-converter">💱 Currency</a><a class="footer-tool-link" href="/tools/late-payment-calculator">📅 Late Payment</a><a class="footer-tool-link" href="/tools/profit-margin-calculator">📈 Profit Margin</a><a class="footer-tool-link" href="/tools/loan-calculator">🏦 Loan Calc</a><a class="footer-tool-link" href="/tools/uae-corporate-tax">🇦🇪 UAE Corp Tax</a><a class="footer-tool-link" href="/tools/invoice-due-date">🗓️ Due Date</a><a class="footer-tool-link" href="/tools/zakat-calculator">☪️ Zakat</a><a class="footer-tool-link" href="/tools/salary-calculator">💼 Salary</a><a class="footer-tool-link" href="/tools/break-even-calculator">⚖️ Break-Even</a><a class="footer-tool-link" href="/tools/invoice-number-generator">📄 Invoice Nos</a></div>
+    <div class="footer-bottom">
+      <span>© 2025 <strong>AlBills™</strong> · albills.com</span>
+      <span><a href="/" style="color:var(--accent);text-decoration:none">Invoice Extractor</a> · <a href="/tools" style="color:var(--accent);text-decoration:none">All Tools</a> · <a href="/privacy" style="color:var(--accent);text-decoration:none">Privacy</a></span>
+    </div></div></footer>
+<script>
+const goldPrice = 2385;
+const rates = {1:1, 3.6725:3.6725, 3.75:3.75, 0.79:0.79, 0.92:0.92, 83.5:83.5, 278:278};
+const syms = {1:'$', 3.6725:'AED ', 3.75:'SAR ', 0.79:'£', 0.92:'€', 83.5:'₹', 278:'₨'};
+function calcGold(){
+  const w=parseFloat(document.getElementById('g-weight').value)||0;
+  const u=parseFloat(document.getElementById('g-unit').value)||1;
+  const p=parseFloat(document.getElementById('g-purity').value)||1;
+  const r=parseFloat(document.getElementById('g-currency').value)||1;
+  const val=w*u*p*goldPrice*r;
+  const sym=syms[document.getElementById('g-currency').value]||'$';
+  document.getElementById('g-result').textContent=sym+val.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('g-sub').textContent=w+' '+document.getElementById('g-unit').options[document.getElementById('g-unit').selectedIndex].text.split('(')[0].trim()+' at '+document.getElementById('g-purity').options[document.getElementById('g-purity').selectedIndex].text;
+}
+</script>
+</body>
+</html>

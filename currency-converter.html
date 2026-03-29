@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Currency Converter — USD, AED, SAR, EUR, GBP | Free | AlBills</title>
+<meta name="description" content="Free currency converter for USD, AED, SAR, EUR, GBP, INR, PKR and 20+ more currencies. Live indicative rates for international invoice calculations.">
+<link rel="canonical" href="https://www.albills.com/tools/currency-converter">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#161b27;--surface:#1e2638;--surface2:#252f47;--surface3:#2d3859;--border:rgba(130,160,255,0.12);--border2:rgba(130,160,255,0.2);--accent:#5b8dee;--accent2:#8b6fee;--accent3:#4dd9c0;--text:#e8eaf6;--text2:#9aabcc;--text3:#5a6b90;--green:#4dd9c0;--green-bg:rgba(77,217,192,0.1);--red:#ff6b7a;--amber:#f0a500;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif}
+html{scroll-behavior:smooth}body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.6;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(91,141,238,0.07),transparent 60%)}
+nav{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(22,27,39,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.logo{font-family:var(--font-d);font-weight:800;font-size:20px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-link{color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:7px;transition:all .2s}
+.nav-link:hover{color:var(--text);background:var(--surface)}
+.nbtn{padding:8px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);text-decoration:none}
+.wrap{max-width:860px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+.breadcrumb{padding:20px 0 0;font-size:13px;color:var(--text3)}.breadcrumb a{color:var(--accent);text-decoration:none}.breadcrumb span{margin:0 6px}
+.hero{padding:32px 0 24px}.hero-tag{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--text2);margin-bottom:16px}
+.hero h1{font-family:var(--font-d);font-size:clamp(26px,4vw,42px);font-weight:800;line-height:1.1;letter-spacing:-.025em;margin-bottom:12px}
+.grad{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:15px;color:var(--text2);max-width:600px}
+.calc-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;margin-bottom:28px}
+.calc-card::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.calc-body{padding:28px}
+.field{margin-bottom:16px}.field label{display:block;font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--accent)}.field input::placeholder{color:var(--text3)}.field select option{background:var(--surface2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.result-box.featured{border-color:var(--accent);background:rgba(91,141,238,0.06)}
+.result-label{font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.result-value{font-family:var(--font-d);font-size:24px;font-weight:700;color:var(--green)}
+.result-value.big{font-size:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.result-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;margin:10px 0}
+.calc-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(91,141,238,0.35)}
+.content-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;margin-bottom:24px}
+.content-card h2{font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:14px}
+.content-card h3{font-family:var(--font-d);font-size:16px;font-weight:600;margin:18px 0 10px;color:var(--text)}
+.content-card p{color:var(--text2);font-size:14px;line-height:1.75;margin-bottom:12px}
+.content-card ul,.content-card ol{color:var(--text2);font-size:14px;line-height:1.75;padding-left:20px;margin-bottom:12px}
+.content-card li{margin-bottom:5px}
+.highlight{background:rgba(77,217,192,0.08);border:1px solid rgba(77,217,192,0.15);border-radius:10px;padding:14px 16px;color:var(--green);font-size:14px;margin:14px 0}
+.faq-item{border-bottom:1px solid var(--border);padding:18px 0}.faq-item:last-child{border-bottom:none}
+.faq-q{font-family:var(--font-d);font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px}
+.faq-a{font-size:14px;color:var(--text2);line-height:1.7}
+.cta-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;text-align:center;margin-bottom:40px;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.cta-box h3{font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:8px}
+.cta-box p{color:var(--text2);margin-bottom:18px;font-size:14px}
+.btn-p{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:13px 24px;border-radius:10px;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(91,141,238,0.4)}
+footer{border-top:1px solid var(--border);padding:32px 0 20px;position:relative;z-index:1;margin-top:10px}
+.footer-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.footer-tool-link{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 13px;font-size:12px;color:var(--text3);text-decoration:none;transition:all .2s}
+.footer-tool-link:hover{border-color:var(--accent);color:var(--accent)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--text3);border-top:1px solid var(--border);padding-top:16px;margin-top:12px}
+@media(max-width:600px){.field-row{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<nav>
+  <a class="logo" href="/"><div class="logo-icon">⚡</div>AlBills</a>
+  <div class="nav-r">
+    <a class="nav-link" href="/">Invoice Extractor</a>
+    <a class="nav-link" href="/tools">All Tools</a>
+    <a class="nbtn" href="/">Try Free →</a>
+  </div>
+</nav>
+<div class="wrap">
+  <div class="breadcrumb"><a href="/">AlBills</a><span>›</span><a href="/tools">Free Tools</a><span>›</span>Currency Converter</div>
+  <div class="hero">
+    <div class="hero-tag">💱 Free Currency Converter — 23+ currencies</div>
+    <h1>Currency Converter <span class="grad">— Live Rates</span></h1>
+    <p>Convert between 23+ currencies including USD, AED, SAR, EUR, GBP, INR and more. Perfect for calculating international invoice amounts.</p>
+  </div>
+  <div class="calc-card"><div class="calc-body">
+  <div class="field"><label>Amount</label><input type="number" id="cc-amt" placeholder="1.00" value="1" oninput="calcCC()"></div>
+  <div class="field-row">
+    <div class="field"><label>From Currency</label><select id="cc-from" onchange="calcCC()">
+      <option value="USD">🇺🇸 USD — US Dollar</option>
+      <option value="AED">🇦🇪 AED — UAE Dirham</option>
+      <option value="SAR">🇸🇦 SAR — Saudi Riyal</option>
+      <option value="EUR">🇪🇺 EUR — Euro</option>
+      <option value="GBP">🇬🇧 GBP — British Pound</option>
+      <option value="INR">🇮🇳 INR — Indian Rupee</option>
+      <option value="PKR">🇵🇰 PKR — Pakistani Rupee</option>
+      <option value="BDT">🇧🇩 BDT — Bangladeshi Taka</option>
+      <option value="EGP">🇪🇬 EGP — Egyptian Pound</option>
+      <option value="KWD">🇰🇼 KWD — Kuwaiti Dinar</option>
+      <option value="QAR">🇶🇦 QAR — Qatari Riyal</option>
+      <option value="OMR">🇴🇲 OMR — Omani Rial</option>
+      <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+      <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+      <option value="SGD">🇸🇬 SGD — Singapore Dollar</option>
+      <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+      <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+      <option value="CHF">🇨🇭 CHF — Swiss Franc</option>
+      <option value="TRY">🇹🇷 TRY — Turkish Lira</option>
+      <option value="NGN">🇳🇬 NGN — Nigerian Naira</option>
+      <option value="ZAR">🇿🇦 ZAR — South African Rand</option>
+      <option value="MYR">🇲🇾 MYR — Malaysian Ringgit</option>
+      <option value="PHP">🇵🇭 PHP — Philippine Peso</option>
+    </select></div>
+    <div class="field"><label>To Currency</label><select id="cc-to" onchange="calcCC()">
+      <option value="AED">🇦🇪 AED — UAE Dirham</option>
+      <option value="USD">🇺🇸 USD — US Dollar</option>
+      <option value="SAR">🇸🇦 SAR — Saudi Riyal</option>
+      <option value="EUR">🇪🇺 EUR — Euro</option>
+      <option value="GBP">🇬🇧 GBP — British Pound</option>
+      <option value="INR">🇮🇳 INR — Indian Rupee</option>
+      <option value="PKR">🇵🇰 PKR — Pakistani Rupee</option>
+      <option value="BDT">🇧🇩 BDT — Bangladeshi Taka</option>
+      <option value="EGP">🇪🇬 EGP — Egyptian Pound</option>
+      <option value="KWD">🇰🇼 KWD — Kuwaiti Dinar</option>
+      <option value="QAR">🇶🇦 QAR — Qatari Riyal</option>
+      <option value="OMR">🇴🇲 OMR — Omani Rial</option>
+      <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+      <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+      <option value="SGD">🇸🇬 SGD — Singapore Dollar</option>
+      <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+      <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+      <option value="CHF">🇨🇭 CHF — Swiss Franc</option>
+      <option value="TRY">🇹🇷 TRY — Turkish Lira</option>
+      <option value="NGN">🇳🇬 NGN — Nigerian Naira</option>
+      <option value="ZAR">🇿🇦 ZAR — South African Rand</option>
+      <option value="MYR">🇲🇾 MYR — Malaysian Ringgit</option>
+      <option value="PHP">🇵🇭 PHP — Philippine Peso</option>
+    </select></div>
+  </div>
+  <div class="result-box featured">
+    <div class="result-label">Converted Amount</div>
+    <div class="result-value big" id="cc-result">—</div>
+    <div class="result-sub" id="cc-rate">Exchange rate: loading...</div>
+  </div>
+</div></div>
+  <div class="content-card"><h2>About Currency Conversion</h2>
+     <p>Exchange rates fluctuate constantly based on global market conditions. The rates shown in this calculator are indicative reference rates for general calculations.</p>
+     <h3>Gulf Currency Facts</h3>
+     <ul>
+       <li><strong>UAE Dirham (AED):</strong> Pegged to USD at 3.6725 since 1997. Very stable.</li>
+       <li><strong>Saudi Riyal (SAR):</strong> Pegged to USD at 3.75. Stable long-term.</li>
+       <li><strong>Kuwaiti Dinar (KWD):</strong> One of the world's highest valued currencies.</li>
+       <li><strong>Qatari Riyal (QAR):</strong> Pegged to USD at 3.64.</li>
+     </ul>
+     <div class="highlight">💡 For official financial transactions, always use rates from your bank or a licensed money exchange. Rates shown here are for estimation purposes.</div></div>
+  <div class="content-card"><h2>Frequently Asked Questions</h2><div class="faq-item"><div class="faq-q">Why do exchange rates change?</div><div class="faq-a">Exchange rates are determined by supply and demand in global currency markets (forex). They are affected by interest rates, inflation, economic growth, political stability, and market sentiment. Gulf currencies pegged to the USD are an exception.</div></div>
+<div class="faq-item"><div class="faq-q">What is the USD to AED exchange rate?</div><div class="faq-a">The UAE Dirham has been pegged to the US Dollar at 3.6725 AED per USD since 1997. This means 1 USD = 3.6725 AED. This rate is fixed and does not fluctuate like other currencies.</div></div>
+<div class="faq-item"><div class="faq-q">How do I convert invoice amounts between currencies?</div><div class="faq-a">To convert: divide the amount by the exchange rate (or multiply, depending on the currency pair). Use our calculator above for instant, accurate conversions. For official invoices, use your bank's rate on the invoice date.</div></div>
+</div>
+  <div class="cta-box">
+    <h3>⚡ Extract currency and amounts from invoices automatically</h3>
+    <p>AlBills uses AI to read invoices from any country and extract data into clean Excel files. Upload unlimited invoices — free to start.</p>
+    <a class="btn-p" href="/">Try AlBills Free — 3 invoices, no card needed</a>
+  </div>
+</div>
+<footer><div class="wrap">
+    <div style="font-size:13px;color:var(--text3);margin-bottom:12px;font-family:var(--font-d);font-weight:600">More Free Financial Tools</div>
+    <div class="footer-tools"><a class="footer-tool-link" href="/tools/vat-calculator">🧮 VAT Calculator</a><a class="footer-tool-link" href="/tools/gold-price-calculator">🏅 Gold Price</a><a class="footer-tool-link" href="/tools/currency-converter">💱 Currency</a><a class="footer-tool-link" href="/tools/late-payment-calculator">📅 Late Payment</a><a class="footer-tool-link" href="/tools/profit-margin-calculator">📈 Profit Margin</a><a class="footer-tool-link" href="/tools/loan-calculator">🏦 Loan Calc</a><a class="footer-tool-link" href="/tools/uae-corporate-tax">🇦🇪 UAE Corp Tax</a><a class="footer-tool-link" href="/tools/invoice-due-date">🗓️ Due Date</a><a class="footer-tool-link" href="/tools/zakat-calculator">☪️ Zakat</a><a class="footer-tool-link" href="/tools/salary-calculator">💼 Salary</a><a class="footer-tool-link" href="/tools/break-even-calculator">⚖️ Break-Even</a><a class="footer-tool-link" href="/tools/invoice-number-generator">📄 Invoice Nos</a></div>
+    <div class="footer-bottom">
+      <span>© 2025 <strong>AlBills™</strong> · albills.com</span>
+      <span><a href="/" style="color:var(--accent);text-decoration:none">Invoice Extractor</a> · <a href="/tools" style="color:var(--accent);text-decoration:none">All Tools</a> · <a href="/privacy" style="color:var(--accent);text-decoration:none">Privacy</a></span>
+    </div></div></footer>
+<script>
+const RATES = {'USD': 1, 'AED': 3.6725, 'SAR': 3.75, 'EUR': 0.92, 'GBP': 0.79, 'INR': 83.5, 'PKR': 278, 'BDT': 110, 'EGP': 30.9, 'KWD': 0.307, 'QAR': 3.64, 'OMR': 0.385, 'JPY': 149.5, 'CNY': 7.24, 'SGD': 1.34, 'AUD': 1.53, 'CAD': 1.36, 'CHF': 0.88, 'TRY': 32.1, 'NGN': 1580, 'ZAR': 18.9, 'MYR': 4.72, 'PHP': 56.5};
+function calcCC(){
+  const amt=parseFloat(document.getElementById('cc-amt').value)||0;
+  const from=document.getElementById('cc-from').value;
+  const to=document.getElementById('cc-to').value;
+  const rate=(RATES[to]||1)/(RATES[from]||1);
+  const result=amt*rate;
+  document.getElementById('cc-result').textContent=result.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:4})+' '+to;
+  document.getElementById('cc-rate').textContent='1 '+from+' = '+rate.toFixed(4)+' '+to+' (indicative rate)';
+}
+calcCC();
+</script>
+</body>
+</html>
