@@ -2,327 +2,1187 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free Financial Tools for Businesses | AlBills</title>
-<meta name="description" content="Free financial tools for businesses and accountants: VAT calculator, gold price, currency converter, invoice tools, profit margin, loan calculator and more. No signup required.">
-<meta name="keywords" content="vat calculator, gold price calculator, currency converter, invoice calculator, profit margin calculator, UAE tax calculator, zakat calculator, late payment calculator">
-<link rel="canonical" href="https://www.albills.com/tools">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AlBills — AI Invoice Data Extraction | Any Document, Any Country</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#161b27;--surface:#1e2638;--surface2:#252f47;--border:rgba(130,160,255,0.12);--border2:rgba(130,160,255,0.2);--accent:#5b8dee;--accent2:#8b6fee;--accent3:#4dd9c0;--text:#e8eaf6;--text2:#9aabcc;--text3:#5a6b90;--green:#4dd9c0;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif}
+:root{
+  --bg:#161b27;--bg2:#1c2333;--bg3:#222a3f;
+  --surface:#1e2638;--surface2:#252f47;--surface3:#2d3859;
+  --border:rgba(130,160,255,0.09);--border2:rgba(130,160,255,0.16);--border3:rgba(130,160,255,0.26);
+  --accent:#5b8dee;--accent2:#8b6fee;--accent3:#4dd9c0;
+  --text:#e8eaf6;--text2:#9aabcc;--text3:#5a6b90;
+  --white:#fff;--green:#4dd9c0;--green-bg:rgba(77,217,192,0.1);
+  --amber:#f0a500;--amber-bg:rgba(240,165,0,0.1);
+  --red:#ff6b7a;--red-bg:rgba(255,107,122,0.1);
+  --font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.6;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(91,141,238,0.07),transparent 60%),radial-gradient(ellipse 50% 35% at 85% 80%,rgba(139,111,238,0.05),transparent 60%)}
-nav{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(22,27,39,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
-.logo{font-family:var(--font-d);font-weight:800;font-size:20px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
-.nav-r{display:flex;align-items:center;gap:8px}
-.nav-link{color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:7px;transition:all .2s}
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-grad{position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 15% 10%,rgba(91,141,238,0.07),transparent 60%),radial-gradient(ellipse 50% 35% at 85% 80%,rgba(139,111,238,0.05),transparent 60%)}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(91,141,238,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(91,141,238,0.035) 1px,transparent 1px);background-size:44px 44px}
+.particles{position:absolute;inset:0;overflow:hidden}
+.p{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--accent);animation:pfloat linear infinite}
+@keyframes pfloat{0%{transform:translateY(105vh);opacity:0}10%{opacity:.35}90%{opacity:.15}100%{transform:translateY(-5vh);opacity:0}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(22,27,39,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.logo{font-family:var(--font-d);font-weight:800;font-size:20px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:9px;cursor:pointer}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 18px rgba(91,141,238,0.45);animation:lp 3s ease-in-out infinite}
+@keyframes lp{0%,100%{box-shadow:0 0 18px rgba(91,141,238,0.4)}50%{box-shadow:0 0 32px rgba(91,141,238,0.7)}}
+.nav-r{display:flex;align-items:center;gap:6px}
+.nav-link{padding:7px 14px;color:var(--text2);font-size:13px;text-decoration:none;border-radius:7px;transition:all .2s;cursor:pointer;border:none;background:transparent;font-family:var(--font-b)}
 .nav-link:hover{color:var(--text);background:var(--surface)}
-.nbtn{padding:8px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);text-decoration:none}
+.nbtn{padding:8px 18px;background:transparent;border:1px solid var(--border3);color:var(--text);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.nbtn:hover{background:var(--surface2);border-color:var(--accent)}
+.nbtn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 4px 18px rgba(91,141,238,0.3)}
+.nbtn-p:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(91,141,238,0.45)}
 
-.wrap{max-width:1000px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+/* PAGES */
+main{position:relative;z-index:1}
+.page{display:none;min-height:100vh;padding-top:64px}
+.page.active{display:block}
+#login.active{display:flex;align-items:center;justify-content:center}
 
-/* HERO */
-.hero{padding:60px 0 40px;text-align:center}
-.hero-tag{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--text2);margin-bottom:20px}
-.hero h1{font-family:var(--font-d);font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.1;letter-spacing:-.025em;margin-bottom:14px}
-.grad{background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:16px;color:var(--text2);max-width:560px;margin:0 auto}
+/* BUTTONS */
+.btn-p{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-family:var(--font-d);font-size:15px;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 5px 26px rgba(91,141,238,0.32)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 9px 36px rgba(91,141,238,0.48)}
+.btn-s{display:inline-flex;align-items:center;gap:9px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);padding:14px 24px;border-radius:11px;font-family:var(--font-b);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-s:hover{border-color:var(--accent);background:var(--surface3)}
 
-/* CATEGORIES */
-.cats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:28px 0}
-.cat{padding:7px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
-.cat:hover,.cat.active{background:rgba(91,141,238,0.1);border-color:var(--accent);color:var(--accent)}
+/* SECTIONS */
+.section{max-width:900px;margin:0 auto;padding:70px 1.5rem}
+.sec-head{text-align:center;margin-bottom:44px}
+.sec-tag{display:inline-block;background:rgba(91,141,238,0.09);color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 13px;border-radius:100px;border:1px solid rgba(91,141,238,0.18);margin-bottom:12px}
+.sec-title{font-family:var(--font-d);font-size:clamp(24px,4vw,38px);font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+.sec-sub{font-size:15px;color:var(--text2);font-weight:300}
+.grad-text{background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-/* TOOLS GRID */
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:60px}
-.tool-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;text-decoration:none;color:inherit;transition:all .25s;display:block;position:relative;overflow:hidden}
-.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .3s}
-.tool-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.2)}
-.tool-card:hover::before{opacity:1}
-.tool-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.tool-card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.tool-card-title{font-family:var(--font-d);font-size:16px;font-weight:700;color:var(--text)}
-.tool-card-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;margin-top:4px}
-.badge-free{background:rgba(77,217,192,0.1);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
-.badge-live{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2)}
-.badge-uae{background:rgba(240,165,0,0.1);color:#f0a500;border:1px solid rgba(240,165,0,0.2)}
-.tool-card-desc{font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:14px}
-.tool-card-link{font-size:13px;color:var(--accent);font-weight:500;display:flex;align-items:center;gap:5px}
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(28px);transition:all .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-/* SECTION TITLE */
-.sec-title{font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
-.sec-divider{height:1px;background:var(--border);margin:40px 0 32px}
+/* =================== HOME =================== */
+.hero{max-width:860px;margin:0 auto;padding:80px 1.5rem 50px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--text2);margin-bottom:28px;animation:fu .7s ease both}
+.edot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:var(--font-d);font-size:clamp(34px,6vw,66px);font-weight:800;line-height:1.08;letter-spacing:-.025em;margin-bottom:20px;animation:fu .7s .1s ease both}
+.hero-sub{font-size:17px;color:var(--text2);max-width:560px;margin:0 auto 36px;font-weight:300;line-height:1.7;animation:fu .7s .2s ease both}
+.hero-cta{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;animation:fu .7s .3s ease both}
 
-/* CTA */
-.cta-box{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:40px;text-align:center;margin-bottom:60px;position:relative;overflow:hidden}
-.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
-.cta-box h2{font-family:var(--font-d);font-size:26px;font-weight:700;margin-bottom:10px}
-.cta-box p{color:var(--text2);margin-bottom:24px;font-size:15px}
-.btn-p{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-family:var(--font-d);font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .25s}
-.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(91,141,238,0.4)}
+/* WORLD GLOBE VISUAL */
+.globe-visual{max-width:760px;margin:52px auto 0;animation:fu .7s .4s ease both}
+.globe-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden;position:relative}
+.globe-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.globe-header{background:var(--surface2);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.globe-dots{display:flex;gap:5px}
+.gd{width:10px;height:10px;border-radius:50%}
+.globe-title{font-size:12px;color:var(--text3);margin-left:8px;font-family:var(--font-d)}
+.globe-body{padding:20px}
+.countries-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.country-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;text-align:center;font-size:11px;color:var(--text2);transition:all .3s}
+.country-chip:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.country-flag{font-size:18px;display:block;margin-bottom:2px}
+.country-name{font-size:10px;color:var(--text3)}
+.processing-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:12px}
+.pr-icon{font-size:16px}
+.pr-text{flex:1;font-size:12px;color:var(--text2)}
+.pr-badge{background:var(--green-bg);color:var(--green);font-size:10px;padding:3px 10px;border-radius:100px;border:1px solid rgba(77,217,192,0.2);white-space:nowrap}
+
+/* STATS */
+.stats{display:flex;max-width:680px;margin:48px auto 0;background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;animation:fu .7s .5s ease both}
+.si{flex:1;padding:20px 12px;text-align:center;border-right:1px solid var(--border)}
+.si:last-child{border-right:none}
+.sv{font-family:var(--font-d);font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* FEATURES */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 18px;transition:all .25s;position:relative;overflow:hidden}
+.feat::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,238,0.05),transparent);opacity:0;transition:opacity .3s}
+.feat:hover{border-color:var(--border3);transform:translateY(-3px)}
+.feat:hover::after{opacity:1}
+.feat-ico{font-size:26px;margin-bottom:12px}
+.feat-t{font-family:var(--font-d);font-size:14px;font-weight:600;margin-bottom:6px}
+.feat-d{font-size:13px;color:var(--text3);line-height:1.5}
+.feat-badge{display:inline-block;background:rgba(77,217,192,0.1);color:var(--green);font-size:10px;padding:2px 8px;border-radius:100px;border:1px solid rgba(77,217,192,0.2);margin-top:8px}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:680px;margin:0 auto}
+.price-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px;position:relative;overflow:hidden}
+.price-card.featured{border-color:var(--accent)}
+.price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.pc-badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 11px;border-radius:100px;margin-bottom:14px}
+.badge-free{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
+.badge-paid{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2)}
+.pc-title{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:5px}
+.pc-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
+.pc-price{font-family:var(--font-d);font-size:42px;font-weight:800;line-height:1;margin-bottom:4px}
+.pc-price.free-price{color:var(--green)}
+.pc-price.paid-price{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pc-per{font-size:13px;color:var(--text3);margin-bottom:22px}
+.pc-feats{list-style:none;margin-bottom:24px}
+.pc-feats li{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+.pc-feats li:last-child{border-bottom:none}
+.pfc{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.pfc-g{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
+.pfc-b{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2)}
+.pc-btn{width:100%;padding:13px;border:none;border-radius:10px;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s}
+.pc-btn-free{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.3)}
+.pc-btn-free:hover{background:rgba(77,217,192,0.18)}
+.pc-btn-paid{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(91,141,238,0.3)}
+.pc-btn-paid:hover{transform:translateY(-1px);box-shadow:0 7px 28px rgba(91,141,238,0.45)}
+
+/* SECURITY NOTICE */
+.security-banner{background:rgba(77,217,192,0.05);border:1px solid rgba(77,217,192,0.15);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:16px;max-width:760px;margin:0 auto}
+.sb-icon{font-size:28px;flex-shrink:0}
+.sb-title{font-family:var(--font-d);font-size:15px;font-weight:600;color:var(--green);margin-bottom:6px}
+.sb-text{font-size:13px;color:var(--text3);line-height:1.6}
+
+/* FREE TOOLS QUICK CARDS */
+.tool-quick-card{text-decoration:none;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:18px;display:flex;align-items:flex-start;gap:13px;transition:all .25s;position:relative;overflow:hidden}
+.tool-quick-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .3s}
+.tool-quick-card:hover{border-color:var(--border3);transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.2)}
+.tool-quick-card:hover::before{opacity:1}
+.tqc-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.tqc-title{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.tqc-desc{font-size:12px;color:var(--text3);line-height:1.5}
+.live-badge{background:rgba(91,141,238,0.1);color:var(--accent);font-size:10px;padding:1px 7px;border-radius:100px;border:1px solid rgba(91,141,238,0.2);margin-left:4px;font-family:var(--font-b)}
 
 /* FOOTER */
-footer{border-top:1px solid var(--border);padding:40px 0 24px;position:relative;z-index:1}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px}
-.footer-brand h3{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.footer-brand p{font-size:13px;color:var(--text3);line-height:1.7;max-width:260px}
-.footer-col h4{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
-.footer-col a{display:block;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:9px;transition:color .2s}
+footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;z-index:1}
+.footer-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+.footer-brand h3{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.footer-brand p{font-size:13px;color:var(--text3);line-height:1.6;max-width:280px}
+.footer-col h4{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.footer-col a{display:block;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:8px;transition:color .2s}
 .footer-col a:hover{color:var(--accent)}
-.footer-bottom{border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--text3)}
+.footer-bottom{max-width:900px;margin:24px auto 0;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text3)}
+.footer-bottom strong{color:var(--text2)}
 
-@media(max-width:700px){
-  .tools-grid{grid-template-columns:1fr}
-  .footer-grid{grid-template-columns:1fr 1fr}
+/* =================== DEMO PAGE =================== */
+.demo-wrap{max-width:1100px;margin:0 auto;padding:40px 1.5rem 80px}
+.demo-hd{text-align:center;margin-bottom:40px}
+.demo-hd h2{font-family:var(--font-d);font-size:32px;font-weight:700;margin-bottom:8px}
+.demo-hd p{font-size:15px;color:var(--text2);max-width:600px;margin:0 auto}
+.demo-selector{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px}
+.demo-chip{background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.demo-chip:hover{border-color:var(--accent);color:var(--accent)}
+.demo-chip.active{background:rgba(91,141,238,0.1);border-color:var(--accent);color:var(--accent)}
+.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.demo-invoice{background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden}
+.demo-invoice-header{background:var(--surface2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.dih-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.dih-flag{font-size:18px}
+.dih-type{background:rgba(91,141,238,0.1);color:var(--accent);font-size:10px;padding:2px 8px;border-radius:100px;border:1px solid rgba(91,141,238,0.2)}
+.demo-invoice-body{padding:14px}
+.demo-table{width:100%;border-collapse:collapse;font-size:12px}
+.demo-table th{background:var(--surface3);padding:6px 10px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.demo-table td{padding:7px 10px;color:var(--text2);border-top:1px solid var(--border);word-break:break-word}
+.demo-table tr:hover td{background:rgba(255,255,255,0.02)}
+.td-g{color:var(--green);font-weight:500}
+
+/* =================== APP PAGE =================== */
+.app-wrap{max-width:960px;margin:0 auto;padding:32px 1.5rem 80px}
+.app-hd{text-align:center;margin-bottom:28px}
+.app-hd h2{font-family:var(--font-d);font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.app-hd p{font-size:14px;color:var(--text2)}
+.security-note-bar{display:flex;align-items:center;gap:10px;background:rgba(77,217,192,0.05);border:1px solid rgba(77,217,192,0.15);border-radius:10px;padding:10px 16px;margin-bottom:20px;font-size:12px;color:var(--text3)}
+.snb-icon{color:var(--green);font-size:14px}
+.free-banner{display:flex;align-items:center;justify-content:space-between;background:var(--green-bg);border:1px solid rgba(77,217,192,0.2);border-radius:11px;padding:12px 18px;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+.fb-left{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--green);font-weight:500}
+.fb-used{display:flex;gap:6px}
+.fb-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.fb-dot.used{background:var(--surface3);box-shadow:none}
+.fb-right{font-size:12px;color:var(--text3)}
+.atabs{display:flex;background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.atab{flex:1;padding:12px 10px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:500;color:var(--text3);border-right:1px solid var(--border);transition:all .2s;position:relative}
+.atab:last-child{border-right:none}
+.atab.active{color:var(--text);background:rgba(91,141,238,0.07)}
+.atab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.atab.done{color:var(--green)}
+.tnum{width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all .2s}
+.atab.active .tnum{background:var(--accent);border-color:var(--accent);color:#fff}
+.atab.done .tnum{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.ucard{background:var(--surface);border:1px solid var(--border2);border-radius:18px;overflow:hidden}
+.uzone{border:2px dashed var(--border3);border-radius:12px;margin:20px;padding:44px 24px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(91,141,238,0.02);position:relative;overflow:hidden}
+.uzone::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(91,141,238,0.07),transparent 70%);opacity:0;transition:opacity .3s}
+.uzone:hover,.uzone.drag{border-color:var(--accent);background:rgba(91,141,238,0.04)}
+.uzone:hover::before,.uzone.drag::before{opacity:1}
+.u-icon{width:56px;height:56px;border-radius:14px;background:rgba(91,141,238,0.09);border:1px solid rgba(91,141,238,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;transition:all .3s}
+.uzone:hover .u-icon{background:rgba(91,141,238,0.16);box-shadow:0 0 22px rgba(91,141,238,0.2)}
+.uzone h3{font-family:var(--font-d);font-size:17px;font-weight:600;margin-bottom:5px}
+.uzone p{font-size:13px;color:var(--text3);margin-bottom:18px}
+.uchoose{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.uchoose:hover{border-color:var(--accent);color:var(--accent)}
+.fmts{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:16px}
+.fmt{background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 9px;font-size:11px;color:var(--text3);font-weight:500}
+.excel-section{margin:0 20px 0;border:1px solid rgba(77,217,192,0.2);border-radius:12px;padding:16px;background:rgba(77,217,192,0.03)}
+.excel-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.excel-icon{width:36px;height:36px;border-radius:9px;background:rgba(77,217,192,0.1);border:1px solid rgba(77,217,192,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.excel-title{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--green)}
+.excel-sub{font-size:12px;color:var(--text3)}
+.excel-upload-zone{border:1px dashed rgba(77,217,192,0.3);border-radius:9px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.excel-upload-zone:hover{border-color:var(--green);background:rgba(77,217,192,0.05)}
+.excel-upload-zone p{font-size:12px;color:var(--text3)}
+.excel-file-shown{display:none;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:8px 12px;margin-top:8px}
+.excel-file-name{font-size:12px;color:var(--green);flex:1}
+.excel-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px}
+.flist{display:flex;flex-direction:column;gap:7px;padding:0 20px}
+.frow{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;animation:fu .3s ease both}
+.fico{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fico.pdf{background:rgba(255,100,100,0.1)}.fico.img{background:rgba(91,141,238,0.12)}.fico.doc{background:rgba(77,217,192,0.1)}
+.fn{font-size:13px;font-weight:500;flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fs{font-size:11px;color:var(--text3);flex-shrink:0}
+.frm{width:24px;height:24px;border-radius:6px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.frm:hover{background:var(--red-bg);color:var(--red)}
+.email-section{padding:16px 20px 0}
+.field-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.email-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s}
+.email-input:focus{border-color:var(--accent)}
+.email-input::placeholder{color:var(--text3)}
+.email-note{font-size:11px;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:5px}
+.isec{padding:14px 20px}
+.ibox{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.6;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+.ibox:focus{border-color:var(--accent)}
+.ibox::placeholder{color:var(--text3)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.chip{background:var(--surface3);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(91,141,238,0.07)}
+.proc-btn{width:calc(100% - 40px);margin:16px 20px;padding:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:11px;color:#fff;font-family:var(--font-d);font-size:15px;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:9px}
+.proc-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(91,141,238,0.4)}
+.proc-btn:disabled{opacity:.3;cursor:not-allowed}
+.sec-note{text-align:center;padding-bottom:18px;font-size:12px;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:5px}
+.sg{color:var(--green);font-weight:500}
+.pstate{display:none;padding:48px 20px;text-align:center}
+.spin{width:52px;height:52px;margin:0 auto 20px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pstate h3{font-family:var(--font-d);font-size:19px;font-weight:600;margin-bottom:7px}
+.pstate p{font-size:13px;color:var(--text3);margin-bottom:22px}
+.pbar{width:240px;height:3px;background:var(--border2);border-radius:100px;margin:0 auto;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .4s ease;width:0%}
+.pinvoices{display:flex;flex-direction:column;gap:6px;max-width:340px;margin:20px auto 0}
+.pinv{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text3)}
+.pinv.done{color:var(--green)}.pinv.active{color:var(--text)}
+.pinv-bar{flex:1;height:2px;background:var(--border2);border-radius:100px;overflow:hidden}
+.pinv-fill{height:100%;background:var(--accent);width:0%;transition:width .3s}
+.pinv.done .pinv-fill{width:100%;background:var(--green)}
+
+/* RESULTS */
+.results-wrap{max-width:1100px;margin:0 auto;padding:32px 1.5rem 80px}
+.results-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.results-title{display:flex;align-items:center;gap:10px}
+.results-title h2{font-family:var(--font-d);font-size:22px;font-weight:700}
+.rcheck{width:28px;height:28px;border-radius:50%;background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.25);display:flex;align-items:center;justify-content:center;font-size:13px}
+.results-actions{display:flex;gap:10px;flex-wrap:wrap}
+.raction-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s;border:none}
+.dl-excel{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 18px rgba(91,141,238,0.3)}
+.dl-excel:hover{transform:translateY(-1px)}
+.dl-csv{background:var(--surface2);border:1px solid var(--border2) !important;color:var(--text)}
+.dl-csv:hover{border-color:var(--accent) !important;color:var(--accent)}
+.summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.sc-val{font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:3px}
+.sc-val.green{color:var(--green)}.sc-val.blue{color:var(--accent)}.sc-val.amber{color:var(--amber)}
+.sc-label{font-size:11px;color:var(--text3)}
+.email-receive{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.er-icon{width:44px;height:44px;border-radius:11px;background:rgba(91,141,238,0.1);border:1px solid rgba(91,141,238,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.er-text{flex:1;min-width:200px}
+.er-text h4{font-family:var(--font-d);font-size:14px;font-weight:600;margin-bottom:3px}
+.er-text p{font-size:12px;color:var(--text3)}
+.er-form{display:flex;gap:8px;flex:2;min-width:240px}
+.er-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;transition:border-color .2s}
+.er-input:focus{border-color:var(--accent)}
+.er-input::placeholder{color:var(--text3)}
+.er-send{padding:10px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s;white-space:nowrap}
+.er-sent{display:none;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:500}
+.rtable-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.rtable-toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.rt-title{font-family:var(--font-d);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.rt-count{background:rgba(91,141,238,0.1);color:var(--accent);font-size:11px;font-weight:600;padding:2px 9px;border-radius:100px;border:1px solid rgba(91,141,238,0.2)}
+.rt-search{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;width:200px;transition:border-color .2s}
+.rt-search:focus{border-color:var(--accent)}
+.rt-search::placeholder{color:var(--text3)}
+.rtable-scroll{overflow-x:auto}
+.rtable{width:100%;border-collapse:collapse;font-size:13px;min-width:500px}
+.rtable thead tr{background:var(--surface3)}
+.rtable th{padding:11px 14px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border2)}
+.rtable td{padding:11px 14px;color:var(--text2);border-bottom:1px solid var(--border);transition:background .15s;word-break:break-word;max-width:200px}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(255,255,255,0.025)}
+.rtable .td-num{color:var(--text3);font-size:11px;width:32px}
+.rtable .td-file{color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-amt{color:var(--green);font-weight:500}
+.td-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px}
+.status-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
+.status-review{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,165,0,0.2)}
+.conf{display:flex;align-items:center;gap:6px}
+.conf-bar{width:48px;height:4px;background:var(--border2);border-radius:100px;overflow:hidden}
+.conf-fill{height:100%;border-radius:100px}
+.conf-high{background:var(--green)}.conf-med{background:var(--amber)}.conf-low{background:var(--red)}
+.conf-val{font-size:11px;color:var(--text3)}
+.more-btn{width:100%;padding:13px;background:transparent;border:none;border-top:1px solid var(--border);color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.more-btn:hover{background:rgba(91,141,238,0.05)}
+.back-btn{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:9px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-b);transition:all .2s;margin-top:20px}
+.back-btn:hover{border-color:var(--border3);color:var(--text)}
+
+/* =================== LOGIN =================== */
+.auth-card{background:var(--surface);border:1px solid var(--border2);border-radius:22px;padding:36px 32px;width:100%;max-width:420px;position:relative;overflow:hidden}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.auth-logo{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:24px}
+.al-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 22px rgba(91,141,238,0.4)}
+.al-text{font-family:var(--font-d);font-size:21px;font-weight:800;color:var(--white)}
+.auth-title{font-family:var(--font-d);font-size:22px;font-weight:700;text-align:center;margin-bottom:5px}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:26px}
+.atabs2{display:flex;background:var(--surface2);border-radius:9px;padding:3px;margin-bottom:24px;gap:3px}
+.atab2{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text3);border-radius:7px;cursor:pointer;transition:all .2s;border:none;background:transparent;font-family:var(--font-b)}
+.atab2.active{background:var(--surface3);color:var(--text);box-shadow:0 2px 7px rgba(0,0,0,0.2)}
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:11px 13px;color:var(--text);font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--text3)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.auth-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;margin-top:2px}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 5px 24px rgba(91,141,238,0.4)}
+.adiv{display:flex;align-items:center;gap:10px;margin:18px 0}
+.adiv::before,.adiv::after{content:'';flex:1;height:1px;background:var(--border)}
+.adiv span{font-size:11px;color:var(--text3)}
+.soc-btn{width:100%;padding:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px}
+.soc-btn:hover{border-color:var(--border3);background:var(--surface3)}
+.auth-fn{text-align:center;font-size:12px;color:var(--text3);margin-top:18px}
+.auth-fn a{color:var(--accent);text-decoration:none}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .feats{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .summary-cards{grid-template-columns:1fr 1fr}
   .nav-link{display:none}
+  .hero h1{font-size:32px}
+  .stats{flex-wrap:wrap}
+  .si{min-width:50%}
+  .frow2{grid-template-columns:1fr}
+  .demo-layout{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .countries-grid{grid-template-columns:repeat(4,1fr)}
+  .results-hd{flex-direction:column;align-items:flex-start}
+  .er-form{width:100%}
+}
+@media(max-width:480px){
+  .summary-cards{grid-template-columns:1fr 1fr}
+  .hero-cta{flex-direction:column;align-items:center}
+  .auth-card{padding:24px 18px}
+  .countries-grid{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
 <body>
-<div class="bg"></div>
+
+<div class="bg-wrap">
+  <div class="bg-grad"></div>
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+</div>
 
 <nav>
-  <a class="logo" href="/"><div class="logo-icon">⚡</div>AlBills</a>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-icon">⚡</div>AlBills
+  </div>
   <div class="nav-r">
-    <a class="nav-link" href="/">Invoice Extractor</a>
-    <a class="nav-link" href="/tools">Free Tools</a>
-    <a class="nbtn" href="/">Try AlBills Free →</a>
+    <button class="nav-link" onclick="showPage('demo')">Live Demo</button>
+    <button class="nav-link" onclick="showPage('home');goTo('features')">Features</button>
+    <button class="nav-link" onclick="showPage('home');goTo('pricing')">Pricing</button>
+    <button class="nbtn" onclick="showPage('login');setTab('login')">Sign in</button>
+    <button class="nbtn nbtn-p" onclick="showPage('app')">Start free</button>
   </div>
 </nav>
 
-<div class="wrap">
-  <div class="hero">
-    <div class="hero-tag">🛠️ 12 Free Tools — No signup required</div>
-    <h1>Free <span class="grad">Financial Tools</span><br>for Businesses</h1>
-    <p>VAT calculators, gold price, currency converter, invoice tools, profit margin and more. All completely free, instant results, no registration needed.</p>
-  </div>
+<main>
 
-  <div class="cats">
-    <a class="cat active" href="/tools">All Tools</a>
-    <a class="cat" href="#vat">💰 VAT & Tax</a>
-    <a class="cat" href="#currency">💱 Currency</a>
-    <a class="cat" href="#invoice">🧾 Invoice</a>
-    <a class="cat" href="#financial">📈 Financial</a>
-    <a class="cat" href="#uae">🇦🇪 UAE/Gulf</a>
-  </div>
+<!-- ===== HOME ===== -->
+<div id="home" class="page active">
+  <section class="hero">
+    <div class="eyebrow"><div class="edot"></div>Trusted by bookkeepers worldwide · Powered by Claude AI</div>
+    <h1>Any invoice.<br><span class="grad-text">Any country. Instantly.</span></h1>
+    <p class="hero-sub">Upload unlimited invoices — PDF, image, or document — in any language from any country. Tell AlBills what data you need. Get a clean Excel file in seconds.</p>
+    <div class="hero-cta">
+      <button class="btn-p" onclick="showPage('app')">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Try free — no card needed
+      </button>
+      <button class="btn-s" onclick="showPage('demo')">
+        🌍 See live demo — 20 countries
+      </button>
+    </div>
 
-  <!-- VAT & TAX -->
-  <div id="vat">
-    <div class="sec-title">💰 VAT & Tax Calculators</div>
-    <div class="tools-grid">
-      <a class="tool-card" href="/tools/vat-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(91,141,238,0.1)">🧮</div>
-          <div>
-            <div class="tool-card-title">VAT Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
+    <!-- WORLD VISUAL -->
+    <div class="globe-visual">
+      <div class="globe-card">
+        <div class="globe-header">
+          <div class="globe-dots"><div class="gd" style="background:#ff5f57"></div><div class="gd" style="background:#ffbd2e"></div><div class="gd" style="background:#28c840"></div></div>
+          <span class="globe-title">AlBills — Processing invoices from around the world</span>
+        </div>
+        <div class="globe-body">
+          <div class="countries-grid">
+            <div class="country-chip"><span class="country-flag">🇺🇸</span><span class="country-name">USA</span></div>
+            <div class="country-chip"><span class="country-flag">🇦🇪</span><span class="country-name">UAE</span></div>
+            <div class="country-chip"><span class="country-flag">🇬🇧</span><span class="country-name">UK</span></div>
+            <div class="country-chip"><span class="country-flag">🇩🇪</span><span class="country-name">Germany</span></div>
+            <div class="country-chip"><span class="country-flag">🇫🇷</span><span class="country-name">France</span></div>
+            <div class="country-chip"><span class="country-flag">🇸🇦</span><span class="country-name">Saudi</span></div>
+            <div class="country-chip"><span class="country-flag">🇮🇳</span><span class="country-name">India</span></div>
+            <div class="country-chip"><span class="country-flag">🇯🇵</span><span class="country-name">Japan</span></div>
+            <div class="country-chip"><span class="country-flag">🇨🇳</span><span class="country-name">China</span></div>
+            <div class="country-chip"><span class="country-flag">🇧🇷</span><span class="country-name">Brazil</span></div>
+            <div class="country-chip"><span class="country-flag">🇰🇷</span><span class="country-name">Korea</span></div>
+            <div class="country-chip"><span class="country-flag">🇮🇹</span><span class="country-name">Italy</span></div>
+            <div class="country-chip"><span class="country-flag">🇳🇱</span><span class="country-name">Netherlands</span></div>
+            <div class="country-chip"><span class="country-flag">🇸🇬</span><span class="country-name">Singapore</span></div>
+            <div class="country-chip"><span class="country-flag">🇦🇺</span><span class="country-name">Australia</span></div>
+          </div>
+          <div class="processing-row">
+            <span class="pr-icon">📄</span>
+            <span class="pr-text">Invoice from Saudi Arabia (Arabic) — فاتورة ضريبية · SAR 260,610.00</span>
+            <span class="pr-badge">✓ Extracted 97%</span>
+          </div>
+          <div class="processing-row" style="margin-top:8px">
+            <span class="pr-icon">🧾</span>
+            <span class="pr-text">Credit Note from Germany (German) — GUTSCHRIFT · €5,082.73</span>
+            <span class="pr-badge">✓ Extracted 98%</span>
+          </div>
+          <div class="processing-row" style="margin-top:8px">
+            <span class="pr-icon">📑</span>
+            <span class="pr-text">Tax Invoice from South Africa (ZAR) — Mining equipment · R 1,476,830.00</span>
+            <span class="pr-badge">✓ Extracted 99%</span>
           </div>
         </div>
-        <div class="tool-card-desc">Calculate VAT for UAE (5%), Saudi Arabia (15%), UK (20%), EU countries and 15+ more. Add or extract VAT instantly from any amount.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/uae-corporate-tax">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(240,165,0,0.1)">🇦🇪</div>
-          <div>
-            <div class="tool-card-title">UAE Corporate Tax Calculator</div>
-            <span class="tool-card-badge badge-uae">UAE 2023</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate UAE Corporate Tax at 9% (effective June 2023). Includes free zone exemptions, small business relief under AED 3M, and the AED 375,000 tax-free threshold.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/zakat-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(77,217,192,0.1)">☪️</div>
-          <div>
-            <div class="tool-card-title">Zakat Calculator</div>
-            <span class="tool-card-badge badge-uae">Islamic Finance</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate your annual Zakat obligation at 2.5% on eligible wealth including cash, gold, business inventory and receivables. Checks Nisab threshold automatically.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
+      </div>
+    </div>
+  </section>
+
+  <div style="max-width:900px;margin:0 auto;padding:0 1.5rem">
+    <div class="stats reveal">
+      <div class="si"><div class="sv">Unlimited</div><div class="sl">Invoices per batch</div></div>
+      <div class="si"><div class="sv">50+</div><div class="sl">Countries supported</div></div>
+      <div class="si"><div class="sv">&lt;30s</div><div class="sl">Processing time</div></div>
+      <div class="si"><div class="sv">$0.50</div><div class="sl">Per invoice</div></div>
     </div>
   </div>
 
-  <div class="sec-divider"></div>
-
-  <!-- CURRENCY -->
-  <div id="currency">
-    <div class="sec-title">💱 Currency & Gold</div>
-    <div class="tools-grid">
-      <a class="tool-card" href="/tools/currency-converter">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(77,217,192,0.1)">💱</div>
-          <div>
-            <div class="tool-card-title">Currency Converter</div>
-            <span class="tool-card-badge badge-live">🔴 Live Rates</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Convert between 23+ currencies including USD, AED, SAR, EUR, GBP, INR, PKR and more with live exchange rates. Perfect for international invoices.</div>
-        <div class="tool-card-link">Use converter →</div>
-      </a>
-      <a class="tool-card" href="/tools/gold-price-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(240,165,0,0.1)">🏅</div>
-          <div>
-            <div class="tool-card-title">Gold Price Calculator</div>
-            <span class="tool-card-badge badge-live">🔴 Live Price</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate the value of gold by weight and purity. Supports grams, troy ounces, tola and bhori in 24K, 22K, 18K, 14K and 9K. Results in 7 currencies.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Features</div>
+      <h2 class="sec-title">Everything a bookkeeper needs</h2>
+      <p class="sec-sub">Built from real experience. Every feature solves a real problem.</p>
     </div>
-  </div>
-
-  <div class="sec-divider"></div>
-
-  <!-- INVOICE -->
-  <div id="invoice">
-    <div class="sec-title">🧾 Invoice Tools</div>
-    <div class="tools-grid">
-      <a class="tool-card" href="/tools/late-payment-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(255,107,122,0.1)">📅</div>
-          <div>
-            <div class="tool-card-title">Late Payment Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate interest charges on overdue invoices. Enter invoice date, payment terms and interest rate to find out exactly how much a client owes including late fees.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/invoice-due-date">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(240,165,0,0.1)">🗓️</div>
-          <div>
-            <div class="tool-card-title">Invoice Due Date Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate exact payment due dates for Net 7, Net 14, Net 30, Net 60 and custom payment terms. Instantly shows if an invoice is overdue and by how many days.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/invoice-number-generator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(91,141,238,0.1)">📄</div>
-          <div>
-            <div class="tool-card-title">Invoice Number Generator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Generate sequential, professional invoice numbers in bulk. Customize prefix, year, starting number and padding. Generate up to 50 invoice numbers instantly.</div>
-        <div class="tool-card-link">Use generator →</div>
-      </a>
+    <div class="feats reveal">
+      <div class="feat"><div class="feat-ico">🌍</div><div class="feat-t">Any country, any language</div><div class="feat-d">English, Arabic, Japanese, German, French, Portuguese — AlBills reads them all perfectly.</div><div class="feat-badge">50+ countries</div></div>
+      <div class="feat"><div class="feat-ico">⚡</div><div class="feat-t">Unlimited invoices at once</div><div class="feat-d">No limits. Upload 5 or 500 invoices at once. All processed automatically in seconds.</div><div class="feat-badge">No limits</div></div>
+      <div class="feat"><div class="feat-ico">📊</div><div class="feat-t">Upload your Excel template</div><div class="feat-d">Have your own Excel format? Upload it and AlBills extracts data directly into YOUR columns — zero reformatting.</div><div class="feat-badge">New feature</div></div>
+      <div class="feat"><div class="feat-ico">🧾</div><div class="feat-t">Any document type</div><div class="feat-d">Invoices, bills, credit notes, debit notes, receipts, tax invoices, folios — all supported.</div></div>
+      <div class="feat"><div class="feat-ico">📧</div><div class="feat-t">Email delivery</div><div class="feat-d">Enter your email and receive the Excel file directly in your inbox. Process anywhere, get results everywhere.</div></div>
+      <div class="feat"><div class="feat-ico">🔒</div><div class="feat-t">Zero data storage</div><div class="feat-d">Your documents are deleted immediately after extraction. We never store, share or use your invoices.</div><div class="feat-badge">Privacy guaranteed</div></div>
+      <div class="feat"><div class="feat-ico">📱</div><div class="feat-t">Works on mobile</div><div class="feat-d">Fully responsive — use AlBills on your phone, tablet, or desktop. Process invoices anywhere.</div></div>
+      <div class="feat"><div class="feat-ico">📈</div><div class="feat-t">Line-by-line extraction</div><div class="feat-d">Each line item becomes its own row in Excel — description, qty, price, tax, total. Perfectly structured.</div></div>
+      <div class="feat"><div class="feat-ico">🎯</div><div class="feat-t">Natural language instructions</div><div class="feat-d">Just type what you need in plain English. No templates, no field mapping, no technical setup ever.</div></div>
     </div>
-  </div>
+  </section>
 
-  <div class="sec-divider"></div>
-
-  <!-- FINANCIAL -->
-  <div id="financial">
-    <div class="sec-title">📈 Financial Calculators</div>
-    <div class="tools-grid">
-      <a class="tool-card" href="/tools/profit-margin-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(77,217,192,0.1)">📈</div>
-          <div>
-            <div class="tool-card-title">Profit Margin Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate gross profit, profit margin percentage, markup percentage and cost ratio. Essential for pricing products and services correctly for profitability.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/loan-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(91,141,238,0.1)">🏦</div>
-          <div>
-            <div class="tool-card-title">Loan & Interest Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Calculate monthly loan payments, total interest payable and total amount due. Supports loan terms from 6 months to 30 years with any interest rate.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/break-even-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(139,111,238,0.1)">⚖️</div>
-          <div>
-            <div class="tool-card-title">Break-Even Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Find exactly how many units you need to sell to cover all costs. Enter fixed costs, selling price and variable costs to calculate your break-even point.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
-      <a class="tool-card" href="/tools/salary-calculator">
-        <div class="tool-card-top">
-          <div class="tool-card-icon" style="background:rgba(77,217,192,0.1)">💼</div>
-          <div>
-            <div class="tool-card-title">Salary Calculator</div>
-            <span class="tool-card-badge badge-free">Free</span>
-          </div>
-        </div>
-        <div class="tool-card-desc">Convert salary between annual, monthly, weekly, daily and hourly rates. Supports 5-day and 6-day working weeks. Essential for HR and payroll calculations.</div>
-        <div class="tool-card-link">Use calculator →</div>
-      </a>
+  <!-- SECURITY -->
+  <section class="section" style="padding-top:0">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Privacy & Security</div>
+      <h2 class="sec-title">Your documents are safe with us</h2>
     </div>
-  </div>
+    <div class="security-banner reveal">
+      <div class="sb-icon">🔐</div>
+      <div>
+        <div class="sb-title">We never store your invoices</div>
+        <div class="sb-text">When you upload an invoice, it is sent directly to our AI for reading and then <strong style="color:var(--green)">permanently deleted</strong>. We do not save, copy, share or use your documents in any way. Only the extracted data you requested is returned to you. Your financial documents remain completely private and confidential.</div>
+      </div>
+    </div>
+  </section>
 
-  <!-- MAIN CTA -->
-  <div class="cta-box">
-    <h2>⚡ Extract invoice data in seconds</h2>
-    <p>Upload unlimited invoices in any language from any country. Get clean Excel data instantly with AlBills — the AI invoice extraction tool.</p>
-    <a class="btn-p" href="/">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Try AlBills Free — 3 invoices free
-    </a>
-  </div>
-</div>
+  <!-- PRICING -->
+  <section class="section" id="pricing" style="padding-top:0">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Pricing</div>
+      <h2 class="sec-title">Start free. Pay only when you need more.</h2>
+      <p class="sec-sub">No subscriptions. No commitments. No surprises.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="pc-badge badge-free">Free forever</div>
+        <div class="pc-title">Free plan</div>
+        <div class="pc-sub">Perfect to try AlBills risk-free</div>
+        <div class="pc-price free-price">$0</div>
+        <div class="pc-per">3 invoices every month · no credit card</div>
+        <ul class="pc-feats">
+          <li><div class="pfc pfc-g">✓</div> 3 invoices per month free</li>
+          <li><div class="pfc pfc-g">✓</div> All file formats & languages</li>
+          <li><div class="pfc pfc-g">✓</div> Custom extraction instructions</li>
+          <li><div class="pfc pfc-g">✓</div> CSV download</li>
+          <li><div class="pfc pfc-g">✓</div> Email delivery</li>
+        </ul>
+        <button class="pc-btn pc-btn-free" onclick="showPage('login');setTab('signup')">Start free — no card needed</button>
+      </div>
+      <div class="price-card featured">
+        <div class="pc-badge badge-paid">Pay as you go</div>
+        <div class="pc-title">Pro plan</div>
+        <div class="pc-sub">For bookkeepers & businesses</div>
+        <div class="pc-price paid-price">$0.50</div>
+        <div class="pc-per">per invoice · no monthly fee</div>
+        <ul class="pc-feats">
+          <li><div class="pfc pfc-b">✓</div> Unlimited invoices</li>
+          <li><div class="pfc pfc-b">✓</div> All file formats & 50+ languages</li>
+          <li><div class="pfc pfc-b">✓</div> Upload your own Excel template</li>
+          <li><div class="pfc pfc-b">✓</div> Line-by-line extraction</li>
+          <li><div class="pfc pfc-b">✓</div> Excel, CSV & email delivery</li>
+          <li><div class="pfc pfc-b">✓</div> Priority processing</li>
+        </ul>
+        <button class="pc-btn pc-btn-paid" onclick="showPage('login');setTab('signup')">Get started — pay as you go</button>
+      </div>
+    </div>
+  </section>
 
-<footer>
-  <div class="wrap">
-    <div class="footer-grid">
+  <!-- ===== FREE FINANCIAL TOOLS SECTION (NEW) ===== -->
+  <section class="section" id="free-tools" style="padding-top:0">
+    <div class="sec-head reveal">
+      <div class="sec-tag">🛠️ Free Tools</div>
+      <h2 class="sec-title">Free <span class="grad-text">Financial Tools</span></h2>
+      <p class="sec-sub">No signup required. Instant results. Built for businesses in the UAE and worldwide.</p>
+    </div>
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
+
+      <a href="/vat-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(91,141,238,0.1)">🧮</div>
+        <div><div class="tqc-title">VAT Calculator</div><div class="tqc-desc">UAE 5%, Saudi 15%, UK 20%, EU and 15+ countries</div></div>
+      </a>
+
+      <a href="/uae-corporate-tax.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(240,165,0,0.1)">🇦🇪</div>
+        <div><div class="tqc-title">UAE Corporate Tax</div><div class="tqc-desc">9% tax with free zone exemptions & AED 375K threshold</div></div>
+      </a>
+
+      <a href="/zakat-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(77,217,192,0.1)">☪️</div>
+        <div><div class="tqc-title">Zakat Calculator</div><div class="tqc-desc">2.5% on eligible wealth — Nisab checked automatically</div></div>
+      </a>
+
+      <a href="/currency-converter.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(77,217,192,0.1)">💱</div>
+        <div>
+          <div class="tqc-title">Currency Converter <span class="live-badge">🔴 Live</span></div>
+          <div class="tqc-desc">USD, AED, SAR, EUR, GBP, INR, PKR and 17+ more</div>
+        </div>
+      </a>
+
+      <a href="/gold-price-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(240,165,0,0.1)">🏅</div>
+        <div>
+          <div class="tqc-title">Gold Price Calculator <span class="live-badge">🔴 Live</span></div>
+          <div class="tqc-desc">24K/22K/18K — grams, tola, bhori in 7 currencies</div>
+        </div>
+      </a>
+
+      <a href="/late-payment-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(255,107,122,0.1)">📅</div>
+        <div><div class="tqc-title">Late Payment Calculator</div><div class="tqc-desc">Interest on overdue invoices — exact amounts instantly</div></div>
+      </a>
+
+      <a href="/invoice-due-date.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(240,165,0,0.1)">🗓️</div>
+        <div><div class="tqc-title">Invoice Due Date</div><div class="tqc-desc">Net 7/14/30/60 — shows if overdue and by how many days</div></div>
+      </a>
+
+      <a href="/invoice-number-generator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(91,141,238,0.1)">📄</div>
+        <div><div class="tqc-title">Invoice Number Generator</div><div class="tqc-desc">Up to 50 sequential numbers with custom prefix & padding</div></div>
+      </a>
+
+      <a href="/profit-margin-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(77,217,192,0.1)">📈</div>
+        <div><div class="tqc-title">Profit Margin Calculator</div><div class="tqc-desc">Gross profit, margin %, markup % and cost ratio</div></div>
+      </a>
+
+      <a href="/loan-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(91,141,238,0.1)">🏦</div>
+        <div><div class="tqc-title">Loan & Interest Calculator</div><div class="tqc-desc">Monthly payments, total interest, any term or rate</div></div>
+      </a>
+
+      <a href="/break-even-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(139,111,238,0.1)">⚖️</div>
+        <div><div class="tqc-title">Break-Even Calculator</div><div class="tqc-desc">Units needed to cover all costs — fixed & variable</div></div>
+      </a>
+
+      <a href="/salary-calculator.html" class="tool-quick-card">
+        <div class="tqc-icon" style="background:rgba(77,217,192,0.1)">💼</div>
+        <div><div class="tqc-title">Salary Calculator</div><div class="tqc-desc">Annual, monthly, weekly, daily & hourly conversions</div></div>
+      </a>
+
+    </div>
+  </section>
+  <!-- ===== END FREE TOOLS SECTION ===== -->
+
+  <footer>
+    <div class="footer-inner">
       <div class="footer-brand">
-        <h3><span>⚡</span> AlBills</h3>
-        <p>AI-powered invoice data extraction. Upload any invoice from any country, get clean Excel data instantly. Plus free financial tools for businesses.</p>
+        <h3><span style="font-size:18px">⚡</span> AlBills</h3>
+        <p>AI-powered invoice data extraction. Any document, any country, any language. Trusted by bookkeepers worldwide.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--text3)">🔒 Documents deleted after processing. Your data stays private.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a onclick="showPage('app')">Extract invoices</a>
+        <a onclick="showPage('demo')">Live demo</a>
+        <a onclick="showPage('home');goTo('features')">Features</a>
+        <a onclick="showPage('home');goTo('pricing')">Pricing</a>
       </div>
       <div class="footer-col">
         <h4>Free Tools</h4>
-        <a href="/tools/vat-calculator">VAT Calculator</a>
-        <a href="/tools/gold-price-calculator">Gold Price</a>
-        <a href="/tools/currency-converter">Currency Converter</a>
-        <a href="/tools/profit-margin-calculator">Profit Margin</a>
-        <a href="/tools/loan-calculator">Loan Calculator</a>
+        <a href="/vat-calculator.html">VAT Calculator</a>
+        <a href="/gold-price-calculator.html">Gold Price</a>
+        <a href="/currency-converter.html">Currency Converter</a>
+        <a href="/loan-calculator.html">Loan Calculator</a>
+        <a href="/zakat-calculator.html">Zakat Calculator</a>
       </div>
       <div class="footer-col">
-        <h4>More Tools</h4>
-        <a href="/tools/late-payment-calculator">Late Payment</a>
-        <a href="/tools/invoice-due-date">Due Date</a>
-        <a href="/tools/uae-corporate-tax">UAE Corp Tax</a>
-        <a href="/tools/zakat-calculator">Zakat Calculator</a>
-        <a href="/tools/salary-calculator">Salary Converter</a>
-      </div>
-      <div class="footer-col">
-        <h4>AlBills</h4>
-        <a href="/">Invoice Extractor</a>
-        <a href="/tools">All Tools</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms of Service</a>
+        <h4>Legal</h4>
+        <a href="#" onclick="showPage('privacy')">Privacy Policy</a>
+        <a href="#" onclick="showPage('terms')">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
         <a href="mailto:support@albills.com">Support</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 <strong>AlBills™</strong>. All rights reserved.</span>
-      <span>albills.com · Powered by Claude AI</span>
+      <span>© 2025 <strong>AlBills</strong>. All rights reserved. AlBills™ is a registered trademark.</span>
+      <span>Powered by Claude AI · albills.com</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ===== DEMO PAGE ===== -->
+<div id="demo" class="page">
+  <div class="demo-wrap">
+    <div class="demo-hd">
+      <div class="sec-tag">Live Demo</div>
+      <h2 class="sec-title">AlBills handles <span class="grad-text">any invoice from any country</span></h2>
+      <p style="font-size:15px;color:var(--text2);margin-top:10px">20 real invoices. 20 different countries. 12 different languages. All extracted perfectly.</p>
+    </div>
+    <div class="demo-selector" id="demoFilter">
+      <div class="demo-chip active" onclick="filterDemo('all',this)">🌍 All (20)</div>
+      <div class="demo-chip" onclick="filterDemo('invoice',this)">📄 Invoices</div>
+      <div class="demo-chip" onclick="filterDemo('credit',this)">📋 Credit Notes</div>
+      <div class="demo-chip" onclick="filterDemo('debit',this)">📑 Debit Notes</div>
+      <div class="demo-chip" onclick="filterDemo('receipt',this)">🧾 Receipts</div>
+    </div>
+    <div class="demo-layout" id="demoGrid"></div>
+    <div style="text-align:center;margin-top:40px">
+      <button class="btn-p" onclick="showPage('app')" style="margin-right:12px">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Try it with your own invoices
+      </button>
+      <button class="btn-s" onclick="showPage('home')">← Back to home</button>
     </div>
   </div>
-</footer>
+</div>
+
+<!-- ===== APP PAGE ===== -->
+<div id="app" class="page">
+  <div class="app-wrap">
+    <div class="app-hd">
+      <h2>Extract invoice data</h2>
+      <p>Upload any invoices, describe what to extract, get your Excel file instantly</p>
+    </div>
+    <div class="security-note-bar">
+      <span class="snb-icon">🔒</span>
+      <span>Your documents are <strong style="color:var(--green)">never stored</strong> — processed securely and deleted immediately after extraction. Your financial data stays private.</span>
+    </div>
+    <div class="free-banner">
+      <div class="fb-left">
+        <div class="fb-used" id="freeDots">
+          <div class="fb-dot"></div><div class="fb-dot"></div><div class="fb-dot"></div>
+        </div>
+        <span id="freeText">3 free invoices remaining this month</span>
+      </div>
+      <div class="fb-right">Free plan · <a onclick="showPage('home');goTo('pricing')" style="color:var(--accent);text-decoration:none;cursor:pointer">Upgrade for more →</a></div>
+    </div>
+    <div class="atabs">
+      <div class="atab active" id="tab1"><div class="tnum">1</div> Upload files</div>
+      <div class="atab" id="tab2"><div class="tnum">2</div> Instructions</div>
+      <div class="atab" id="tab3"><div class="tnum">3</div> Results</div>
+    </div>
+    <div class="ucard">
+      <div id="uploadState">
+        <div class="uzone" id="dropZone" onclick="document.getElementById('fi').click()">
+          <div class="u-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h3>Drop your invoices here</h3>
+          <p>Drag & drop unlimited files — PDF, JPG, PNG, DOCX, any format, any country</p>
+          <div class="uchoose" onclick="event.stopPropagation();document.getElementById('fi').click()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose files
+          </div>
+          <div class="fmts"><span class="fmt">PDF</span><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">DOCX</span><span class="fmt">XLSX</span><span class="fmt">TIFF</span></div>
+        </div>
+        <div class="flist" id="fileList"></div>
+        <div style="padding:16px 20px 0">
+          <div class="excel-section">
+            <div class="excel-header">
+              <div class="excel-icon">📊</div>
+              <div>
+                <div class="excel-title">Upload your Excel template (optional)</div>
+                <div class="excel-sub">Have your own Excel format? Upload it and we'll match your exact column structure</div>
+              </div>
+            </div>
+            <div class="excel-upload-zone" onclick="document.getElementById('excelTemplate').click()">
+              <p>📁 Click to upload your Excel template (.xlsx or .csv)</p>
+            </div>
+            <div class="excel-file-shown" id="excelFileShown">
+              <span style="font-size:20px">📊</span>
+              <span class="excel-file-name" id="excelFileName"></span>
+              <button class="excel-remove" onclick="removeExcelTemplate()">×</button>
+            </div>
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="field-label">📧 Send results to email</div>
+          <input class="email-input" type="email" id="userEmail" placeholder="your@email.com — receive Excel in your inbox">
+          <div class="email-note">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Optional — you can also download directly after processing
+          </div>
+        </div>
+        <div class="isec">
+          <div class="field-label">What do you want to extract?</div>
+          <textarea class="ibox" id="instructions" placeholder="e.g. vendor name, customer name, invoice number, date, line items, total amount, currency, VAT number"></textarea>
+          <div class="chips">
+            <span class="chip" onclick="setChip('vendor name, customer name, invoice number, date, total amount, currency')">📄 Basic</span>
+            <span class="chip" onclick="setChip('vendor name, customer name, document type, invoice number, date, due date, line description, quantity, unit price, tax rate, tax amount, line total, subtotal, total amount, currency')">🧾 Full line items</span>
+            <span class="chip" onclick="setChip('vendor name, invoice number, date, total amount, tax amount, currency, bank name, account number, swift, iban, payment terms')">🏦 Payment details</span>
+            <span class="chip" onclick="setChip('vendor name, date, amount, currency, tax number, category, description, reference number')">📁 Expenses</span>
+          </div>
+        </div>
+        <button class="proc-btn" id="procBtn" onclick="startProc()" disabled>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Extract data — $0.50 per invoice
+        </button>
+        <div class="sec-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Secure · Documents deleted after extraction · <span class="sg">First 3 invoices free</span>
+        </div>
+      </div>
+      <div class="pstate" id="procState">
+        <div class="spin"></div>
+        <h3>Reading your invoices...</h3>
+        <p id="procMsg">Sending invoices to AI...</p>
+        <div class="pbar"><div class="pfill" id="progFill"></div></div>
+        <div class="pinvoices" id="pinvoices"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULTS PAGE ===== -->
+<div id="results" class="page">
+  <div class="results-wrap">
+    <div class="results-hd">
+      <div class="results-title">
+        <div class="rcheck">✓</div>
+        <h2>Extraction complete</h2>
+      </div>
+      <div class="results-actions">
+        <button class="raction-btn dl-excel" onclick="doDownload('excel')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Excel
+        </button>
+        <button class="raction-btn dl-csv" style="border:1px solid var(--border2)" onclick="doDownload('csv')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download CSV
+        </button>
+      </div>
+    </div>
+    <div class="summary-cards" id="summaryCards"></div>
+    <div class="email-receive">
+      <div class="er-icon">📧</div>
+      <div class="er-text"><h4>Receive Excel by email</h4><p>Enter your email and we'll send the file directly to your inbox</p></div>
+      <div class="er-form" id="erForm">
+        <input class="er-input" type="email" id="erEmail" placeholder="your@email.com">
+        <button class="er-send" onclick="sendEmail()">Send now</button>
+      </div>
+      <div class="er-sent" id="erSent"><span style="font-size:18px">✅</span> Excel sent to your inbox!</div>
+    </div>
+    <div class="rtable-card">
+      <div class="rtable-toolbar">
+        <div class="rt-title">Extracted data<span class="rt-count" id="rowCount">0 rows</span></div>
+        <input class="rt-search" type="text" placeholder="🔍 Search results..." oninput="filterTable(this.value)">
+      </div>
+      <div class="rtable-scroll">
+        <table class="rtable" id="resTable">
+          <thead><tr id="resHead"></tr></thead>
+          <tbody id="resBody"></tbody>
+        </table>
+      </div>
+      <button class="more-btn" onclick="resetAll()">⟳ Process more invoices</button>
+    </div>
+    <button class="back-btn" onclick="resetAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to upload
+    </button>
+  </div>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div id="login" class="page" style="padding:1rem">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="al-icon">⚡</div><div class="al-text">AlBills</div></div>
+    <div id="lf">
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to your AlBills account</p>
+      <div class="atabs2">
+        <button class="atab2 active" onclick="setTab('login')">Sign in</button>
+        <button class="atab2" onclick="setTab('signup')">Create account</button>
+      </div>
+      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" placeholder="you@company.com"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="••••••••"></div>
+      <button class="auth-btn" onclick="showPage('app')">Sign in to AlBills</button>
+      <div class="adiv"><span>or continue with</span></div>
+      <button class="soc-btn" onclick="showPage('app')">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-fn">No account? <a onclick="setTab('signup')">Sign up free</a> · <a href="#">Forgot password?</a></div>
+    </div>
+    <div id="sf" style="display:none">
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub">Start with 3 free invoices — no card needed</p>
+      <div class="atabs2">
+        <button class="atab2" onclick="setTab('login')">Sign in</button>
+        <button class="atab2 active" onclick="setTab('signup')">Create account</button>
+      </div>
+      <div class="frow2">
+        <div class="fg"><label class="fl">First name</label><input class="fi" type="text" placeholder="Mohammed"></div>
+        <div class="fg"><label class="fl">Last name</label><input class="fi" type="text" placeholder="Al Rashidi"></div>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="you@company.com"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="At least 8 characters"></div>
+      <button class="auth-btn" onclick="showPage('app')">Create free account</button>
+      <div class="adiv"><span>or</span></div>
+      <button class="soc-btn" onclick="showPage('app')">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Sign up with Google
+      </button>
+      <div class="auth-fn">Already have an account? <a onclick="setTab('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<input type="file" id="fi" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx,.tiff">
+<input type="file" id="excelTemplate" accept=".xlsx,.csv" onchange="handleExcelTemplate(this)">
+
+<script>
+// PARTICLES
+const pc=document.getElementById('particles');
+for(let i=0;i<16;i++){
+  const p=document.createElement('div');p.className='p';
+  p.style.left=Math.random()*100+'%';
+  p.style.animationDuration=(14+Math.random()*18)+'s';
+  p.style.animationDelay=(Math.random()*16)+'s';
+  if(Math.random()>.65)p.style.background='var(--accent3)';
+  pc.appendChild(p);
+}
+
+// REVEAL
+const obs=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// PAGES
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none'});
+  const pg=document.getElementById(id);
+  if(id==='login'){pg.style.display='flex';pg.classList.add('active')}
+  else{pg.style.display='block';pg.classList.add('active')}
+  window.scrollTo(0,0);
+  if(id==='demo') buildDemo('all');
+}
+function goTo(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'})},80)}
+function setTab(t){
+  document.getElementById('lf').style.display=t==='login'?'block':'none';
+  document.getElementById('sf').style.display=t==='signup'?'block':'none';
+}
+
+// DEMO DATA
+const demoInvoices=[
+  {flag:'🇮🇳',country:'India',type:'invoice',vendor:'Krishnamurthy Medisupply Pvt Ltd',customer:'Apollo Hospitals',docNum:'MedSupply/2023-24/B-087421',date:'05/03/2024',lines:'Paracetamol 500mg (500 x ₹48=₹24,000); Metformin HCl (300 x ₹89.50=₹26,850)',tax:'₹87,717.60 GST',total:'₹5,75,037.60',currency:'INR'},
+  {flag:'🇧🇷',country:'Brazil',type:'invoice',vendor:'Supermercado Familia Verde Ltda',customer:'Restaurante Sabor & Arte',docNum:'NF-e No: 000.014.873-2',date:'18/03/2024',lines:'Carne Bovina (48kg x R$89.90=R$4,315.20); Salmão Atlântico (18kg x R$149=R$2,682)',tax:'R$1,517.00 ICMS',total:'R$9,944.80',currency:'BRL'},
+  {flag:'🇨🇦',country:'Canada',type:'receipt',vendor:'Maple Valley Pharmacy',customer:'Ms. Catherine Tremblay-Beauchemin',docNum:'Rx Receipt #2024-MV-093847',date:'20/03/2024',lines:'Atorvastatin 40mg (1 x $48.99); Metoprolol 100mg (1 x $61.25)',tax:'CAD $0.00 GST/PST',total:'CAD $312.47',currency:'CAD'},
+  {flag:'🇫🇷',country:'France',type:'credit',vendor:'Brasserie Saint-Germain',customer:'M. Édouard Clément Fontaine',docNum:'AV-2024-000891',date:'14/03/2024',lines:'Annulation Menu Prestige 9 Services (18 x €190=€3,420)',tax:'€684.00 TVA 20%',total:'€4,104.00',currency:'EUR'},
+  {flag:'🇰🇷',country:'Korea',type:'invoice',vendor:'Samsung Electronics Retail 삼성전자판매',customer:'Park Joon-hyun CEO, JH Tech Solutions',docNum:'SEL-2024-TX-048920',date:'22/03/2024',lines:'Samsung Galaxy S24 Ultra (5 x ₩1,749,600=₩8,748,000)',tax:'₩1,842,000 VAT 10%',total:'₩20,262,000',currency:'KRW'},
+  {flag:'🇲🇽',country:'Mexico',type:'invoice',vendor:'Abarrotes y Distribución Reyes S.A.',customer:'Supermercados Grupo Estrella S.A.P.I.',docNum:'A-000184732',date:'25/03/2024',lines:'Aceite Nutrioli (80 Cajas x $312=$24,960); Frijol Negro (300kg x $42.50=$12,750)',tax:'$20,454.40 IVA 16%',total:'$148,294.40',currency:'MXN'},
+  {flag:'🇸🇬',country:'Singapore',type:'receipt',vendor:'Marina Bay Sands Hotel',customer:'Mr. Rajan Subramaniam Nair',docNum:'MBS-2024-F-029847',date:'25/03/2024',lines:'Premier Garden Suite 4 nights (4 x $2,800=$11,200+GST)',tax:'SGD $1,642.23 GST 9%',total:'SGD $19,889.23',currency:'SGD'},
+  {flag:'🇳🇬',country:'Nigeria',type:'receipt',vendor:'Lagos Fashion Court Ltd',customer:'Mrs. Adaeze Ngozi Okafor-Eze',docNum:'LFC-2024-00938',date:'18/03/2024',lines:'Ankara Wrapper Fabric (2 x ₦85,000=₦170,000)',tax:'₦67,800.00 VAT 7.5%',total:'₦915,300.00',currency:'NGN'},
+  {flag:'🇹🇷',country:'Turkey',type:'debit',vendor:'İstanbul Lezzet Lokantası A.Ş.',customer:'Öztürk Catering & Events Ltd.',docNum:'BN-2024-IST-001847',date:'22/03/2024',lines:'Özel Ziyafet Menüsü 180 kişi (180 x ₺425=₺76,500)',tax:'₺16,840.00 KDV 20%',total:'₺101,040.00',currency:'TRY'},
+  {flag:'🇳🇱',country:'Netherlands',type:'invoice',vendor:'De Groot Kantoorartikelen B.V.',customer:'Hovenier & Partners Advocatenkantoor',docNum:'NL-2024-F-048321',date:'25/03/2024',lines:'HP LaserJet Printer M612dn (4 x €2,190=€8,760+BTW)',tax:'€2,998.80 BTW 21%',total:'€17,278.80',currency:'EUR'},
+  {flag:'🇸🇦',country:'Saudi Arabia',type:'invoice',vendor:'AL-JAZEERA Retail Markets أسواق الجزيرة',customer:'Almarai Company Ltd',docNum:'SAR-2024-TI-093847',date:'15/03/2024',lines:'Al Marai Fresh Milk 1L (2400 x SAR8.25=SAR19,800)',tax:'SAR 12,410.00 VAT 5%',total:'SAR 260,610.00',currency:'SAR'},
+  {flag:'🇮🇹',country:'Italy',type:'invoice',vendor:'Calzature Romano & Figli S.R.L.',customer:'Sig.ra Valentina Conti-Borghese',docNum:'IT-2024-F-018473',date:'20/03/2024',lines:'Scarpe Oxford Brogue Uomo (12 x €850=€10,200+IVA)',tax:'€5,047.80 IVA 22%',total:'€27,987.80',currency:'EUR'},
+  {flag:'🇹🇭',country:'Thailand',type:'receipt',vendor:'Baan Lotus Wellness Spa & Resort',customer:'Mr. Alessandro Ferrari',docNum:'BLO-2024-R-002847',date:'23/03/2024',lines:'Royal Thai Massage 2hr (6 x ฿3,800=฿22,800)',tax:'฿4,536.00 VAT 7%',total:'฿69,336.00',currency:'THB'},
+  {flag:'🇿🇦',country:'South Africa',type:'invoice',vendor:'Highveld Mining Supplies (Pty) Ltd',customer:'Exxaro Resources Ltd',docNum:'ZAF-2024-TI-011847',date:'26/03/2024',lines:'Caterpillar 994K Tyre (4 pair x R182,000=R728,000+VAT)',tax:'R192,630.00 VAT 15%',total:'R1,476,830.00',currency:'ZAR'},
+  {flag:'🇺🇸',country:'USA',type:'invoice',vendor:'TechWave Electronics',customer:'Nexus Solutions Group Inc.',docNum:'INV-2024-087432',date:'15/03/2024',lines:'Apple MacBook Pro 16" M3 (3 x $2,499=$7,497)',tax:'$1,835.37 Sales Tax 8.75%',total:'$22,694.58',currency:'USD'},
+  {flag:'🇬🇧',country:'UK',type:'invoice',vendor:'Maison Élégance London',customer:'Lady Arabella C. Harrington-Smythe',docNum:'MSE/2024/INV/003847',date:'22/02/2024',lines:'Burberry Heritage Trench Coat (1 x £1,827.50)',tax:'£2,390.60 VAT 20%',total:'£14,343.60',currency:'GBP'},
+  {flag:'🇩🇪',country:'Germany',type:'credit',vendor:'Müller & Schreiber GmbH',customer:'Stadtschule Charlottenburg',docNum:'GS-2024-001892',date:'08/03/2024',lines:'Pelikan Souverän M800 Füllhalter (12 x €189.90=€2,278.80)',tax:'€811.53 MwSt 19%',total:'€5,082.73',currency:'EUR'},
+  {flag:'🇯🇵',country:'Japan',type:'receipt',vendor:'鮨処 花水月 Hanasuki Sushi',customer:'Mr. Kenji Yamamoto-Tanaka 山本田中 健次',docNum:'HMG-2024-R-00347',date:'19/03/2024',lines:"Chef's Omakase Course (4 x ¥38,500=¥154,000)",tax:'¥29,282 消費税 10%',total:'¥322,102',currency:'JPY'},
+  {flag:'🇦🇺',country:'Australia',type:'invoice',vendor:'Outback Pro Hardware',customer:'McCormack & Sons Building Pty Ltd',docNum:'OPH-TAX-2024-029183',date:'11/03/2024',lines:'Makita 18V Combo Kit (5 Kit x $1,039.20)',tax:'$2,485.47 GST 10%',total:'AUD $24,535.58',currency:'AUD'},
+  {flag:'🇦🇪',country:'UAE',type:'debit',vendor:'Al Nakheel Furniture Trading LLC',customer:'Jumeirah Beach Residence Hotel Group',docNum:'DN-AE-2024-00312',date:'14/03/2024',lines:'Ligne Roset TOGO Modular Sofa (6 x AED12,800=AED76,800+VAT)',tax:'AED 4,210.00 VAT 5%',total:'AED 88,410.00',currency:'AED'},
+];
+
+function buildDemo(filter){
+  const grid=document.getElementById('demoGrid');
+  grid.innerHTML='';
+  const filtered=filter==='all'?demoInvoices:demoInvoices.filter(d=>d.type===filter);
+  filtered.forEach(inv=>{
+    const div=document.createElement('div');
+    div.className='demo-invoice';
+    const typeLabel={invoice:'Invoice',credit:'Credit Note',debit:'Debit Note',receipt:'Receipt'}[inv.type];
+    div.innerHTML=`
+      <div class="demo-invoice-header">
+        <div class="dih-left"><span class="dih-flag">${inv.flag}</span><strong>${inv.country}</strong><span style="color:var(--text3)">·</span><span>${inv.vendor.substring(0,28)}${inv.vendor.length>28?'...':''}</span></div>
+        <span class="dih-type">${typeLabel}</span>
+      </div>
+      <div class="demo-invoice-body">
+        <table class="demo-table">
+          <thead><tr><th>Field</th><th>Extracted Value</th></tr></thead>
+          <tbody>
+            <tr><td>Document #</td><td>${inv.docNum}</td></tr>
+            <tr><td>Date</td><td>${inv.date}</td></tr>
+            <tr><td>Vendor</td><td>${inv.vendor}</td></tr>
+            <tr><td>Customer</td><td>${inv.customer.substring(0,38)}${inv.customer.length>38?'...':''}</td></tr>
+            <tr><td>Line Items</td><td style="font-size:11px;color:var(--text3)">${inv.lines.substring(0,80)}...</td></tr>
+            <tr><td>Tax</td><td>${inv.tax}</td></tr>
+            <tr><td>Total</td><td class="td-g"><strong>${inv.total}</strong></td></tr>
+            <tr><td>Currency</td><td>${inv.currency}</td></tr>
+          </tbody>
+        </table>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function filterDemo(type,el){
+  document.querySelectorAll('.demo-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  buildDemo(type);
+}
+
+// FREE COUNTER
+let freeLeft=3;
+function updateFreeBanner(){
+  const dots=document.getElementById('freeDots');
+  const txt=document.getElementById('freeText');
+  if(!dots||!txt) return;
+  dots.innerHTML='';
+  for(let i=0;i<3;i++){
+    const d=document.createElement('div');
+    d.className='fb-dot'+(i>=freeLeft?' used':'');
+    dots.appendChild(d);
+  }
+  txt.textContent=freeLeft>0?`${freeLeft} free invoice${freeLeft!==1?'s':''} remaining this month`:'Free invoices used — $0.50 per invoice';
+}
+
+// EXCEL TEMPLATE
+let excelTemplateFile=null;
+function handleExcelTemplate(input){
+  if(input.files&&input.files[0]){
+    excelTemplateFile=input.files[0];
+    document.getElementById('excelFileName').textContent=excelTemplateFile.name;
+    document.getElementById('excelFileShown').style.display='flex';
+    document.querySelector('.excel-upload-zone').style.display='none';
+  }
+}
+function removeExcelTemplate(){
+  excelTemplateFile=null;
+  document.getElementById('excelTemplate').value='';
+  document.getElementById('excelFileShown').style.display='none';
+  document.querySelector('.excel-upload-zone').style.display='block';
+}
+
+// FILES
+let files=[];
+let extractedData=[];
+const fi=document.getElementById('fi');
+const dz=document.getElementById('dropZone');
+const fl2=document.getElementById('fileList');
+const pb=document.getElementById('procBtn');
+const instr=document.getElementById('instructions');
+
+fi.addEventListener('change',e=>addFiles(Array.from(e.target.files)));
+instr.addEventListener('input',updateBtn);
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');addFiles(Array.from(e.dataTransfer.files))});
+
+function addFiles(nf){files=[...files,...nf];renderFiles();updateBtn()}
+function getIcon(n){const e=n.split('.').pop().toLowerCase();if(e==='pdf')return{i:'📄',c:'pdf'};if(['jpg','jpeg','png','tiff'].includes(e))return{i:'🖼️',c:'img'};return{i:'📝',c:'doc'}}
+function fmtSz(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+
+function renderFiles(){
+  fl2.innerHTML='';
+  files.forEach((f,i)=>{
+    const{i:ico,c:cls}=getIcon(f.name);
+    const d=document.createElement('div');d.className='frow';
+    d.innerHTML=`<div class="fico ${cls}">${ico}</div><span class="fn">${f.name}</span><span class="fs">${fmtSz(f.size)}</span><button class="frm" onclick="rmFile(${i})">×</button>`;
+    fl2.appendChild(d);
+  });
+}
+function rmFile(i){files.splice(i,1);renderFiles();updateBtn()}
+
+function updateBtn(){
+  const ok=files.length>0&&instr.value.trim()!=='';
+  pb.disabled=!ok;
+  if(ok){
+    const cnt=Math.min(files.length,freeLeft);
+    const paid=files.length-cnt;
+    const cost=paid*0.50;
+    pb.innerHTML=`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Extract ${files.length} invoice${files.length>1?'s':''} ${paid>0?' — $'+cost.toFixed(2):' — Free!'}`;
+  } else {
+    pb.innerHTML=`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Extract data`;
+  }
+}
+function setChip(t){instr.value=t;updateBtn();instr.focus()}
+
+async function startProc(){
+  const email=document.getElementById('userEmail').value;
+  document.getElementById('uploadState').style.display='none';
+  document.getElementById('procState').style.display='block';
+  document.getElementById('tab1').className='atab done';
+  document.getElementById('tab2').className='atab active';
+  const pi=document.getElementById('pinvoices');
+  pi.innerHTML='';
+  files.forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.className='pinv';d.id='pinv'+i;
+    d.innerHTML=`<span>📄</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span><div class="pinv-bar"><div class="pinv-fill" id="pf${i}"></div></div>`;
+    pi.appendChild(d);
+  });
+  const fill=document.getElementById('progFill');
+  const msg=document.getElementById('procMsg');
+  msg.textContent='Sending invoices to AI...';
+  let prog=0;
+  const iv=setInterval(()=>{prog+=2;if(prog>90)prog=90;fill.style.width=prog+'%'},300);
+  try {
+    const formData=new FormData();
+    formData.append('instructions',instr.value);
+    files.forEach(f=>formData.append('files',f));
+    if(excelTemplateFile) formData.append('template',excelTemplateFile);
+    const response=await fetch('/api/extract',{method:'POST',body:formData});
+    const data=await response.json();
+    clearInterval(iv);fill.style.width='100%';
+    if(data.results){msg.textContent='Done! Building your results...';setTimeout(()=>showResults(email,data.results),600);}
+    else{alert('Error: '+(data.error||'Unknown error'));resetAll();}
+  } catch(err){
+    clearInterval(iv);
+    alert('Connection error: '+err.message);
+    resetAll();
+  }
+}
+
+function showResults(email,apiResults){
+  freeLeft=Math.max(0,freeLeft-files.length);
+  updateFreeBanner();
+  const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
+  extractedData=apiResults||[];
+  const sc=document.getElementById('summaryCards');
+  sc.innerHTML=`
+    <div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div>
+    <div class="scard"><div class="sc-val blue">${fields.length}</div><div class="sc-label">Fields extracted</div></div>
+    <div class="scard"><div class="sc-val green">97%</div><div class="sc-label">Avg accuracy</div></div>
+    <div class="scard"><div class="sc-val amber">${freeLeft>0?'Free':'$'+(files.length*0.50).toFixed(2)}</div><div class="sc-label">Cost</div></div>`;
+  if(email){document.getElementById('erEmail').value=email}
+  const head=document.getElementById('resHead');
+  const body=document.getElementById('resBody');
+  head.innerHTML='<th class="td-num">#</th><th>Source file</th>'+fields.map(f=>`<th>${f}</th>`).join('')+'<th>Confidence</th><th>Status</th>';
+  body.innerHTML='';
+  extractedData.forEach((result,i)=>{
+    const tr=document.createElement('tr');
+    const conf=result.confidence||97;
+    const confCls=conf>=95?'conf-high':conf>=85?'conf-med':'conf-low';
+    const statusCls=conf>=90?'status-ok':'status-review';
+    const statusTxt=conf>=90?'✓ Verified':'⚠ Review';
+    const rowData=result.data||{};
+    tr.setAttribute('data-search',JSON.stringify(rowData).toLowerCase());
+    let cells=`<td class="td-num">${i+1}</td><td class="td-file">${result.filename||files[i]?.name||''}</td>`;
+    fields.forEach(f=>{
+      const key=Object.keys(rowData).find(k=>k.toLowerCase()===f.toLowerCase())||f;
+      const v=rowData[key]||rowData[f]||'—';
+      const isAmt=f.toLowerCase().includes('amount')||f.toLowerCase().includes('total')||f.toLowerCase().includes('price');
+      cells+=`<td ${isAmt?'class="td-amt"':''}>${v}</td>`;
+    });
+    cells+=`<td><div class="conf"><div class="conf-bar"><div class="conf-fill ${confCls}" style="width:${conf}%"></div></div><span class="conf-val">${conf}%</span></div></td>`;
+    cells+=`<td><span class="td-badge ${statusCls}">${statusTxt}</span></td>`;
+    tr.innerHTML=cells;body.appendChild(tr);
+  });
+  document.getElementById('rowCount').textContent=extractedData.length+' row'+(extractedData.length!==1?'s':'');
+  showPage('results');
+  document.getElementById('tab3').className='atab done';
+}
+
+function filterTable(q){
+  document.querySelectorAll('#resBody tr').forEach(r=>{r.style.display=q===''||r.getAttribute('data-search').includes(q.toLowerCase())?'':'none'});
+}
+function sendEmail(){
+  const email=document.getElementById('erEmail').value;
+  if(!email||!email.includes('@')){alert('Please enter a valid email address');return}
+  document.getElementById('erForm').style.display='none';
+  document.getElementById('erSent').style.display='flex';
+}
+function doDownload(type){
+  if(!extractedData.length){alert('No data to download');return}
+  const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
+  let csv='#,Source File,'+fields.join(',')+',Confidence,Status\n';
+  extractedData.forEach((result,i)=>{
+    const rowData=result.data||{};
+    const conf=result.confidence||97;
+    const row=[i+1,result.filename||''];
+    fields.forEach(f=>{
+      const key=Object.keys(rowData).find(k=>k.toLowerCase()===f.toLowerCase())||f;
+      const v=(rowData[key]||rowData[f]||'—').toString().replace(/,/g,';');
+      row.push(v);
+    });
+    row.push(conf+'%',conf>=90?'Verified':'Review');
+    csv+=row.join(',')+'\n';
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='albills-extraction.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+function resetAll(){
+  files=[];
+  if(fl2)fl2.innerHTML='';
+  if(instr)instr.value='';
+  const ue=document.getElementById('userEmail');if(ue)ue.value='';
+  if(pb)pb.disabled=true;
+  const us=document.getElementById('uploadState');if(us)us.style.display='block';
+  const ps=document.getElementById('procState');if(ps)ps.style.display='none';
+  const pf=document.getElementById('progFill');if(pf)pf.style.width='0%';
+  const pi=document.getElementById('pinvoices');if(pi)pi.innerHTML='';
+  const ef=document.getElementById('erForm');if(ef)ef.style.display='flex';
+  const es=document.getElementById('erSent');if(es)es.style.display='none';
+  const t1=document.getElementById('tab1');if(t1)t1.className='atab active';
+  const t2=document.getElementById('tab2');if(t2)t2.className='atab';
+  const t3=document.getElementById('tab3');if(t3)t3.className='atab';
+  updateBtn();showPage('app');
+}
+
+updateFreeBanner();
+</script>
 </body>
 </html>
