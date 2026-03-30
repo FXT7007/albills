@@ -3,16 +3,26 @@ export const config = { api: { bodyParser: false } };
 const SUPABASE_URL = 'https://bynkbsuphhyxsnnbftoa.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-async function supabase(path, method, body) {
+async function dbPost(path, body) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    method,
+    method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : ''
+      'Prefer': 'return=representation'
     },
-    body: body ? JSON.stringify(body) : undefined
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function dbGet(path) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
+    }
   });
   return res.json();
 }
@@ -32,7 +42,7 @@ export default async function handler(req, res) {
     const parts = bodyStr.split('--' + boundary);
 
     let instructions = '';
-    let userId = null;
+    let userId = 'anonymous';
     let fingerprint = null;
     let splitLineItems = false;
     let templateColumns = [];
@@ -57,34 +67,61 @@ export default async function handler(req, res) {
         const fnMatch = header.match(/filename="([^"]+)"/);
         const mtMatch = header.match(/Content-Type:\s*([^\r\n]+)/);
         const fileName = fnMatch ? fnMatch[1] : 'invoice.pdf';
-        const mimeType = mtMatch ? mtMatch[1].trim() : 'application/pdf';
+        let mimeType = mtMatch ? mtMatch[1].trim() : 'application/pdf';
+
+        // Fix mime type — Anthropic only accepts these image types
+        if (!['application/pdf','image/jpeg','image/png','image/gif','image/webp'].includes(mimeType)) {
+          if (fileName.match(/\.(jpg|jpeg)$/i)) mimeType = 'image/jpeg';
+          else if (fileName.match(/\.png$/i)) mimeType = 'image/png';
+          else mimeType = 'application/pdf';
+        }
+
         const fileBase64 = Buffer.from(content, 'binary').toString('base64');
+        const fieldsToExtract = templateColumns.length > 0 ? templateColumns.join(', ') : instructions;
 
-        // Build extraction prompt
-        const fieldsToExtract = templateColumns.length > 0
-          ? templateColumns.join(', ')
-          : instructions;
+        const lineRule = splitLineItems
+          ? `CRITICAL: Return a JSON ARRAY where each element is one line item. Each element must include ALL invoice header fields (vendor name, invoice number, date, etc.) PLUS these line item fields: line_description, line_quantity, line_unit_price, line_tax_rate, line_tax_amount, line_total. One object per line item.`
+          : `Include all line items as a text summary in a single "line_items" field.`;
 
-        const lineItemInstruction = splitLineItems
-          ? `For line items: create a SEPARATE JSON object for each line item. Each line item object must include all header fields PLUS these line item fields: "line_description", "line_quantity", "line_unit_price", "line_tax_rate", "line_tax_amount", "line_total". Return an ARRAY of objects, one per line item, each repeating the invoice header data.`
-          : `Include all line items combined in a single "line_items" field as a text summary.`;
-
-        const prompt = `You are an expert invoice data extraction assistant. Extract data from this invoice.
+        const prompt = `You are an expert invoice data extraction AI. Your job is to carefully read this invoice document and extract specific data fields.
 
 FIELDS TO EXTRACT: ${fieldsToExtract}
 
-LINE ITEM RULE: ${lineItemInstruction}
+RULES:
+1. Return ONLY valid JSON — no explanation, no markdown, no backticks
+2. Use the EXACT field names provided as JSON keys
+3. Extract the EXACT values as they appear in the document
+4. For any field you cannot find, use null (not empty string, not dash)
+5. Always include the currency code or symbol with monetary amounts
+6. Format all dates as DD/MM/YYYY
+7. For vendor name: look for "From", "Seller", "Supplier", company letterhead at top
+8. For customer name: look for "To", "Bill To", "Ship To", "Buyer"
+9. For invoice number: look for "Invoice #", "Invoice No", "Inv #", reference numbers
+10. For total amount: look for "Total", "Grand Total", "Amount Due", "Balance Due"
+11. Look carefully at ALL text in the document including headers, footers, and stamps
 
-IMPORTANT RULES:
-- Return ONLY valid JSON (object if no split, array if split line items)
-- Use EXACT field names provided as keys
-- Extract exact values as they appear
-- For missing fields use null
-- Include currency symbol with amounts
-- Format dates as DD/MM/YYYY
-- For amounts always include currency code
+${lineRule}
 
-Return only the JSON, nothing else.`;
+Example output format: {"vendor name": "ABC Company Ltd", "invoice number": "INV-2024-001", "date": "15/03/2024", "total amount": "USD 1,250.00", "currency": "USD"}
+
+Return ONLY the JSON object or array. Nothing else.`;
+
+        // Build content array — support both PDF and images
+        const contentArr = [];
+        
+        if (mimeType === 'application/pdf') {
+          contentArr.push({
+            type: 'document',
+            source: { type: 'base64', media_type: 'application/pdf', data: fileBase64 }
+          });
+        } else {
+          contentArr.push({
+            type: 'image',
+            source: { type: 'base64', media_type: mimeType, data: fileBase64 }
+          });
+        }
+        
+        contentArr.push({ type: 'text', text: prompt });
 
         const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
@@ -94,20 +131,17 @@ Return only the JSON, nothing else.`;
             'anthropic-version': '2023-06-01'
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-5',
-            max_tokens: 4096,
-            messages: [{
-              role: 'user',
-              content: [
-                { type: 'document', source: { type: 'base64', media_type: mimeType, data: fileBase64 } },
-                { type: 'text', text: prompt }
-              ]
-            }]
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 2048,
+            messages: [{ role: 'user', content: contentArr }]
           })
         });
 
         const apiData = await apiResponse.json();
-        if (!apiResponse.ok) return res.status(500).json({ error: apiData.error?.message || 'API error' });
+        if (!apiResponse.ok) {
+          console.error('API error:', apiData);
+          return res.status(500).json({ error: apiData.error?.message || 'API error' });
+        }
 
         const text = apiData.content?.[0]?.text || '{}';
         let extracted = {};
@@ -125,7 +159,7 @@ Return only the JSON, nothing else.`;
             }
           }
         } catch(e) {
-          extracted = { error: 'Parse error', raw: text };
+          extracted = { parse_error: text.substring(0, 200) };
         }
 
         fileResults.push({
@@ -137,44 +171,35 @@ Return only the JSON, nothing else.`;
       }
     }
 
-    // Track usage in Supabase
-    if (userId && userId !== 'anonymous') {
-      // Logged in user — deduct credit
-      await supabase(
-        `invoice_usage`,
-        'POST',
-        {
+    // Track usage
+    if (userId !== 'anonymous' && SUPABASE_KEY) {
+      try {
+        await dbPost('invoice_usage', {
           user_id: userId,
           invoice_count: fileResults.length,
+          fields_extracted: instructions.split(',').length,
           created_at: new Date().toISOString()
-        }
-      );
-    } else if (fingerprint) {
-      // Anonymous user — track by fingerprint
-      const existing = await supabase(
-        `anonymous_usage?fingerprint=eq.${fingerprint}&select=count`,
-        'GET'
-      );
-      const used = Array.isArray(existing) && existing[0] ? existing[0].count : 0;
-
-      if (used + fileResults.length > 3) {
-        return res.status(403).json({
-          error: 'FREE_LIMIT_REACHED',
-          used: used,
-          limit: 3
         });
-      }
-
-      await supabase('anonymous_usage', 'POST', {
-        fingerprint,
-        count: (used || 0) + fileResults.length,
-        last_used: new Date().toISOString()
-      });
+      } catch(e) { console.error('DB log error:', e); }
+    } else if (fingerprint && SUPABASE_KEY) {
+      try {
+        const existing = await dbGet(`anonymous_usage?fingerprint=eq.${fingerprint}&select=count`);
+        const used = Array.isArray(existing) && existing[0] ? (existing[0].count || 0) : 0;
+        if (used + fileResults.length > 3) {
+          return res.status(403).json({ error: 'FREE_LIMIT_REACHED', used, limit: 3 });
+        }
+        await dbPost('anonymous_usage', {
+          fingerprint,
+          count: used + fileResults.length,
+          last_used: new Date().toISOString()
+        });
+      } catch(e) { console.error('Anon track error:', e); }
     }
 
     return res.status(200).json({ results: fileResults });
 
   } catch (error) {
+    console.error('Handler error:', error);
     return res.status(500).json({ error: error.message });
   }
 }
