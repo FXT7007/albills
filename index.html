@@ -2,8 +2,52 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AlBills — AI Invoice Data Extraction | Any Document, Any Country</title>
+<meta name="description" content="Extract data from any invoice instantly using AI. Upload PDF, image or document in any language from any country. Get clean Excel data in seconds. Free for 3 invoices — no card needed.">
+<link rel="canonical" href="https://www.albills.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.albills.com/">
+<meta property="og:title" content="AlBills — AI Invoice Data Extraction | Any Document, Any Country">
+<meta property="og:description" content="Upload any invoice in any language. Get clean Excel data in seconds. Powered by Claude AI. Free for 3 invoices — no credit card needed.">
+<meta property="og:image" content="https://www.albills.com/og-image.png">
+<meta property="og:site_name" content="AlBills">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AlBills — AI Invoice Data Extraction">
+<meta name="twitter:description" content="Upload any invoice in any language. Get clean Excel data in seconds. Free to try.">
+<meta name="twitter:image" content="https://www.albills.com/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AlBills",
+  "url": "https://www.albills.com",
+  "description": "AI-powered invoice data extraction tool. Upload any invoice from any country in any language and get clean Excel data instantly.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Free Plan",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "3 free invoices per month"
+    },
+    {
+      "@type": "Offer",
+      "name": "Pay As You Go",
+      "price": "0.50",
+      "priceCurrency": "USD",
+      "description": "Per invoice, no monthly fee"
+    }
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "124"
+  }
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -53,8 +97,9 @@ main{position:relative;z-index:1}
 .sec-title{font-family:var(--font-d);font-size:clamp(24px,4vw,38px);font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
 .sec-sub{font-size:15px;color:var(--text2);font-weight:300}
 .grad-text{background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.reveal{opacity:0;transform:translateY(28px);transition:all .7s ease}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
 @keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 /* HOME */
 .hero{max-width:860px;margin:0 auto;padding:80px 1.5rem 50px;text-align:center}
@@ -329,7 +374,13 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 .footer-col a{display:block;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:8px;transition:color .2s;cursor:pointer}
 .footer-col a:hover{color:var(--accent)}
 .footer-bottom{max-width:900px;margin:24px auto 0;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text3)}
-@media(max-width:768px){.feats{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}.summary-cards,.dash-cards{grid-template-columns:1fr 1fr}.nav-link{display:none}.hero h1{font-size:32px}.stats{flex-wrap:wrap}.si{min-width:50%}.frow2{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr 1fr}.countries-grid{grid-template-columns:repeat(4,1fr)}}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:none;background:transparent}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+.mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(22,27,39,0.98);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);padding:16px;z-index:199;flex-direction:column;gap:8px}
+.mobile-menu.open{display:flex}
+.mobile-menu a,.mobile-menu button{color:var(--text2);font-size:14px;padding:10px 14px;border-radius:8px;text-decoration:none;border:none;background:transparent;font-family:var(--font-b);cursor:pointer;text-align:left;transition:all .2s}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface);color:var(--text)}
+@media(max-width:768px){.feats{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}.summary-cards,.dash-cards{grid-template-columns:1fr 1fr}.nav-link{display:none}.hamburger{display:flex}.hero h1{font-size:32px}.stats{flex-wrap:wrap}.si{min-width:50%}.frow2{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr 1fr}.countries-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:480px){.summary-cards,.dash-cards{grid-template-columns:1fr 1fr}.hero-cta{flex-direction:column;align-items:center}.auth-card{padding:24px 18px}.countries-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -340,10 +391,13 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 <div class="modal-overlay" id="limitModal">
   <div class="modal-box">
     <div class="modal-icon">⚡</div>
-    <div class="modal-title">You've used your 3 free invoices</div>
-    <div class="modal-sub">Create a free account to keep extracting. No credit card needed — just your email and a password.</div>
-    <div class="modal-btns">
-      <button class="modal-primary" onclick="showPage('login');setTab('signup');closeLimitModal()">Create free account →</button>
+    <div class="modal-title" id="modalTitle">You've used your 3 free invoices</div>
+    <div class="modal-sub" id="modalSub">Get 10 more invoice extractions instantly — any language, any country, clean Excel every time.</div>
+    <div class="modal-btns" id="modalBtns">
+      <a href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" class="modal-primary" style="text-decoration:none;display:block;text-align:center" onclick="closeLimitModal()">
+        💳 Buy 10 invoices — $5.00
+      </a>
+      <button class="modal-secondary" onclick="showPage('login');setTab('signup');closeLimitModal()">Create free account instead</button>
       <button class="modal-secondary" onclick="showPage('login');setTab('login');closeLimitModal()">Sign in to existing account</button>
     </div>
   </div>
@@ -360,13 +414,29 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <button class="nbtn nbtn-p" onclick="showPage('app')">Start free</button>
     </div>
     <div id="navUser" style="display:none">
-      <div class="nav-user" onclick="showPage('dashboard')">
-        <div class="nav-avatar" id="navAvatar">M</div>
-        <span id="navCredits" style="color:var(--green);font-size:12px;font-weight:600">3 credits</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <a href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" id="navBuyBtn" style="display:none;padding:6px 12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none">Buy credits</a>
+        <div class="nav-user" onclick="showPage('dashboard')">
+          <div class="nav-avatar" id="navAvatar">M</div>
+          <span id="navCredits" style="color:var(--green);font-size:12px;font-weight:600">3 credits</span>
+        </div>
       </div>
     </div>
+    <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button onclick="showPage('demo');closeMobileMenu()">Live Demo</button>
+  <button onclick="showPage('home');goTo('features');closeMobileMenu()">Features</button>
+  <button onclick="showPage('home');goTo('pricing');closeMobileMenu()">Pricing</button>
+  <button onclick="showPage('home');goTo('free-tools');closeMobileMenu()">Free Tools</button>
+  <button onclick="showPage('login');setTab('login');closeMobileMenu()" style="color:var(--accent)">Sign in</button>
+  <button onclick="showPage('app');closeMobileMenu()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px;margin-top:4px">Start free →</button>
+</div>
 
 <main>
 <!-- HOME -->
@@ -465,10 +535,10 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
     <div class="footer-inner">
       <div class="footer-brand"><h3>⚡ AlBills</h3><p>AI-powered invoice data extraction. Any document, any country, any language.</p><p style="margin-top:8px;font-size:12px;color:var(--text3)">🔒 Documents deleted after processing.</p></div>
       <div class="footer-col"><h4>Product</h4><a onclick="showPage('app')">Extract invoices</a><a onclick="showPage('demo')">Live demo</a><a onclick="showPage('home');goTo('features')">Features</a><a onclick="showPage('home');goTo('pricing')">Pricing</a></div>
-      <div class="footer-col"><h4>Free Tools</h4><a href="/vat-calculator.html">VAT Calculator</a><a href="/gold-price-calculator.html">Gold Price</a><a href="/currency-converter.html">Currency Converter</a><a href="/loan-calculator.html">Loan Calculator</a><a href="/zakat-calculator.html">Zakat Calculator</a></div>
-      <div class="footer-col"><h4>Account</h4><a onclick="showPage('login');setTab('signup')">Sign up free</a><a onclick="showPage('login');setTab('login')">Sign in</a><a onclick="showPage('dashboard')">Dashboard</a><a href="mailto:support@albills.com">Support</a></div>
+      <div class="footer-col"><h4>Free Tools</h4><a href="/vat-calculator.html">VAT Calculator</a><a href="/gold-price-calculator.html">Gold Price</a><a href="/currency-converter.html">Currency Converter</a><a href="/loan-calculator.html">Loan Calculator</a><a href="/zakat-calculator.html">Zakat Calculator</a><a href="/profit-margin-calculator.html">Profit Margin</a><a href="/break-even-calculator.html">Break-Even</a><a href="/salary-calculator.html">Salary</a><a href="/uae-corporate-tax.html">UAE Corp Tax</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="#" onclick="showPage('login');setTab('signup');return false">Sign up free</a><a href="#" onclick="showPage('login');setTab('login');return false">Sign in</a><a href="#" onclick="showPage('dashboard');return false">Dashboard</a><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms of Service</a><a href="/cdn-cgi/l/email-protection#15666065657a6761557479777c7979663b767a78">Support</a></div>
     </div>
-    <div class="footer-bottom"><span>© 2025 <strong>AlBills</strong>. All rights reserved.</span><span>Powered by Claude AI · albills.com</span></div>
+    <div class="footer-bottom"><span>© 2026 <strong>AlBills</strong>. All rights reserved.</span><span>Powered by Claude AI · albills.com</span></div>
   </footer>
 </div>
 
@@ -596,7 +666,10 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
   <div class="dash-wrap">
     <div class="dash-header">
       <div class="dash-greeting"><h2>Welcome back, <span id="dashName">Mohammed</span> 👋</h2><p id="dashEmail" style="color:var(--text3);font-size:13px"></p></div>
-      <button class="btn-p" onclick="showPage('app')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Extract invoices</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:rgba(77,217,192,0.1);border:1px solid rgba(77,217,192,0.3);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(77,217,192,0.18)'" onmouseout="this.style.background='rgba(77,217,192,0.1)'">💳 Buy 10 credits — $5.00</a>
+        <button class="btn-p" onclick="showPage('app')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Extract invoices</button>
+      </div>
     </div>
     <div class="dash-cards">
       <div class="dash-card green"><div class="dc-icon">⚡</div><div class="dc-val green" id="dashCredits">3</div><div class="dc-label">Credits remaining</div></div>
@@ -641,7 +714,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 <input type="file" id="fi" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx,.tiff" style="display:none">
 <input type="file" id="excelTemplate" accept=".xlsx,.csv" onchange="handleExcelTemplate(this)" style="display:none">
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SUPA_URL='https://bynkbsuphhyxsnnbftoa.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5bmtic3VwaGh5eHNubmJmdG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Mjg0NjAsImV4cCI6MjA5MDMwNDQ2MH0.YkikdYvLP_afw3B2t_qM1EESFjZ6n2kCxGa8NDxDNzU';
 const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -684,6 +757,8 @@ async function setUser(user){
   }
   userCredits=profile?.credits??3;
   document.getElementById('navCredits').textContent=userCredits+' credits';
+  const buyBtn=document.getElementById('navBuyBtn');
+  if(buyBtn) buyBtn.style.display=userCredits<=0?'block':'none';
   document.getElementById('freeText').textContent=userCredits+' credits remaining';
   document.getElementById('freeRight').innerHTML='<a onclick="showPage(\'dashboard\')" style="color:var(--accent);cursor:pointer">My Dashboard →</a>';
   updateFreeDots(Math.min(userCredits,3));
@@ -1002,10 +1077,15 @@ function buildDemo(){
 const pc=document.getElementById('particles');
 for(let i=0;i<16;i++){const p=document.createElement('div');p.className='p';p.style.left=Math.random()*100+'%';p.style.animationDuration=(14+Math.random()*18)+'s';p.style.animationDelay=(Math.random()*16)+'s';if(Math.random()>.65)p.style.background='var(--accent3)';pc.appendChild(p);}
 
-const obs=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
-document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const obs=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.05,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>{obs.observe(el);});
+setTimeout(()=>{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'))},500);
 
-updateFreeDots(3-getAnonUsed());
+function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('open')}
+function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open')}
+
+const anonUsed=getAnonUsed();
+updateFreeDots(Math.max(0,3-anonUsed));
 initAuth();
 </script>
 </body>
