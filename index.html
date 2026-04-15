@@ -791,8 +791,11 @@ async function loadHistory(userId){
     const ds=d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     return`<tr><td>${ds}</td><td>${r.invoice_count}</td><td>${r.fields_extracted||'—'}</td><td><span class="td-badge status-ok">✓ Done</span></td><td style="color:var(--accent)">${r.invoice_count}</td></tr>`;
   }).join('');
-  const thisMonth=data.filter(r=>new Date(r.created_at).getMonth()===new Date().getMonth()).reduce((s,r)=>s+r.invoice_count,0);
+  const now=new Date();
+  const thisMonth=data.filter(r=>{const d=new Date(r.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,r)=>s+(r.invoice_count||0),0);
   document.getElementById('dashThisMonth').textContent=thisMonth;
+  document.getElementById('dashTotal').textContent=data.reduce((s,r)=>s+(r.invoice_count||0),0);
+  document.getElementById('dashSaved').textContent='$'+(data.reduce((s,r)=>s+(r.invoice_count||0),0)*2).toFixed(0);
 }
 
 async function doLogin(){
