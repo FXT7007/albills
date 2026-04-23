@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Convert a Scanned PDF Invoice to Excel (With or Without OCR)</title>
+<meta name="description" content="Three proven methods to convert scanned PDF invoices into Excel. OCR pitfalls, accuracy tips, and when to just use an AI tool.">
+<link rel="canonical" href="https://albills.com/blog/how-to-convert-scanned-pdf-invoice-to-excel">
+<meta property="og:title" content="How to Convert a Scanned PDF Invoice to Excel (With or Without OCR)">
+<meta property="og:description" content="Three proven methods to convert scanned PDF invoices into Excel. OCR pitfalls, accuracy tips, and when to just use an AI tool.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://albills.com/blog/how-to-convert-scanned-pdf-invoice-to-excel">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "How to Convert a Scanned PDF Invoice to Excel (With or Without OCR)",
+  "description": "Three proven methods to convert scanned PDF invoices into Excel. OCR pitfalls, accuracy tips, and when to just use an AI tool.",
+  "datePublished": "2026-04-23",
+  "author": { "@type": "Organization", "name": "Albills" },
+  "publisher": { "@type": "Organization", "name": "Albills" }
+}
+</script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1a202c; background: #fff; line-height: 1.65; }
+  .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+  .wide { max-width: 1100px; }
+  header { padding: 20px 0; border-bottom: 1px solid #e2e8f0; }
+  header .inner { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-weight: 700; font-size: 1.3rem; color: #1F3A5F; text-decoration: none; }
+  nav a { color: #4a5568; text-decoration: none; margin-left: 20px; font-size: 0.95rem; }
+  nav a:hover { color: #1F3A5F; }
+
+  article { padding: 48px 0 32px; }
+  article h1 { font-size: 2.25rem; color: #1F3A5F; line-height: 1.25; margin: 0 0 14px; }
+  article .meta { color: #64748b; font-size: 0.9rem; margin-bottom: 32px; }
+  article h2 { font-size: 1.5rem; color: #1F3A5F; margin: 40px 0 12px; }
+  article h3 { font-size: 1.15rem; color: #1F3A5F; margin: 28px 0 8px; }
+  article p { margin: 0 0 16px; color: #2d3748; }
+  article ul, article ol { padding-left: 24px; margin: 0 0 16px; }
+  article li { margin-bottom: 6px; color: #2d3748; }
+  article a { color: #1F3A5F; text-decoration: underline; }
+  article code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.92em; font-family: Menlo, Consolas, monospace; }
+  article pre { background: #1e293b; color: #e2e8f0; padding: 18px 20px; border-radius: 8px; overflow-x: auto; font-size: 0.88rem; margin: 16px 0; }
+  article pre code { background: transparent; color: inherit; padding: 0; }
+  article table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; display: block; overflow-x: auto; }
+  article thead { background: #1F3A5F; }
+  article th { color: white; padding: 10px 14px; text-align: left; font-weight: 600; }
+  article td { padding: 10px 14px; border-top: 1px solid #e2e8f0; }
+  article tr:nth-child(even) td { background: #f8fafc; }
+  article blockquote { border-left: 4px solid #1F3A5F; padding: 8px 18px; color: #4a5568; margin: 18px 0; background: #f8fafc; }
+
+  .cta-box { background: linear-gradient(135deg, #1F3A5F, #2E5987); color: white; padding: 28px; border-radius: 12px; margin: 32px 0; }
+  .cta-box h3 { color: white; margin: 0 0 8px; font-size: 1.2rem; }
+  .cta-box p { color: #dbeafe; margin: 0 0 16px; }
+  .cta-box .btn { display: inline-block; background: white; color: #1F3A5F; padding: 12px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+  .cta-box .btn:hover { background: #f1f5f9; }
+
+  .affiliate-disclosure { font-size: 0.85rem; color: #94a3b8; font-style: italic; margin: 32px 0 8px; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+
+  .related-cta { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px; margin: 24px 0; }
+  .related-cta strong { color: #1F3A5F; }
+
+  footer { padding: 36px 0; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem; text-align: center; margin-top: 32px; }
+
+  @media (max-width: 640px) {
+    article h1 { font-size: 1.7rem; }
+    article h2 { font-size: 1.3rem; }
+  }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <a href="/" class="logo">Albills</a>
+    <nav>
+      <a href="/pdf-to-excel.html">PDF to Excel</a>
+      <a href="/invoice-to-excel.html">Invoice to Excel</a>
+      <a href="/blog/">Blog</a>
+      <a href="/api/">API</a>
+    </nav>
+  </div>
+</header>
+
+<article>
+  <div class="container">
+    <div class="meta">2026-04-23 · Albills Team</div>
+    <h1>How to Convert a Scanned PDF Invoice to Excel (With or Without OCR)</h1>
+<p>If you have a stack of scanned invoices and need them in Excel, you already know the real problem isn't "can it be done" — it's "how do I get clean rows and columns without spending an afternoon fixing them."</p>
+<p>This guide walks through the three methods that actually work in 2026, explains why scanned PDFs are harder than digital ones, and gives you a checklist for getting accuracy close to 99% on real-world invoices.</p>
+<h2>Why scanned PDFs are different from regular PDFs</h2>
+<p>A digital PDF (say, one you exported from Word) contains real, selectable text. You can highlight it with your cursor, copy it, and paste it into Excel.</p>
+<p>A scanned PDF is just a picture of a page saved in PDF format. There is no text inside it — only pixels. To turn those pixels into data you can put in Excel, something has to <strong>read</strong> the image. That "something" is <strong>OCR</strong> (optical character recognition).</p>
+<p>Here's the quick test: open the PDF, try to highlight a word. If you can't, you have a scanned PDF and plain copy-paste won't work.</p>
+<h2>Method 1 — Use an AI invoice tool (fastest, most accurate)</h2>
+<p>This is the right method for almost everyone. A modern invoice-to-Excel tool does three things at once:</p>
+<ol><li>Runs OCR to read the text.</li><li>Detects the invoice layout (vendor, date, totals, line items).</li><li>Outputs a structured Excel file with one row per line item.</li></ol>
+**Steps:**
+<ol><li>Upload the scanned PDF to a tool like <a href="https://albills.com/scanned-pdf-to-excel">Albills</a>.</li><li>Wait 5–20 seconds while OCR and layout detection run.</li><li>Download the <code>.xlsx</code>. You'll get a header sheet (vendor, invoice #, totals) and a line-items sheet.</li></ol>
+**Pros:** Near-zero manual work. Handles multi-page invoices and batches.
+<p><strong>Cons:</strong> Free tiers usually have daily limits. For large volumes, you'll want a paid plan or the API.</p>
+<p><strong>Accuracy tip:</strong> The cleaner your scan, the better. Scan at 300 DPI in grayscale mode. If you're photographing a paper invoice with your phone, hold the camera flat and use natural light — no flash.</p>
+
+<div class="cta-box">
+  <h3>Skip the setup — try the tool</h3>
+  <p>Albills handles scanned PDFs out of the box. OCR + table structure + line items auto-detected.</p>
+  <a class="btn" href="/scanned-pdf-to-excel.html">Open Scanned PDF to Excel →</a>
+</div>
+<h2>Method 2 — Adobe Acrobat Pro (if you already have it)</h2>
+<p>Adobe Acrobat Pro has a built-in "Export to Excel" feature that includes basic OCR.</p>
+<p><strong>Steps:</strong></p>
+<ol><li>Open the scanned PDF in Acrobat Pro.</li><li>Go to <code>Tools → Scan & OCR → Recognize Text → In This File</code>.</li><li>After OCR completes, go to <code>Export PDF → Spreadsheet → Microsoft Excel Workbook</code>.</li><li>Save the <code>.xlsx</code>.</li></ol>
+**Pros:** Everything in one app if you already subscribe.
+<p><strong>Cons:</strong> Acrobat's table detection is okay for clean layouts and mediocre on complex invoices. Line items often get merged into fewer columns than they should. Expect 10–30 minutes of manual cleanup per invoice on anything other than a simple layout.</p>
+<p><strong>When to use:</strong> Occasional scans of simple invoices, or when you absolutely can't use a cloud tool for compliance reasons.</p>
+<h2>Method 3 — The free-but-manual route (Tesseract + a spreadsheet)</h2>
+<p>If you're technical and want a $0 solution, the open-source path works:</p>
+<ol><li>Install <a href="https://github.com/tesseract-ocr/tesseract">Tesseract</a> — the open-source OCR engine.</li><li>Convert the scanned PDF to images with <code>pdftoppm</code> at 300 DPI.</li><li>Run Tesseract on each page: <code>tesseract page.png page -l eng</code>.</li><li>Paste the output into Excel and manually clean it into columns.</li></ol>
+**Pros:** Free. Runs offline.
+<p><strong>Cons:</strong> Tesseract outputs plain text. There is no table structure — every invoice needs manual column reconstruction. On a 3-line-item invoice this takes 5 minutes. On a 50-line-item invoice it takes an hour.</p>
+<p><strong>When to use:</strong> One-off scans where privacy is paramount and you have time to spare.</p>
+<h2>The OCR pitfalls no one warns you about</h2>
+<p>After running OCR on thousands of invoices, these are the failure modes that bite most often:</p>
+<ul><li><strong>Commas vs. periods.</strong> In European invoices, <code>1.234,56</code> means one thousand two hundred thirty-four and 56 cents. In US invoices, <code>1,234.56</code> means the same. OCR doesn't know which you meant — set the locale explicitly.</li><li><strong>O vs. 0, I vs. 1, S vs. 5.</strong> Low-resolution scans confuse these constantly. Post-OCR validation (is this field numeric?) catches most errors.</li><li><strong>Rotated pages.</strong> A page scanned sideways produces garbage unless the tool auto-rotates. Always use a tool that deskews.</li><li><strong>Faint carbon copies and thermal receipts.</strong> Contrast enhancement before OCR helps. Some tools do this automatically; Tesseract doesn't.</li><li><strong>Line items that wrap across two visual rows.</strong> Human-readable but OCR often treats them as separate items. Post-process to stitch by matching amounts.</li></ul>
+<h2>Accuracy checklist (before you upload anything)</h2>
+<p>Use this checklist to get OCR accuracy as high as possible:</p>
+<ul><li>[ ] Scan is 300 DPI or better.</li><li>[ ] Scan mode is grayscale or black-and-white, not color.</li><li>[ ] Page is flat (no book-spine curl).</li><li>[ ] Document is straight (or will be auto-deskewed).</li><li>[ ] Lighting is even (for phone photos).</li><li>[ ] File is a standard PDF (not an encrypted or password-protected one).</li><li>[ ] Language is known and set in the tool.</li></ul>
+<h2>Which method should you actually use?</h2>
+<table><thead><tr><th>Your situation</th><th>Best method</th></tr></thead><tbody><tr><td>One-off invoice, want it done now</td><td>AI invoice tool (free tier)</td></tr><tr><td>A folder of 20+ invoices per month</td><td>AI invoice tool, Pro plan</td></tr><tr><td>Building this into another app</td><td>AI tool's API</td></tr><tr><td>Already paying for Adobe, 1–2 scans/month</td><td>Adobe Acrobat Pro</td></tr><tr><td>Privacy requires offline processing</td><td>Tesseract + manual cleanup</td></tr></tbody></table>For most people — freelancers, bookkeepers, small-business owners — the AI invoice tool is the right answer. The time you save cleaning up OCR output easily pays for a $9/month plan.
+<h2>Try Albills on your scanned invoice</h2>
+<p>If you want to see how accurate modern invoice OCR has become, upload a scanned invoice to <a href="https://albills.com/scanned-pdf-to-excel">Albills' scanned-PDF-to-Excel tool</a> — it's free for up to 5 files per day, no signup. You'll get a clean Excel with vendor, date, totals, and every line item already populated.</p>
+<hr>
+*Want to automate this across a team? See our [bulk PDF invoice converter](https://albills.com/bulk-pdf-to-excel) or the [Albills API](https://albills.com/api) for developers.*
+<div class="cta-box">
+  <h3>Try Albills free — right now</h3>
+  <p>Convert up to 5 invoices per day for free. No signup. OCR included. Pro unlocks unlimited files + batch upload for $9/month.</p>
+  <a class="btn" href="/pdf-to-excel.html">Try free →</a>
+</div>
+
+<p class="affiliate-disclosure">
+  Some links above may be affiliate links. When you sign up through them, Albills may receive a referral fee at no cost to you.
+  We only recommend tools we would actually use ourselves.
+</p>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container wide">
+    <p>© <span id="year"></span> Albills. Free invoice-to-Excel for everyone who hates manual data entry.</p>
+  </div>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+</body>
+</html>
