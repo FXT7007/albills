@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convert PDF to Excel Free — Albills</title>
+  <meta name="description" content="Convert any PDF to Excel in seconds. Free, accurate, no signup. Handles tables, invoices, and scanned documents. Download your .xlsx instantly.">
+  <link rel="canonical" href="https://albills.com/pdf-to-excel">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Convert PDF to Excel Free — Albills">
+  <meta property="og:description" content="Free PDF-to-Excel converter. Tables, invoices, scans — all supported. Instant download.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://albills.com/pdf-to-excel">
+  <meta property="og:image" content="https://albills.com/og/pdf-to-excel.png">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Convert PDF to Excel Free">
+  <meta name="twitter:description" content="Free PDF-to-Excel converter with OCR. No signup. Instant download.">
+
+  <!-- Schema: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Albills PDF to Excel Converter",
+    "operatingSystem": "Web",
+    "applicationCategory": "BusinessApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1200"
+    }
+  }
+  </script>
+
+  <!-- Schema: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is the PDF to Excel converter really free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Up to 5 PDFs per day, each up to 10 pages, are free with no signup. For larger files and batch conversion, upgrade to Pro for $9/month."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on scanned PDFs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Albills uses OCR to read text from scanned invoices and image-based PDFs, and converts them to structured Excel rows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Will my data be safe?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Files are encrypted in transit and at rest, and automatically deleted within one hour unless you save them to your account."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I convert multiple PDFs at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Batch upload is available for Pro and Business plans — drop a folder or ZIP and get one Excel file per PDF."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1a202c;
+      background: #ffffff;
+      line-height: 1.6;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    header { padding: 20px 0; border-bottom: 1px solid #e2e8f0; }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 700; font-size: 1.3rem; color: #1F3A5F; text-decoration: none; }
+    nav a { color: #4a5568; text-decoration: none; margin-left: 24px; font-size: 0.95rem; }
+    nav a:hover { color: #1F3A5F; }
+
+    .hero { padding: 60px 0 40px; text-align: center; }
+    .hero h1 { font-size: 2.6rem; margin: 0 0 16px; color: #1F3A5F; }
+    .hero p.sub { font-size: 1.15rem; color: #4a5568; max-width: 680px; margin: 0 auto 32px; }
+
+    .dropzone {
+      border: 2px dashed #94a3b8;
+      border-radius: 12px;
+      padding: 56px 24px;
+      background: #f8fafc;
+      max-width: 720px;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dropzone:hover { border-color: #1F3A5F; background: #f1f5f9; }
+    .dropzone .icon { font-size: 3rem; margin-bottom: 12px; }
+    .dropzone h3 { margin: 0 0 8px; font-size: 1.25rem; }
+    .dropzone p { margin: 0; color: #64748b; font-size: 0.95rem; }
+    .btn-primary {
+      display: inline-block;
+      background: #1F3A5F;
+      color: white;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn-primary:hover { background: #172a44; }
+    .free-note { margin-top: 16px; color: #64748b; font-size: 0.9rem; }
+
+    .trust-row { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-top: 40px; color: #64748b; font-size: 0.9rem; }
+    .trust-row span::before { content: "✓ "; color: #10b981; font-weight: 700; }
+
+    section { padding: 60px 0; }
+    section.alt { background: #f8fafc; }
+    h2 { font-size: 2rem; color: #1F3A5F; margin: 0 0 24px; }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .feature { padding: 24px; background: white; border: 1px solid #e2e8f0; border-radius: 10px; }
+    .feature h3 { margin: 0 0 8px; color: #1F3A5F; font-size: 1.15rem; }
+    .feature p { margin: 0; color: #4a5568; font-size: 0.95rem; }
+
+    .how-it-works { counter-reset: step; }
+    .step { display: flex; gap: 24px; margin-bottom: 32px; }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      flex-shrink: 0;
+      width: 48px; height: 48px;
+      background: #1F3A5F;
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .step-body h3 { margin: 0 0 6px; color: #1F3A5F; }
+    .step-body p { margin: 0; color: #4a5568; }
+
+    .faq dt { font-weight: 600; margin-top: 20px; color: #1F3A5F; font-size: 1.05rem; }
+    .faq dd { margin: 6px 0 0; color: #4a5568; }
+
+    .related { display: flex; flex-wrap: wrap; gap: 12px; }
+    .related a {
+      background: white;
+      padding: 10px 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      color: #1F3A5F;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .related a:hover { border-color: #1F3A5F; }
+
+    footer { padding: 40px 0; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem; text-align: center; }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 2rem; }
+      .dropzone { padding: 40px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">Albills</a>
+    <nav>
+      <a href="/pdf-to-excel">PDF to Excel</a>
+      <a href="/invoice-to-excel">Invoice to Excel</a>
+      <a href="/api">API</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/blog">Blog</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Convert PDF to Excel — Free, Instant, Accurate</h1>
+    <p class="sub">Drop a PDF and get a clean <strong>.xlsx</strong> back in seconds. Tables, invoices, and scanned documents all supported. No signup required.</p>
+
+    <div class="dropzone" onclick="document.getElementById('file-input').click()">
+      <div class="icon">📄</div>
+      <h3>Drop your PDF here or click to browse</h3>
+      <p>Up to 10 pages free · OCR included · Data auto-deleted in 1 hour</p>
+      <input type="file" id="file-input" accept="application/pdf" style="display:none" multiple>
+      <div><button class="btn-primary" onclick="event.stopPropagation();document.getElementById('file-input').click()">Choose PDF</button></div>
+    </div>
+
+    <p class="free-note">5 free conversions / day. No credit card. No watermark on output.</p>
+
+    <div class="trust-row">
+      <span>99% table accuracy</span>
+      <span>OCR for scanned docs</span>
+      <span>Bank-grade encryption</span>
+      <span>GDPR compliant</span>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Why Albills?</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>Invoice-aware extraction</h3>
+        <p>Auto-detects vendor, date, totals, and line items — not just raw cells. Saves hours of cleanup.</p>
+      </div>
+      <div class="feature">
+        <h3>Works on scanned PDFs</h3>
+        <p>Built-in OCR reads photographed and scanned invoices accurately, even at lower resolutions.</p>
+      </div>
+      <div class="feature">
+        <h3>Preserves table structure</h3>
+        <p>Rows stay rows, columns stay columns. No more merged cells or broken formulas.</p>
+      </div>
+      <div class="feature">
+        <h3>Batch conversion (Pro)</h3>
+        <p>Drop a folder or ZIP. One Excel file per PDF, delivered together. Perfect for month-end work.</p>
+      </div>
+      <div class="feature">
+        <h3>Developer API</h3>
+        <p>$0.02 per page. Free tier with 100 pages/month. Webhooks and Python/Node SDKs included.</p>
+      </div>
+      <div class="feature">
+        <h3>Private by default</h3>
+        <p>Files are encrypted, processed, and deleted within one hour. You control your data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>How it works</h2>
+    <div class="how-it-works">
+      <div class="step">
+        <div class="step-body">
+          <h3>Upload your PDF</h3>
+          <p>Drag a file or click to browse. Any PDF works — tables, invoices, statements, or scans.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-body">
+          <h3>We detect and extract</h3>
+          <p>Albills identifies tables, line items, and key fields automatically. OCR kicks in for scanned pages.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-body">
+          <h3>Download your Excel</h3>
+          <p>Get a clean .xlsx with proper rows, columns, and data types. Open in Excel, Google Sheets, or Numbers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Frequently asked questions</h2>
+    <dl class="faq">
+      <dt>Is the PDF to Excel converter really free?</dt>
+      <dd>Yes. Up to 5 PDFs per day, each up to 10 pages, are free with no signup. For larger files and batch conversion, upgrade to Pro for $9/month.</dd>
+
+      <dt>Does it work on scanned PDFs?</dt>
+      <dd>Yes. Albills uses OCR to read text from scanned invoices and image-based PDFs, and converts them to structured Excel rows.</dd>
+
+      <dt>Will my data be safe?</dt>
+      <dd>Files are encrypted in transit and at rest, and automatically deleted within one hour unless you save them to your account.</dd>
+
+      <dt>Can I convert multiple PDFs at once?</dt>
+      <dd>Batch upload is available for Pro and Business plans — drop a folder or ZIP and get one Excel file per PDF.</dd>
+
+      <dt>Will formulas and formatting be preserved?</dt>
+      <dd>Table structure, numbers, and dates are preserved. Source formulas are not extracted (PDFs don't contain them), but numeric data types are.</dd>
+
+      <dt>Do you have an API?</dt>
+      <dd>Yes — see <a href="/api">Albills API</a>. Free tier with 100 pages/month, then $0.02–$0.05 per page with volume discounts.</dd>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Related tools</h2>
+    <div class="related">
+      <a href="/invoice-to-excel">Invoice to Excel</a>
+      <a href="/scanned-pdf-to-excel">Scanned PDF to Excel</a>
+      <a href="/pdf-to-csv">PDF to CSV</a>
+      <a href="/pdf-to-google-sheets">PDF to Google Sheets</a>
+      <a href="/bank-statement-to-excel">Bank Statement to Excel</a>
+      <a href="/bulk-pdf-to-excel">Bulk PDF to Excel</a>
+      <a href="/invoice-generator">Free Invoice Generator</a>
+      <a href="/vat-calculator">VAT Calculator</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>© <span id="year"></span> Albills. Built for accountants, freelancers, and developers who hate manual data entry.</p>
+    <p><a href="/privacy" style="color:#64748b">Privacy</a> · <a href="/terms" style="color:#64748b">Terms</a> · <a href="/contact" style="color:#64748b">Contact</a></p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Placeholder upload handler — wire to your backend
+  document.getElementById('file-input').addEventListener('change', (e) => {
+    const files = e.target.files;
+    if (!files.length) return;
+    // TODO: replace with real upload to /api/convert
+    alert(`${files.length} file(s) selected. Connect this to your /api/convert endpoint.`);
+  });
+</script>
+
+</body>
+</html>
