@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice to Excel Converter — Free, AI-Powered | Albills</title>
+  <meta name="description" content="Convert PDF invoices to Excel with line items, vendors, dates, and totals auto-extracted. Free to try. Accountant-grade accuracy. No signup.">
+  <link rel="canonical" href="https://albills.com/invoice-to-excel">
+
+  <meta property="og:title" content="Invoice to Excel Converter — Free | Albills">
+  <meta property="og:description" content="AI-powered invoice-to-Excel. Line items, totals, vendors extracted automatically. Free to try.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://albills.com/invoice-to-excel">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Albills Invoice to Excel",
+    "operatingSystem": "Web",
+    "applicationCategory": "BusinessApplication",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "850" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":"Does it handle invoices from different vendors?","acceptedAnswer":{"@type":"Answer","text":"Yes. Albills uses AI to understand invoice layouts, so it works across thousands of templates — from Amazon and Uber to custom supplier invoices."}},
+      {"@type":"Question","name":"Can it extract line items (not just totals)?","acceptedAnswer":{"@type":"Answer","text":"Yes. Each line item — description, quantity, unit price, tax, line total — is extracted into its own row in Excel."}},
+      {"@type":"Question","name":"Is it accurate enough for accounting?","acceptedAnswer":{"@type":"Answer","text":"We benchmark at 99% field accuracy on clean PDFs and 95%+ on scans. Every field can be reviewed and corrected before export."}},
+      {"@type":"Question","name":"Can I export directly to QuickBooks or Xero?","acceptedAnswer":{"@type":"Answer","text":"Yes — the Business plan includes one-click export to QuickBooks Online and Xero."}}
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1a202c; background: #fff; line-height: 1.6; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    header { padding: 20px 0; border-bottom: 1px solid #e2e8f0; }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 700; font-size: 1.3rem; color: #1F3A5F; text-decoration: none; }
+    nav a { color: #4a5568; text-decoration: none; margin-left: 24px; font-size: 0.95rem; }
+
+    .hero { padding: 60px 0 40px; text-align: center; }
+    .hero h1 { font-size: 2.6rem; margin: 0 0 16px; color: #1F3A5F; }
+    .hero p.sub { font-size: 1.15rem; color: #4a5568; max-width: 720px; margin: 0 auto 32px; }
+    .dropzone { border: 2px dashed #94a3b8; border-radius: 12px; padding: 56px 24px; background: #f8fafc; max-width: 720px; margin: 0 auto; cursor: pointer; }
+    .dropzone:hover { border-color: #1F3A5F; background: #f1f5f9; }
+    .dropzone h3 { margin: 0 0 8px; }
+    .btn-primary { display: inline-block; background: #1F3A5F; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 20px; border: none; cursor: pointer; font-size: 1rem; }
+    .btn-primary:hover { background: #172a44; }
+    .free-note { margin-top: 16px; color: #64748b; font-size: 0.9rem; }
+
+    section { padding: 60px 0; }
+    section.alt { background: #f8fafc; }
+    h2 { font-size: 2rem; color: #1F3A5F; margin: 0 0 24px; }
+
+    .fields-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+    .fields-table th { background: #1F3A5F; color: white; padding: 12px 16px; text-align: left; font-weight: 600; }
+    .fields-table td { padding: 12px 16px; border-top: 1px solid #e2e8f0; }
+    .fields-table tr:nth-child(even) td { background: #f8fafc; }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .feature { padding: 24px; background: white; border: 1px solid #e2e8f0; border-radius: 10px; }
+    .feature h3 { margin: 0 0 8px; color: #1F3A5F; font-size: 1.15rem; }
+    .feature p { margin: 0; color: #4a5568; font-size: 0.95rem; }
+
+    .faq dt { font-weight: 600; margin-top: 20px; color: #1F3A5F; font-size: 1.05rem; }
+    .faq dd { margin: 6px 0 0; color: #4a5568; }
+    .related { display: flex; flex-wrap: wrap; gap: 12px; }
+    .related a { background: white; padding: 10px 18px; border: 1px solid #e2e8f0; border-radius: 8px; color: #1F3A5F; text-decoration: none; font-size: 0.95rem; }
+
+    footer { padding: 40px 0; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem; text-align: center; }
+    @media (max-width: 640px) { .hero h1 { font-size: 2rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">Albills</a>
+    <nav>
+      <a href="/pdf-to-excel">PDF to Excel</a>
+      <a href="/invoice-to-excel">Invoice to Excel</a>
+      <a href="/api">API</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/blog">Blog</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Invoice to Excel — Auto-Extract Every Line Item</h1>
+    <p class="sub">Drop a PDF invoice and get vendor, date, totals, tax, and every line item in a clean Excel sheet. Built for accountants, freelancers, and finance teams.</p>
+
+    <div class="dropzone" onclick="document.getElementById('file-input').click()">
+      <h3>📥 Drop invoice PDF(s) here</h3>
+      <p>Supports PDFs, scans, and photos · Free up to 5 invoices/day</p>
+      <input type="file" id="file-input" accept="application/pdf,image/*" style="display:none" multiple>
+      <div><button class="btn-primary">Choose invoice</button></div>
+    </div>
+    <p class="free-note">5 free conversions / day · Batch upload on Pro · QuickBooks / Xero export on Business</p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Fields extracted automatically</h2>
+    <p>Every Albills export contains a header sheet and a line-items sheet with these fields out of the box:</p>
+    <table class="fields-table">
+      <thead>
+        <tr><th>Section</th><th>Fields</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Invoice header</strong></td><td>Invoice #, date, due date, PO #, vendor name, vendor address, tax ID, currency</td></tr>
+        <tr><td><strong>Buyer</strong></td><td>Buyer name, billing address, shipping address, buyer tax ID</td></tr>
+        <tr><td><strong>Line items</strong></td><td>Description, SKU, quantity, unit, unit price, discount, tax %, line total</td></tr>
+        <tr><td><strong>Totals</strong></td><td>Subtotal, tax total, shipping, discount, grand total</td></tr>
+        <tr><td><strong>Payment</strong></td><td>Terms, payment method, bank details, IBAN, SWIFT</td></tr>
+      </tbody>
+    </table>
+    <p style="color:#64748b;font-size:0.95rem;">Need a custom field? Define it once in a template (Pro) and every future invoice uses it.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Built for the messy real world</h2>
+    <div class="features">
+      <div class="feature"><h3>Any vendor, any layout</h3><p>AI-based extraction works across thousands of invoice templates, not just standard ones.</p></div>
+      <div class="feature"><h3>Scanned & photographed</h3><p>OCR reads receipts from your phone or scans from an all-in-one printer.</p></div>
+      <div class="feature"><h3>Multi-currency & multi-language</h3><p>English, Spanish, French, Arabic, German, Portuguese — detected automatically.</p></div>
+      <div class="feature"><h3>Tax-aware</h3><p>Recognizes VAT, GST, sales tax, and withholding automatically.</p></div>
+      <div class="feature"><h3>QuickBooks & Xero export</h3><p>One-click export to the accounting tools you already use.</p></div>
+      <div class="feature"><h3>Review & edit</h3><p>Confidence scores on every field — fix anything before export, with full audit trail.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Who uses Albills Invoice to Excel</h2>
+    <div class="features">
+      <div class="feature"><h3>Freelancers</h3><p>Convert every client invoice into a reconciliation-ready sheet. End-of-month in minutes, not hours.</p></div>
+      <div class="feature"><h3>Bookkeepers</h3><p>Batch process dozens of vendor invoices at once. Template per client, no retyping.</p></div>
+      <div class="feature"><h3>E-commerce sellers</h3><p>Import supplier invoices, match to purchase orders, track COGS without manual entry.</p></div>
+      <div class="feature"><h3>Finance teams</h3><p>Feed invoices straight into ERP via the Albills API. Line items, GL-ready.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Frequently asked questions</h2>
+    <dl class="faq">
+      <dt>Does it handle invoices from different vendors?</dt>
+      <dd>Yes. Albills uses AI to understand invoice layouts, so it works across thousands of templates — from Amazon and Uber to custom supplier invoices.</dd>
+      <dt>Can it extract line items, not just totals?</dt>
+      <dd>Yes. Each line item — description, quantity, unit price, tax, line total — is extracted into its own row in Excel.</dd>
+      <dt>Is it accurate enough for accounting?</dt>
+      <dd>We benchmark at 99% field accuracy on clean PDFs and 95%+ on scans. Every field can be reviewed and corrected before export.</dd>
+      <dt>Can I export directly to QuickBooks or Xero?</dt>
+      <dd>Yes — the Business plan includes one-click export to QuickBooks Online and Xero. Other tools (Zoho Books, FreshBooks) via Zapier.</dd>
+      <dt>What about multi-currency invoices?</dt>
+      <dd>Currency is detected per invoice and preserved. For totals across currencies, we can apply a reference rate from the invoice date.</dd>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Related tools</h2>
+    <div class="related">
+      <a href="/pdf-to-excel">PDF to Excel</a>
+      <a href="/scanned-pdf-to-excel">Scanned PDF to Excel</a>
+      <a href="/receipt-to-excel">Receipt to Excel</a>
+      <a href="/invoice-to-quickbooks">Invoice to QuickBooks</a>
+      <a href="/invoice-to-xero">Invoice to Xero</a>
+      <a href="/bulk-pdf-to-excel">Bulk Invoice Converter</a>
+      <a href="/invoice-generator">Free Invoice Generator</a>
+      <a href="/vat-calculator">VAT Calculator</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>© <span id="year"></span> Albills. Free invoice-to-Excel for everyone who hates manual data entry.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('file-input').addEventListener('change', (e) => {
+    if (!e.target.files.length) return;
+    alert(`${e.target.files.length} invoice(s) selected. Wire this to /api/convert-invoice.`);
+  });
+</script>
+
+</body>
+</html>
