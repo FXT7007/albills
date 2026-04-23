@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanned PDF to Excel with OCR — Free | Albills</title>
+  <meta name="description" content="Convert scanned PDFs to Excel with high-accuracy OCR. Works on photos, receipts, faxes, and low-resolution scans. Free to try — no signup.">
+  <link rel="canonical" href="https://albills.com/scanned-pdf-to-excel">
+
+  <meta property="og:title" content="Scanned PDF to Excel — OCR-powered | Albills">
+  <meta property="og:description" content="OCR-powered scanned PDF to Excel. Photos, receipts, faxes supported. Free to try.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://albills.com/scanned-pdf-to-excel">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Albills Scanned PDF to Excel","operatingSystem":"Web","applicationCategory":"BusinessApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"What counts as a scanned PDF?","acceptedAnswer":{"@type":"Answer","text":"Any PDF whose text is actually an image — produced by a scanner, fax, phone camera, or 'Print to PDF' from an image. Text cannot be selected in the PDF."}},
+    {"@type":"Question","name":"How accurate is your OCR on scans?","acceptedAnswer":{"@type":"Answer","text":"We benchmark at 95–97% character accuracy on good scans and 88–92% on phone photos. Table structure is preserved in both cases."}},
+    {"@type":"Question","name":"What languages are supported?","acceptedAnswer":{"@type":"Answer","text":"English, Spanish, French, German, Portuguese, Italian, Arabic, Dutch, Polish, and more. Language is auto-detected per page."}},
+    {"@type":"Question","name":"Can I rotate or deskew automatically?","acceptedAnswer":{"@type":"Answer","text":"Yes. Pages are auto-rotated and deskewed before OCR. You don't have to pre-process anything."}}
+  ]}
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1a202c; background: #fff; line-height: 1.6; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    header { padding: 20px 0; border-bottom: 1px solid #e2e8f0; }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 700; font-size: 1.3rem; color: #1F3A5F; text-decoration: none; }
+    nav a { color: #4a5568; text-decoration: none; margin-left: 24px; font-size: 0.95rem; }
+
+    .hero { padding: 60px 0 40px; text-align: center; }
+    .hero h1 { font-size: 2.6rem; margin: 0 0 16px; color: #1F3A5F; }
+    .hero p.sub { font-size: 1.15rem; color: #4a5568; max-width: 720px; margin: 0 auto 32px; }
+    .dropzone { border: 2px dashed #94a3b8; border-radius: 12px; padding: 56px 24px; background: #f8fafc; max-width: 720px; margin: 0 auto; cursor: pointer; }
+    .dropzone:hover { border-color: #1F3A5F; background: #f1f5f9; }
+    .btn-primary { background: #1F3A5F; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 20px; border: none; cursor: pointer; font-size: 1rem; }
+
+    section { padding: 60px 0; }
+    section.alt { background: #f8fafc; }
+    h2 { font-size: 2rem; color: #1F3A5F; margin: 0 0 24px; }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .feature { padding: 24px; background: white; border: 1px solid #e2e8f0; border-radius: 10px; }
+    .feature h3 { margin: 0 0 8px; color: #1F3A5F; }
+
+    .tips-list { counter-reset: tip; padding: 0; list-style: none; }
+    .tips-list li { padding-left: 56px; position: relative; margin-bottom: 24px; }
+    .tips-list li::before {
+      counter-increment: tip; content: counter(tip);
+      position: absolute; left: 0; top: 0;
+      width: 40px; height: 40px; background: #1F3A5F; color: white;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+    }
+    .tips-list li strong { color: #1F3A5F; display: block; margin-bottom: 4px; }
+
+    .faq dt { font-weight: 600; margin-top: 20px; color: #1F3A5F; font-size: 1.05rem; }
+    .faq dd { margin: 6px 0 0; color: #4a5568; }
+    .related { display: flex; flex-wrap: wrap; gap: 12px; }
+    .related a { background: white; padding: 10px 18px; border: 1px solid #e2e8f0; border-radius: 8px; color: #1F3A5F; text-decoration: none; font-size: 0.95rem; }
+
+    footer { padding: 40px 0; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem; text-align: center; }
+    @media (max-width: 640px) { .hero h1 { font-size: 2rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">Albills</a>
+    <nav>
+      <a href="/pdf-to-excel">PDF to Excel</a>
+      <a href="/invoice-to-excel">Invoice to Excel</a>
+      <a href="/api">API</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/blog">Blog</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Scanned PDF to Excel — OCR-Powered, Table-Aware</h1>
+    <p class="sub">Turn photographed, scanned, or faxed PDFs into clean Excel sheets. Our OCR reads messy real-world documents — not just clean, digital ones — and preserves table structure.</p>
+    <div class="dropzone" onclick="document.getElementById('file-input').click()">
+      <h3>📸 Drop your scanned PDF or photo</h3>
+      <p>Up to 10 pages free · Auto-deskew + rotation · 10+ languages</p>
+      <input type="file" id="file-input" accept="application/pdf,image/*" style="display:none" multiple>
+      <div><button class="btn-primary">Choose file</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Built for real scans, not textbook PDFs</h2>
+    <div class="features">
+      <div class="feature"><h3>Auto-deskew & rotate</h3><p>Crooked scans? Upside down phone photos? Albills straightens pages before OCR.</p></div>
+      <div class="feature"><h3>Low-resolution friendly</h3><p>Works down to 150 DPI — fax-quality scans and compressed email attachments.</p></div>
+      <div class="feature"><h3>Multi-language OCR</h3><p>10+ languages auto-detected per page, including Arabic, German, French, Spanish, Portuguese.</p></div>
+      <div class="feature"><h3>Table structure preserved</h3><p>Rows stay rows, columns stay columns — even when gridlines are missing or faint.</p></div>
+      <div class="feature"><h3>Handwriting (beta)</h3><p>Printed handwriting on forms is supported in beta. Confidence scored per field.</p></div>
+      <div class="feature"><h3>Batch mode (Pro)</h3><p>Drop a folder of scans. Get one Excel per PDF — perfect for archive digitization.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>5 tips for the best OCR results</h2>
+    <ol class="tips-list">
+      <li><strong>Scan at 300 DPI when possible.</strong> 200 DPI works, 150 is the floor. Higher DPI = more accurate character recognition.</li>
+      <li><strong>Use "Black & White" or "Grayscale" scan mode.</strong> Color scans pick up background paper textures that confuse OCR.</li>
+      <li><strong>Make sure the page is flat.</strong> Book spines, bent paper, and curled pages distort columns.</li>
+      <li><strong>Good lighting for phone photos.</strong> Shadow-free, even lighting; avoid flash on glossy paper.</li>
+      <li><strong>Let Albills auto-rotate.</strong> Don't pre-rotate — our deskew handles it better than manual rotation.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Frequently asked questions</h2>
+    <dl class="faq">
+      <dt>What counts as a scanned PDF?</dt>
+      <dd>Any PDF whose text is actually an image — produced by a scanner, fax, phone camera, or "Print to PDF" from an image. If you can't highlight text with your cursor, it's a scanned PDF.</dd>
+      <dt>How accurate is your OCR on scans?</dt>
+      <dd>We benchmark at 95–97% character accuracy on good scans and 88–92% on phone photos. Table structure is preserved in both cases. See our <a href="/accuracy">public benchmark</a>.</dd>
+      <dt>What languages are supported?</dt>
+      <dd>English, Spanish, French, German, Portuguese, Italian, Arabic, Dutch, Polish, and more. Language is auto-detected per page.</dd>
+      <dt>Can I rotate or deskew automatically?</dt>
+      <dd>Yes. Pages are auto-rotated and deskewed before OCR. You don't have to pre-process anything.</dd>
+      <dt>Can I OCR a very old or faint document?</dt>
+      <dd>Yes, with caveats. We apply contrast enhancement before OCR. For extremely faint originals, consider scanning at 600 DPI for better results.</dd>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Related tools</h2>
+    <div class="related">
+      <a href="/pdf-to-excel">PDF to Excel</a>
+      <a href="/invoice-to-excel">Invoice to Excel</a>
+      <a href="/receipt-to-excel">Receipt to Excel</a>
+      <a href="/bank-statement-to-excel">Bank Statement to Excel</a>
+      <a href="/image-to-excel">Image to Excel</a>
+      <a href="/handwriting-to-text">Handwriting to Text</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>© <span id="year"></span> Albills.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('file-input').addEventListener('change', (e) => {
+    if (!e.target.files.length) return;
+    alert(`${e.target.files.length} file(s) selected. Wire to /api/ocr-convert.`);
+  });
+</script>
+
+</body>
+</html>
