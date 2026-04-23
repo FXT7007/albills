@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albills Blog — Guides on PDF, Invoices, and Excel</title>
+<meta name="description" content="Guides and deep-dives on PDF-to-Excel workflows, invoice OCR, and getting real work out of your documents.">
+<link rel="canonical" href="https://albills.com/blog/">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1a202c; background: #fff; line-height: 1.65; }
+  .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+  .wide { max-width: 1100px; }
+  header { padding: 20px 0; border-bottom: 1px solid #e2e8f0; }
+  header .inner { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-weight: 700; font-size: 1.3rem; color: #1F3A5F; text-decoration: none; }
+  nav a { color: #4a5568; text-decoration: none; margin-left: 20px; font-size: 0.95rem; }
+  nav a:hover { color: #1F3A5F; }
+
+  article { padding: 48px 0 32px; }
+  article h1 { font-size: 2.25rem; color: #1F3A5F; line-height: 1.25; margin: 0 0 14px; }
+  article .meta { color: #64748b; font-size: 0.9rem; margin-bottom: 32px; }
+  article h2 { font-size: 1.5rem; color: #1F3A5F; margin: 40px 0 12px; }
+  article h3 { font-size: 1.15rem; color: #1F3A5F; margin: 28px 0 8px; }
+  article p { margin: 0 0 16px; color: #2d3748; }
+  article ul, article ol { padding-left: 24px; margin: 0 0 16px; }
+  article li { margin-bottom: 6px; color: #2d3748; }
+  article a { color: #1F3A5F; text-decoration: underline; }
+  article code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.92em; font-family: Menlo, Consolas, monospace; }
+  article pre { background: #1e293b; color: #e2e8f0; padding: 18px 20px; border-radius: 8px; overflow-x: auto; font-size: 0.88rem; margin: 16px 0; }
+  article pre code { background: transparent; color: inherit; padding: 0; }
+  article table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; display: block; overflow-x: auto; }
+  article thead { background: #1F3A5F; }
+  article th { color: white; padding: 10px 14px; text-align: left; font-weight: 600; }
+  article td { padding: 10px 14px; border-top: 1px solid #e2e8f0; }
+  article tr:nth-child(even) td { background: #f8fafc; }
+  article blockquote { border-left: 4px solid #1F3A5F; padding: 8px 18px; color: #4a5568; margin: 18px 0; background: #f8fafc; }
+
+  .cta-box { background: linear-gradient(135deg, #1F3A5F, #2E5987); color: white; padding: 28px; border-radius: 12px; margin: 32px 0; }
+  .cta-box h3 { color: white; margin: 0 0 8px; font-size: 1.2rem; }
+  .cta-box p { color: #dbeafe; margin: 0 0 16px; }
+  .cta-box .btn { display: inline-block; background: white; color: #1F3A5F; padding: 12px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+  .cta-box .btn:hover { background: #f1f5f9; }
+
+  .affiliate-disclosure { font-size: 0.85rem; color: #94a3b8; font-style: italic; margin: 32px 0 8px; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+
+  .related-cta { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px; margin: 24px 0; }
+  .related-cta strong { color: #1F3A5F; }
+
+  footer { padding: 36px 0; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem; text-align: center; margin-top: 32px; }
+
+  @media (max-width: 640px) {
+    article h1 { font-size: 1.7rem; }
+    article h2 { font-size: 1.3rem; }
+  }
+</style>
+
+<style>
+  .post-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 32px 0; }
+  .post-card { display: block; padding: 24px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.15s; }
+  .post-card:hover { border-color: #1F3A5F; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(31,58,95,0.08); }
+  .post-card h2 { color: #1F3A5F; font-size: 1.25rem; margin: 0 0 10px; }
+  .post-card p { color: #4a5568; font-size: 0.95rem; margin: 0 0 12px; }
+  .post-card .date { color: #94a3b8; font-size: 0.85rem; }
+  .hero { padding: 48px 0 24px; text-align: center; }
+  .hero h1 { color: #1F3A5F; font-size: 2.2rem; margin: 0 0 12px; }
+  .hero p { color: #4a5568; max-width: 620px; margin: 0 auto; font-size: 1.05rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <a href="/" class="logo">Albills</a>
+    <nav>
+      <a href="/pdf-to-excel.html">PDF to Excel</a>
+      <a href="/invoice-to-excel.html">Invoice to Excel</a>
+      <a href="/blog/">Blog</a>
+      <a href="/api/">API</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container"><h1>The Albills Blog</h1><p>Guides, comparisons, and workflows for turning PDFs and invoices into real, usable data.</p></div>
+</section>
+<section>
+  <div class="container wide">
+    <div class="post-grid">
+    <a class="post-card" href="/blog/how-to-convert-scanned-pdf-invoice-to-excel.html">
+      <h2>How to Convert a Scanned PDF Invoice to Excel (With or Without OCR)</h2>
+      <p>Three proven methods to convert scanned PDF invoices into Excel. OCR pitfalls, accuracy tips, and when to just use an AI tool.</p>
+      <span class="date">2026-04-23</span>
+    </a>
+  
+    <a class="post-card" href="/blog/bulk-convert-pdf-invoices-to-excel.html">
+      <h2>Bulk Convert PDF Invoices to Excel in Minutes — 3 Methods Compared (2026)</h2>
+      <p>Three ways to batch-convert dozens or hundreds of PDF invoices into one clean Excel file. Speed, accuracy, and cost compared.</p>
+      <span class="date">2026-04-23</span>
+    </a>
+  
+    <a class="post-card" href="/blog/best-invoice-ocr-api-comparison.html">
+      <h2>Best Invoice OCR APIs Compared — Price, Accuracy & Developer Experience (2026)</h2>
+      <p>A developer's comparison of the top invoice OCR APIs in 2026: Albills, Nanonets, Veryfi, Docparser, Rossum, and AWS Textract. Pricing, accuracy, and DX.</p>
+      <span class="date">2026-04-23</span>
+    </a>
+  </div>
+    
+<div class="cta-box">
+  <h3>Get the flagship tool</h3>
+  <p>Convert any PDF to Excel in seconds. Free for 5 files/day. No signup.</p>
+  <a class="btn" href="/pdf-to-excel.html">Open the converter →</a>
+</div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="container wide">
+    <p>© <span id="year"></span> Albills. Free invoice-to-Excel for everyone who hates manual data entry.</p>
+  </div>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+</body>
+</html>
