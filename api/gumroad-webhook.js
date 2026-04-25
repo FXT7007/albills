@@ -77,16 +77,27 @@ export default async function handler(req, res) {
     // ---------- 1. Authenticate ----------
     // Accept the secret as body field, query string or header.
     if (SECRET) {
+      // Trim the env-var value too in case it was pasted with stray whitespace/newline.
+      const expected = String(SECRET).trim();
       // Try every plausible location: body, Vercel-parsed query, raw URL, and headers.
-      const provided =
+      const rawProvided =
         params.get('secret') ||
         (req.query && req.query.secret) ||
         ((req.url || '').match(/[?&]secret=([^&#]+)/) || [])[1] ||
         (req.headers && (req.headers['x-gumroad-secret'] || req.headers['x-webhook-secret'])) ||
         '';
+      const provided = String(rawProvided).trim();
       const decoded = (() => { try { return decodeURIComponent(provided); } catch { return provided; } })();
-      if (decoded !== SECRET && provided !== SECRET) {
-        return res.status(401).json({ error: 'Invalid or missing secret' });
+      if (decoded !== expected && provided !== expected) {
+        // Diagnostic info — only the LENGTHS of the secrets so nothing leaks.
+        return res.status(401).json({
+          error: 'Invalid or missing secret',
+          debug: {
+            provided_length: provided.length,
+            expected_length: expected.length,
+            first2_match: expected.length > 0 && provided.slice(0,2) === expected.slice(0,2)
+          }
+        });
       }
     }
     // If GUMROAD_WEBHOOK_SECRET isn't set, the endpoint is open. Set it before going live.
