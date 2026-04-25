@@ -714,6 +714,17 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <button class="auth-btn" id="forgotBtn" onclick="doForgotPassword()">Send reset link</button>
       <div class="auth-fn">Remembered it? <a onclick="setTab('login')">Back to sign in</a></div>
     </div>
+    <div id="otpf" style="display:none">
+      <h2 class="auth-title">Verify your email</h2>
+      <p class="auth-sub">We sent a 6-digit code to <b id="otpEmailShown"></b>. Enter it below to activate your account.</p>
+      <div class="fg">
+        <label class="fl">Verification code</label>
+        <input class="fi" type="text" id="otpCode" placeholder="123456" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" style="letter-spacing:8px;font-size:18px;text-align:center;font-weight:600" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6);if(this.value.length===6)doVerifyOtp()" onkeydown="if(event.key==='Enter'){event.preventDefault();doVerifyOtp();}">
+      </div>
+      <button class="auth-btn" id="otpBtn" onclick="doVerifyOtp()">Verify &amp; sign in</button>
+      <div class="auth-fn" style="font-size:12px;color:var(--text3)">Didn&rsquo;t receive it? Check your spam folder, or <a onclick="doResendConfirmation()" style="color:var(--accent);cursor:pointer">resend the code</a>.</div>
+      <div class="auth-fn">Wrong email? <a onclick="setTab('signup')">Start over</a></div>
+    </div>
   </div>
 </div>
 
@@ -987,14 +998,15 @@ async function doLogin(){
   const{error}=await supa.auth.signInWithPassword({email,password:pass});
   btn.disabled=false;btn.textContent='Sign in to AlBills';
   if(error){
-    // Friendlier message for the most common case — email not confirmed yet
-    const msg = /confirm|not confirmed|verify/i.test(error.message)
-      ? 'Please verify your email first. Check your inbox for the confirmation link, or '
-      : null;
-    if (msg) {
-      const el = document.getElementById('authMsg');
-      el.className = 'auth-msg error';
-      el.innerHTML = msg + '<a onclick="doResendConfirmation()" style="color:var(--accent);cursor:pointer;text-decoration:underline">resend it</a>.';
+    // Most common signin failure: email not confirmed yet. Send them straight
+    // to the OTP entry view so they can finish the signup with the 6-digit code.
+    if (/confirm|not confirmed|verify/i.test(error.message)) {
+      sessionStorage.setItem('pendingOtpEmail', email);
+      setTab('otp');
+      const shown = document.getElementById('otpEmailShown');
+      if (shown) shown.textContent = email;
+      showAuthMsg(`Almost there — enter the 6-digit code we sent to ${email}.`, 'info');
+      // If they don't have a code, they can resend from the OTP view
       return;
     }
     return showAuthMsg(error.message,'error');
@@ -1075,9 +1087,12 @@ async function doSignup(){
   // If "Confirm email" is enabled in Supabase, session is null and identities is empty until confirmed
   const needsConfirm = !data.session;
   if (needsConfirm) {
-    const el = document.getElementById('authMsg');
-    el.className = 'auth-msg success';
-    el.innerHTML = '✉️ Check your inbox at <strong>' + email.replace(/[<>]/g,'') + '</strong> for the verification link, then sign in. <a onclick="doResendConfirmation()" style="color:var(--accent);cursor:pointer;margin-left:6px">Resend</a>';
+    // Switch to the OTP entry view — much faster UX than 'go check your inbox and click a link'
+    sessionStorage.setItem('pendingOtpEmail', email);
+    setTab('otp');
+    const shown = document.getElementById('otpEmailShown');
+    if (shown) shown.textContent = email;
+    showAuthMsg(`✉️ We sent a 6-digit code to ${email}. Enter it below to finish signing up.`, 'success');
   } else {
     showAuthMsg('Account created! Signing you in…','success');
     const intent = sessionStorage.getItem('postAuthIntent') || 'app';
@@ -1087,6 +1102,32 @@ async function doSignup(){
       catch (_) { showPage('app'); }
     }, 900);
   }
+}
+
+// Verify the 6-digit signup OTP. Supabase signs the user in on success
+// (the auth state change listener picks it up and runs setUser).
+async function doVerifyOtp(){
+  const code = (document.getElementById('otpCode').value || '').trim();
+  const email = sessionStorage.getItem('pendingOtpEmail') ||
+    document.getElementById('signupEmail').value.trim() ||
+    document.getElementById('loginEmail').value.trim();
+  if (code.length !== 6) return showAuthMsg('Please enter the 6-digit code from your email.', 'error');
+  if (!email) return showAuthMsg('We lost the email address — please sign up again.', 'error');
+  const btn = document.getElementById('otpBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying…'; }
+  const { error } = await supa.auth.verifyOtp({ email, token: code, type: 'signup' });
+  if (btn) { btn.disabled = false; btn.textContent = 'Verify & sign in'; }
+  if (error) {
+    return showAuthMsg(error.message || 'That code didn’t match. Try again or resend.', 'error');
+  }
+  sessionStorage.removeItem('pendingOtpEmail');
+  showAuthMsg('Verified! Signing you in…', 'success');
+  const intent = sessionStorage.getItem('postAuthIntent') || 'app';
+  sessionStorage.removeItem('postAuthIntent');
+  setTimeout(() => {
+    try { showPage(intent); }
+    catch (_) { showPage('app'); }
+  }, 600);
 }
 
 async function doResendConfirmation(){
@@ -1197,9 +1238,13 @@ function goTo(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.
 function setTab(t){
   document.getElementById('lf').style.display = t==='login'  ? 'block' : 'none';
   document.getElementById('sf').style.display = t==='signup' ? 'block' : 'none';
-  const fpf = document.getElementById('fpf');
-  if (fpf) fpf.style.display = t==='forgot' ? 'block' : 'none';
+  const fpf = document.getElementById('fpf');  if (fpf)  fpf.style.display  = t==='forgot' ? 'block' : 'none';
+  const otpf = document.getElementById('otpf'); if (otpf) otpf.style.display = t==='otp'    ? 'block' : 'none';
   document.getElementById('authMsg').className='auth-msg';
+  if (t==='otp') {
+    const code = document.getElementById('otpCode');
+    if (code) { code.value=''; setTimeout(()=>code.focus(), 100); }
+  }
 }
 function updateFreeDots(remaining){
   const dots=document.getElementById('freeDots');
