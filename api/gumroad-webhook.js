@@ -127,12 +127,30 @@ export default async function handler(req, res) {
     }
 
     // ---------- 3. Resolve user by email ----------
-    const authRes = await fetch(
-      `${SUPABASE_URL}/auth/v1/admin/users?email=${encodeURIComponent(email)}`,
-      { headers }
+    // NOTE: Supabase's /auth/v1/admin/users endpoint does NOT honour an email query
+    // parameter — it just returns paginated users. We must filter client-side OR
+    // query the auth.users table directly via PostgREST. We use the latter for O(1) lookup.
+    const userLookup = await fetch(
+      `${SUPABASE_URL}/rest/v1/users?select=id&email=eq.${encodeURIComponent(email)}&limit=1`,
+      { headers: { ...headers, 'Accept-Profile': 'auth' } }
     );
-    const authData = await authRes.json();
-    const userId = authData?.users?.[0]?.id;
+    let userId = null;
+    if (userLookup.ok) {
+      const arr = await userLookup.json();
+      if (Array.isArray(arr) && arr.length > 0) userId = arr[0].id;
+    }
+    // Fallback: list-and-filter (safe, but downloads up to perPage users on each call)
+    if (!userId) {
+      const fallback = await fetch(
+        `${SUPABASE_URL}/auth/v1/admin/users?per_page=200`,
+        { headers }
+      );
+      if (fallback.ok) {
+        const data = await fallback.json();
+        const match = (data?.users || []).find(u => (u.email || '').toLowerCase() === email);
+        if (match) userId = match.id;
+      }
+    }
 
     if (!userId) {
       // ---------- 4a. Unknown email -> queue ----------
