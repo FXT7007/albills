@@ -1019,7 +1019,19 @@ async function doSignOut(){
 }
 function showAuthMsg(msg,type){const el=document.getElementById('authMsg');el.textContent=msg;el.className='auth-msg '+type;}
 
-function showPage(id){
+// View id -> URL path. Each in-app view gets a real address so refresh,
+// share, bookmark, browser back/forward all behave naturally.
+const VIEW_TO_PATH = {
+  home:      '/',
+  app:       '/extract',
+  results:   '/extract',     // results sit on the same URL as the upload step
+  demo:      '/live-demo',
+  login:     '/signin',
+  dashboard: '/dashboard'
+};
+
+function showPage(id, opts){
+  opts = opts || {};
   // Guard: only signed-in users can see the dashboard. Otherwise route them to sign in.
   if(id==='dashboard' && !currentUser){
     showPage('login'); setTab('login');
@@ -1033,7 +1045,23 @@ function showPage(id){
   if(id==='login'){pg.style.display='flex';pg.style.alignItems='center';pg.style.justifyContent='center';}
   window.scrollTo(0,0);
   if(id==='demo')buildDemo();
+  // Sync the URL bar so refresh/share/bookmark all land on the same view.
+  // Skip if caller explicitly asked us not to (e.g. when popstate triggered us).
+  if (!opts.skipHistory) {
+    const targetPath = VIEW_TO_PATH[id];
+    if (targetPath && location.pathname !== targetPath) {
+      try { history.pushState({ view: id }, '', targetPath); } catch (_) {}
+    }
+  }
 }
+
+// Browser back / forward buttons: re-route to the right view based on URL.
+window.addEventListener('popstate', () => {
+  const path = location.pathname;
+  const idByPath = Object.entries(VIEW_TO_PATH).find(([, p]) => p === path);
+  const id = idByPath ? idByPath[0] : 'home';
+  showPage(id, { skipHistory: true });
+});
 // Path-based bootstrap so /extract, /pricing, /features, /signin, /dashboard, /live-demo
 // (rewritten to / by Vercel) land on the correct in-app view.
 (function pathBootstrap(){
@@ -1045,7 +1073,8 @@ function showPage(id){
     if (params.get('signin') === '1') route = ['login','login'];
     if(!route)return;
     const fire=()=>{
-      showPage(route[0]);
+      // skipHistory: the browser already has the URL; don't push it again
+      showPage(route[0], { skipHistory: true });
       if(route[0]==='login'&&route[1]) setTab(route[1]);
       if(route[0]==='home'&&route[1])  goTo(route[1]);
       if(params.get('signin') === '1'){
