@@ -564,7 +564,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
         <div class="uzone" id="dropZone" onclick="document.getElementById('fi').click()">
           <div class="u-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
           <h3>Drop your invoices here</h3>
-          <p>Drag & drop unlimited files — PDF, JPG, PNG, DOCX, any format, any country</p>
+          <p>Drag & drop unlimited files — PDF, JPG, PNG, DOCX, any format, any country<br><span style="font-size:11px;color:var(--text3)">1 file = 1 credit · Up to 20 pages per PDF · Split larger files first</span></p>
           <div class="uchoose" onclick="event.stopPropagation();document.getElementById('fi').click()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Choose files</div>
           <div class="fmts"><span class="fmt">PDF</span><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">DOCX</span><span class="fmt">XLSX</span><span class="fmt">TIFF</span></div>
         </div>
@@ -1217,6 +1217,12 @@ async function startProc(){
     if(data.error==='CREDIT_CHECK_FAILED'){
       clearTimeout(watchdog);
       alert(data.message || 'Could not verify your credits — try again in a moment.');
+      resetAll();
+      return;
+    }
+    if(data.error==='FILE_TOO_LARGE'){
+      clearTimeout(watchdog);
+      alert(data.message || 'A file you uploaded is too large. Please split it into smaller PDFs.');
       resetAll();
       return;
     }

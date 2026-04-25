@@ -33,6 +33,28 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 // for cheaper/faster but less accurate, or claude-opus-4-7 for max accuracy).
 const DEFAULT_MODEL = process.env.EXTRACTION_MODEL || 'claude-sonnet-4-6';
 
+// Margin guard. Pricing is 1 file = 1 credit ($0.50). A 20-page Sonnet call
+// costs ~$0.10 input, leaving an 80% margin. Anything bigger eats into it.
+// Reject and ask the user to split — saves both us and them money.
+const MAX_PAGES_PER_FILE = parseInt(process.env.MAX_PAGES_PER_FILE || '20', 10);
+
+// Quick page count from raw PDF bytes — counts /Type /Page or /Type/Page
+// markers (skipping /Type /Pages which is the catalog node). Good enough for
+// a pre-flight cap; we don't need exact accuracy, just an upper-bound estimate.
+function countPdfPages(base64Data) {
+  try {
+    const buf = Buffer.from(base64Data, 'base64');
+    const text = buf.toString('latin1');
+    // /Type /Page  (one or more whitespace), but NOT followed by 's' (Pages = catalog)
+    const matches = text.match(/\/Type\s*\/Page(?![s])/g);
+    if (matches) return matches.length;
+    // Fallback to /Count entry on the catalog (less accurate but better than 0)
+    const countMatch = text.match(/\/Count\s+(\d+)/);
+    if (countMatch) return parseInt(countMatch[1], 10);
+    return 1; // Couldn't determine — assume 1 page rather than over-reject
+  } catch (_) { return 1; }
+}
+
 // ---------- Supabase helpers ----------
 async function dbPost(path, body) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -340,6 +362,23 @@ export default async function handler(req, res) {
       : (instructions || 'vendor_name, invoice_number, date, total_amount, currency');
 
     const systemPrompt = buildSystemPrompt(splitLineItems);
+
+    // ---------- PRE-FLIGHT: per-file page-count cap (margin guard) ----------
+    // A single file with too many pages would erode the $0.50 margin. We reject
+    // BEFORE Anthropic is touched. Images always count as 1 page so they pass.
+    for (const f of filesQueue) {
+      if (f.mimeType !== 'application/pdf') continue;
+      const pages = countPdfPages(f.fileBase64);
+      if (pages > MAX_PAGES_PER_FILE) {
+        return res.status(413).json({
+          error: 'FILE_TOO_LARGE',
+          filename: f.fileName,
+          pages,
+          max_pages: MAX_PAGES_PER_FILE,
+          message: `"${f.fileName}" has ${pages} pages — the limit is ${MAX_PAGES_PER_FILE} pages per file. Split it into smaller PDFs and try again.`
+        });
+      }
+    }
 
     // ---------- PRE-FLIGHT: limit / credit check (BEFORE Anthropic call) ----------
     // Done before Anthropic so we don't burn tokens on requests we'll reject.
