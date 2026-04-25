@@ -409,6 +409,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
     <button class="nav-link" onclick="showPage('demo')">Live Demo</button>
     <button class="nav-link" onclick="showPage('home');goTo('features')">Features</button>
     <button class="nav-link" onclick="showPage('home');goTo('pricing')">Pricing</button>
+    <a class="nav-link" href="/about" style="text-decoration:none">About</a>
     <div id="navGuest" style="display:flex;gap:6px">
       <button class="nbtn" onclick="showPage('login');setTab('login')">Sign in</button>
       <button class="nbtn nbtn-p" onclick="showPage('app')">Start free</button>
@@ -434,6 +435,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
   <button onclick="showPage('home');goTo('features');closeMobileMenu()">Features</button>
   <button onclick="showPage('home');goTo('pricing');closeMobileMenu()">Pricing</button>
   <button onclick="showPage('home');goTo('free-tools');closeMobileMenu()">Free Tools</button>
+  <button onclick="window.location.href='/about'">About</button>
   <button onclick="showPage('login');setTab('login');closeMobileMenu()" style="color:var(--accent)">Sign in</button>
   <button onclick="showPage('app');closeMobileMenu()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px;margin-top:4px">Start free →</button>
 </div>
@@ -536,7 +538,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <div class="footer-brand"><h3>⚡ AlBills</h3><p>AI-powered invoice data extraction. Any document, any country, any language.</p><p style="margin-top:8px;font-size:12px;color:var(--text3)">🔒 Documents deleted after processing.</p></div>
       <div class="footer-col"><h4>Product</h4><a onclick="showPage('app')">Extract invoices</a><a onclick="showPage('demo')">Live demo</a><a onclick="showPage('home');goTo('features')">Features</a><a onclick="showPage('home');goTo('pricing')">Pricing</a></div>
       <div class="footer-col"><h4>Free Tools</h4><a href="/vat-calculator.html">VAT Calculator</a><a href="/gold-price-calculator.html">Gold Price</a><a href="/currency-converter.html">Currency Converter</a><a href="/loan-calculator.html">Loan Calculator</a><a href="/zakat-calculator.html">Zakat Calculator</a><a href="/profit-margin-calculator.html">Profit Margin</a><a href="/break-even-calculator.html">Break-Even</a><a href="/salary-calculator.html">Salary</a><a href="/uae-corporate-tax.html">UAE Corp Tax</a></div>
-      <div class="footer-col"><h4>Account</h4><a href="#" onclick="showPage('login');setTab('signup');return false">Sign up free</a><a href="#" onclick="showPage('login');setTab('login');return false">Sign in</a><a href="#" onclick="showPage('dashboard');return false">Dashboard</a><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms of Service</a><a href="/cdn-cgi/l/email-protection#15666065657a6761557479777c7979663b767a78">Support</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="#" onclick="showPage('login');setTab('signup');return false">Sign up free</a><a href="#" onclick="showPage('login');setTab('login');return false">Sign in</a><a href="#" onclick="showPage('dashboard');return false">Dashboard</a><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms of Service</a><a href="mailto:support@albills.com">Support</a></div>
     </div>
     <div class="footer-bottom"><span>© 2026 <strong>AlBills</strong>. All rights reserved.</span><span>Powered by Claude AI · albills.com</span></div>
   </footer>
@@ -714,7 +716,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 <input type="file" id="fi" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx,.tiff" style="display:none">
 <input type="file" id="excelTemplate" accept=".xlsx,.csv" onchange="handleExcelTemplate(this)" style="display:none">
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const SUPA_URL='https://bynkbsuphhyxsnnbftoa.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5bmtic3VwaGh5eHNubmJmdG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Mjg0NjAsImV4cCI6MjA5MDMwNDQ2MH0.YkikdYvLP_afw3B2t_qM1EESFjZ6n2kCxGa8NDxDNzU';
 const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
