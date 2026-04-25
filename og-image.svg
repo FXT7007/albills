@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="DM Sans, system-ui, sans-serif">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161b27"/>
+      <stop offset="1" stop-color="#0c1019"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.18" cy="0.15" r="0.5">
+      <stop offset="0" stop-color="#5b8dee" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#5b8dee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.85" cy="0.85" r="0.55">
+      <stop offset="0" stop-color="#8b6fee" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#8b6fee" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b8dee"/>
+      <stop offset="1" stop-color="#8b6fee"/>
+    </linearGradient>
+    <linearGradient id="grad1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e8eaf6"/>
+    </linearGradient>
+    <linearGradient id="grad2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5b8dee"/>
+      <stop offset="0.5" stop-color="#8b6fee"/>
+      <stop offset="1" stop-color="#4dd9c0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- Subtle grid -->
+  <g stroke="#2a3450" stroke-width="0.5" opacity="0.5">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Logo + brand -->
+  <g transform="translate(80,80)">
+    <rect x="0" y="0" width="64" height="64" rx="14" fill="url(#logoBg)"/>
+    <text x="32" y="44" font-size="32" font-weight="800" fill="#fff" text-anchor="middle">⚡</text>
+    <text x="84" y="44" font-size="32" font-weight="800" fill="#ffffff" font-family="Syne, system-ui, sans-serif">AlBills</text>
+  </g>
+
+  <!-- Trusted-by tag -->
+  <g transform="translate(80,180)">
+    <rect x="0" y="0" width="380" height="34" rx="17" fill="#252f47" stroke="#3a4869" stroke-width="1"/>
+    <circle cx="18" cy="17" r="4" fill="#4dd9c0"/>
+    <text x="32" y="22" font-size="13" fill="#9aabcc" font-weight="500">Trusted by bookkeepers · Powered by Claude AI</text>
+  </g>
+
+  <!-- Hero headline -->
+  <g font-family="Syne, system-ui, sans-serif" font-weight="800" letter-spacing="-2">
+    <text x="80" y="310" font-size="86" fill="url(#grad1)">Any invoice.</text>
+    <text x="80" y="400" font-size="86" fill="url(#grad2)">Any country.</text>
+    <text x="80" y="490" font-size="86" fill="url(#grad2)">Instantly.</text>
+  </g>
+
+  <!-- Sub -->
+  <text x="80" y="555" font-size="22" fill="#9aabcc">PDF · Image · Doc → clean Excel in seconds. Free for 3 invoices.</text>
+
+  <!-- Bottom URL -->
+  <text x="80" y="600" font-size="18" fill="#5a6b90" font-weight="500">www.albills.com</text>
+
+  <!-- Right-side accent / stats card -->
+  <g transform="translate(820,200)">
+    <rect x="0" y="0" width="300" height="240" rx="20" fill="#1e2638" stroke="#3a4869" stroke-width="1.5" opacity="0.95"/>
+    <rect x="0" y="0" width="300" height="3" rx="1.5" fill="url(#grad2)"/>
+    <text x="20" y="48" font-size="13" fill="#5a6b90" font-weight="600" letter-spacing="2">FEATURES</text>
+    <g font-size="20" fill="#e8eaf6" font-weight="600">
+      <text x="20" y="92">🌍 Any country, any language</text>
+      <text x="20" y="132">⚡ Unlimited invoices at once</text>
+      <text x="20" y="172">📊 Custom Excel templates</text>
+      <text x="20" y="212">🔒 Documents auto-deleted</text>
+    </g>
+  </g>
+</svg>
