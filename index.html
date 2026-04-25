@@ -1142,6 +1142,13 @@ async function startProc(){
   const fill=document.getElementById('progFill'),msg=document.getElementById('procMsg');
   msg.textContent='Sending invoices to AI...';
   let prog=0;const iv=setInterval(()=>{prog+=2;if(prog>90)prog=90;fill.style.width=prog+'%'},300);
+  // Watchdog: if anything below silently fails between progress=100% and the
+  // results page navigation, the user shouldn't be stranded staring at "Done!"
+  // forever. Auto-recover after 60s by alerting + resetting.
+  const watchdog = setTimeout(() => {
+    alert('Extraction took longer than expected. Please try again.');
+    resetAll();
+  }, 60000);
   try{
     const formData=new FormData();
     formData.append('instructions',instr.value);
@@ -1153,11 +1160,20 @@ async function startProc(){
     const response=await fetch('/api/extract',{method:'POST',body:formData});
     const data=await response.json();
     clearInterval(iv);fill.style.width='100%';
-    if(data.error==='FREE_LIMIT_REACHED'){document.getElementById('limitModal').classList.add('show');resetAll();return;}
+    if(data.error==='FREE_LIMIT_REACHED'){
+      clearTimeout(watchdog);
+      // Sync localStorage with the server's authoritative used count
+      if (typeof data.used === 'number') setAnonUsed(data.used);
+      document.getElementById('limitModal').classList.add('show');
+      resetAll();
+      return;
+    }
     if(data.results){
       if(!currentUser){
-        setAnonUsed(getAnonUsed()+files.length);
-        const left=Math.max(0,3-getAnonUsed());
+        // Prefer server's authoritative count; fall back to local increment
+        const newUsed = (typeof data.anon_used === 'number') ? data.anon_used : (getAnonUsed() + files.length);
+        setAnonUsed(newUsed);
+        const left = (typeof data.anon_remaining === 'number') ? data.anon_remaining : Math.max(0, 3 - newUsed);
         document.getElementById('freeText').textContent=left+' free invoices remaining';
         updateFreeDots(left);
       } else {
@@ -1180,9 +1196,25 @@ async function startProc(){
         const pc = document.getElementById('profileCredits'); if (pc) pc.textContent = newC+' credits';
       }
       msg.textContent='Done! Building your results...';
-      setTimeout(()=>showResults(document.getElementById('userEmail').value,data.results),600);
-    } else {alert('Error: '+(data.error||'Unknown error'));resetAll();}
-  }catch(err){clearInterval(iv);alert('Connection error: '+err.message);resetAll();}
+      setTimeout(()=>{
+        clearTimeout(watchdog);
+        try { showResults(document.getElementById('userEmail').value, data.results); }
+        catch (e) {
+          alert('Could not render results: ' + e.message);
+          resetAll();
+        }
+      }, 600);
+    } else {
+      clearTimeout(watchdog);
+      alert('Error: '+(data.error||'Unknown error'));
+      resetAll();
+    }
+  }catch(err){
+    clearInterval(iv);
+    clearTimeout(watchdog);
+    alert('Connection error: '+err.message);
+    resetAll();
+  }
 }
 
 function showResults(email,apiResults){

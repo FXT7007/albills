@@ -341,6 +341,28 @@ export default async function handler(req, res) {
 
     const systemPrompt = buildSystemPrompt(splitLineItems);
 
+    // ---------- PRE-FLIGHT: free-tier limit check (anonymous only) ----------
+    // We do this BEFORE calling Anthropic so we don't burn tokens on requests
+    // that will be rejected anyway. We order by created_at desc and take the
+    // most recent row, which has the cumulative count.
+    let anonUsedSoFar = 0;
+    if (userId === 'anonymous' && fingerprint && SUPABASE_KEY) {
+      try {
+        const existing = await dbGet(
+          `anonymous_usage?fingerprint=eq.${encodeURIComponent(fingerprint)}&select=count&order=created_at.desc&limit=1`
+        );
+        anonUsedSoFar = Array.isArray(existing) && existing[0] ? (existing[0].count || 0) : 0;
+      } catch (_) { /* if read fails, fall through and let server-side enforcement be best-effort */ }
+      if (anonUsedSoFar + filesQueue.length > 3) {
+        return res.status(403).json({
+          error: 'FREE_LIMIT_REACHED',
+          used: anonUsedSoFar,
+          limit: 3,
+          remaining: Math.max(0, 3 - anonUsedSoFar)
+        });
+      }
+    }
+
     // Process files in parallel for responsiveness
     const fileResults = await Promise.all(filesQueue.map(async (f) => {
       const userPrompt = buildUserPrompt(fieldsToExtract, f.fileName);
@@ -426,7 +448,8 @@ export default async function handler(req, res) {
       };
     }));
 
-    // ---------- Usage tracking ----------
+    // ---------- Usage tracking (post-success) ----------
+    let anonUsedAfter = anonUsedSoFar + fileResults.length;
     if (userId !== 'anonymous' && SUPABASE_KEY) {
       try {
         await dbPost('invoice_usage', {
@@ -438,21 +461,24 @@ export default async function handler(req, res) {
         });
       } catch (e) { /* non-fatal */ }
     } else if (fingerprint && SUPABASE_KEY) {
+      // Pre-flight already enforced the limit. Just record the new cumulative count.
       try {
-        const existing = await dbGet(`anonymous_usage?fingerprint=eq.${encodeURIComponent(fingerprint)}&select=count`);
-        const used = Array.isArray(existing) && existing[0] ? (existing[0].count || 0) : 0;
-        if (used + fileResults.length > 3) {
-          return res.status(403).json({ error: 'FREE_LIMIT_REACHED', used, limit: 3 });
-        }
         await dbPost('anonymous_usage', {
           fingerprint,
-          count: used + fileResults.length,
+          count: anonUsedAfter,
           last_used: new Date().toISOString()
         });
       } catch (e) { /* non-fatal */ }
     }
 
-    return res.status(200).json({ results: fileResults });
+    // Echo the new anonymous-usage count back to the client so its localStorage
+    // can stay in sync with the source of truth (server). Avoids drift if the
+    // user clears localStorage or hops devices.
+    return res.status(200).json({
+      results: fileResults,
+      anon_used: userId === 'anonymous' ? anonUsedAfter : undefined,
+      anon_remaining: userId === 'anonymous' ? Math.max(0, 3 - anonUsedAfter) : undefined
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
