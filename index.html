@@ -695,7 +695,14 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
         <div class="fg"><label class="fl">Last name</label><input class="fi" type="text" id="signupLast" placeholder="Al Rashidi" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
       </div>
       <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signupEmail" placeholder="you@company.com" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
-      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signupPass" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
+      <div class="fg">
+        <label class="fl">Password</label>
+        <input class="fi" type="password" id="signupPass" placeholder="8+ chars · upper · lower · number" oninput="updatePasswordStrength(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}">
+        <div id="pwStrengthBar" style="display:none;height:4px;background:var(--surface3);border-radius:2px;margin-top:6px;overflow:hidden">
+          <div id="pwStrengthFill" style="height:100%;width:0;background:var(--red);transition:width .2s,background .2s"></div>
+        </div>
+        <div id="pwStrengthLabel" style="font-size:11px;margin-top:6px;color:var(--text3);line-height:1.5"></div>
+      </div>
       <button class="auth-btn" id="signupBtn" onclick="doSignup()">Create free account</button>
       <div class="auth-fn" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:8px">By creating an account you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>. We&rsquo;ll send a verification email — please confirm before signing in.</div>
       <div class="auth-fn">Already have an account? <a onclick="setTab('login')">Sign in</a></div>
@@ -1002,13 +1009,58 @@ async function doLogin(){
   }, 800);
 }
 
+// Password strength scorer + live UI feedback.
+// Score: length 8+ (1pt) · 12+ (1pt) · lowercase (1) · uppercase (1) · number (1) · symbol (1)
+// 0-2 weak, 3-4 fair, 5 strong, 6 excellent.
+function scorePassword(pw) {
+  let score = 0;
+  const checks = {
+    length8: pw.length >= 8,
+    length12: pw.length >= 12,
+    lower: /[a-z]/.test(pw),
+    upper: /[A-Z]/.test(pw),
+    number: /\d/.test(pw),
+    symbol: /[^a-zA-Z0-9]/.test(pw)
+  };
+  for (const v of Object.values(checks)) if (v) score++;
+  return { score, checks };
+}
+function updatePasswordStrength(pw) {
+  const bar   = document.getElementById('pwStrengthBar');
+  const fill  = document.getElementById('pwStrengthFill');
+  const label = document.getElementById('pwStrengthLabel');
+  if (!bar || !fill || !label) return;
+  if (!pw) { bar.style.display = 'none'; label.textContent = ''; return; }
+  bar.style.display = 'block';
+  const { score, checks } = scorePassword(pw);
+  // Width: scale 0-6 -> 8-100%
+  fill.style.width = Math.min(100, Math.max(8, (score / 6) * 100)) + '%';
+  // Colour: red <3, amber 3-4, green 5+
+  fill.style.background = score < 3 ? 'var(--red)' : score < 5 ? 'var(--amber)' : 'var(--green)';
+  // Show what's missing so the user can fix it as they type
+  const missing = [];
+  if (!checks.length8) missing.push('8+ characters');
+  if (!checks.lower)   missing.push('a lowercase letter');
+  if (!checks.upper)   missing.push('an uppercase letter');
+  if (!checks.number)  missing.push('a number');
+  const tag = score < 3 ? 'Weak' : score < 5 ? 'Fair' : score < 6 ? 'Strong' : 'Excellent';
+  const colour = score < 3 ? 'var(--red)' : score < 5 ? 'var(--amber)' : 'var(--green)';
+  label.innerHTML = missing.length
+    ? `<span style="color:${colour};font-weight:600">${tag}</span> · needs ${missing.join(', ')}`
+    : `<span style="color:${colour};font-weight:600">${tag}</span> · password meets all requirements`;
+}
+
 async function doSignup(){
   const first=document.getElementById('signupFirst').value.trim();
   const last=document.getElementById('signupLast').value.trim();
   const email=document.getElementById('signupEmail').value.trim();
   const pass=document.getElementById('signupPass').value;
   if(!first||!email||!pass)return showAuthMsg('Please fill in all fields','error');
-  if(pass.length<8)return showAuthMsg('Password must be at least 8 characters','error');
+  // Enforce strong password — minimum: 8 chars + lower + upper + number
+  const { checks } = scorePassword(pass);
+  if (!checks.length8 || !checks.lower || !checks.upper || !checks.number) {
+    return showAuthMsg('Password must be at least 8 characters and include uppercase, lowercase, and a number.','error');
+  }
   const btn=document.getElementById('signupBtn');btn.disabled=true;btn.textContent='Creating account...';
   const{data,error}=await supa.auth.signUp({
     email,
