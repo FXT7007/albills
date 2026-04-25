@@ -1125,6 +1125,21 @@ function renderFiles(){
   });
 }
 function rmFile(i){files.splice(i,1);renderFiles();updateBtn()}
+
+// Auto-trim the file list to fit within the user's available limit.
+// Drops files from the END (so the first ones stay — most likely the one the
+// user wanted most). Returns the number of files removed.
+function trimFilesToLimit(maxAllowed) {
+  if (maxAllowed < 0) maxAllowed = 0;
+  const before = files.length;
+  if (before <= maxAllowed) return 0;
+  files = files.slice(0, maxAllowed);
+  renderFiles();
+  updateBtn();
+  // Also reset the <input type=file> element so a re-upload of the same file works
+  if (fi) fi.value = '';
+  return before - maxAllowed;
+}
 function updateBtn(){
   const ok=files.length>0&&instr.value.trim()!=='';pb.disabled=!ok;
   if(ok){
@@ -1185,13 +1200,35 @@ function removeExcelTemplate(){
 
 async function startProc(){
   if(!currentUser){
-    const used=getAnonUsed();
-    if(used+files.length>3){document.getElementById('limitModal').classList.add('show');return;}
+    const used = getAnonUsed();
+    const remaining = Math.max(0, 3 - used);
+    if (files.length > remaining) {
+      const dropped = trimFilesToLimit(remaining);
+      const mt = document.getElementById('modalTitle');
+      const ms = document.getElementById('modalSub');
+      if (remaining === 0) {
+        if (mt) mt.textContent = `You've used your 3 free invoices`;
+        if (ms) ms.textContent = `Get 10 more invoice extractions instantly — any language, any country, clean Excel every time.`;
+      } else {
+        if (mt) mt.textContent = `Only ${remaining} free invoice${remaining===1?'':'s'} left — kept your first ${remaining}, removed ${dropped}`;
+        if (ms) ms.textContent = `Sign up free or buy credits to process more.`;
+      }
+      document.getElementById('limitModal').classList.add('show');
+      return;
+    }
   } else {
     // Logged-in: pre-flight credit check so we don't even start the request
     if (files.length > userCredits) {
-      const mt = document.getElementById('modalTitle'); if (mt) mt.textContent = `Not enough credits — you have ${userCredits}, you uploaded ${files.length}`;
-      const ms = document.getElementById('modalSub');  if (ms) ms.textContent = 'Buy 10 more credits ($5.00) or upload fewer files at once.';
+      const dropped = trimFilesToLimit(userCredits);
+      const mt = document.getElementById('modalTitle');
+      const ms = document.getElementById('modalSub');
+      if (userCredits === 0) {
+        if (mt) mt.textContent = `Out of credits`;
+        if (ms) ms.textContent = `Buy 10 more credits ($5.00) to keep processing invoices.`;
+      } else {
+        if (mt) mt.textContent = `Only ${userCredits} credit${userCredits===1?'':'s'} left — kept your first ${userCredits}, removed ${dropped}`;
+        if (ms) ms.textContent = `Buy 10 more credits ($5.00) or process the remaining ${userCredits} now.`;
+      }
       document.getElementById('limitModal').classList.add('show');
       return;
     }
@@ -1224,15 +1261,40 @@ async function startProc(){
     if(data.error==='FREE_LIMIT_REACHED'){
       clearTimeout(watchdog);
       if (typeof data.used === 'number') setAnonUsed(data.used);
+      // Auto-trim file list to what's left (keeps user's instructions + first N files)
+      const remaining = (typeof data.remaining === 'number') ? data.remaining : Math.max(0, 3 - (data.used || 3));
+      const dropped = trimFilesToLimit(remaining);
+      const mt = document.getElementById('modalTitle');
+      const ms = document.getElementById('modalSub');
+      if (remaining === 0) {
+        if (mt) mt.textContent = `You've used your 3 free invoices`;
+        if (ms) ms.textContent = `Sign up or buy credits to keep processing invoices.`;
+      } else {
+        if (mt) mt.textContent = `Only ${remaining} free invoice${remaining===1?'':'s'} left — kept your first ${remaining}, removed ${dropped}`;
+        if (ms) ms.textContent = `You can process those now, or buy credits for more.`;
+      }
       document.getElementById('limitModal').classList.add('show');
-      resetAll();
+      // Switch back to upload state so the user sees the trimmed file list
+      const us = document.getElementById('uploadState'); if (us) us.style.display = 'block';
+      const ps = document.getElementById('procState');  if (ps) ps.style.display = 'none';
+      const pf = document.getElementById('progFill');   if (pf) pf.style.width = '0%';
+      ['tab1','tab2','tab3'].forEach((t,i)=>{const el=document.getElementById(t);if(el)el.className='atab'+(i===0?' active':'')});
       return;
     }
     if(data.error==='INSUFFICIENT_CREDITS'){
       clearTimeout(watchdog);
-      // Re-show the limit modal but with credit-buy messaging instead of free-tier
-      const mt = document.getElementById('modalTitle'); if (mt) mt.textContent = `Not enough credits — you have ${data.credits ?? 0}, you uploaded ${data.requested ?? files.length}`;
-      const ms = document.getElementById('modalSub');  if (ms) ms.textContent = 'Buy 10 more credits ($5.00) or upload fewer files at once.';
+      // Auto-trim file list to credits available
+      const credits = data.credits ?? 0;
+      const dropped = trimFilesToLimit(credits);
+      const mt = document.getElementById('modalTitle');
+      const ms = document.getElementById('modalSub');
+      if (credits === 0) {
+        if (mt) mt.textContent = `Out of credits`;
+        if (ms) ms.textContent = `Buy 10 more credits ($5.00) to keep processing invoices.`;
+      } else {
+        if (mt) mt.textContent = `Only ${credits} credit${credits===1?'':'s'} left — kept your first ${credits}, removed ${dropped}`;
+        if (ms) ms.textContent = `You can process those now, or buy 10 more credits ($5.00).`;
+      }
       document.getElementById('limitModal').classList.add('show');
       // Sync displayed credit count with server truth
       if (typeof data.credits === 'number') {
@@ -1240,13 +1302,20 @@ async function startProc(){
         document.getElementById('navCredits').textContent = data.credits + ' credits';
         const pc = document.getElementById('profileCredits'); if (pc) pc.textContent = data.credits + ' credits';
       }
-      resetAll();
+      // Switch back to upload state (don't full-reset — keep their instructions + the trimmed file list)
+      const us = document.getElementById('uploadState'); if (us) us.style.display = 'block';
+      const ps = document.getElementById('procState');  if (ps) ps.style.display = 'none';
+      const pf = document.getElementById('progFill');   if (pf) pf.style.width = '0%';
+      ['tab1','tab2','tab3'].forEach((t,i)=>{const el=document.getElementById(t);if(el)el.className='atab'+(i===0?' active':'')});
       return;
     }
     if(data.error==='CREDIT_CHECK_FAILED'){
       clearTimeout(watchdog);
       alert(data.message || 'Could not verify your credits — try again in a moment.');
-      resetAll();
+      // Don't full-reset — let user retry with the same files/instructions
+      const us = document.getElementById('uploadState'); if (us) us.style.display = 'block';
+      const ps = document.getElementById('procState');  if (ps) ps.style.display = 'none';
+      const pf = document.getElementById('progFill');   if (pf) pf.style.width = '0%';
       return;
     }
     if(data.error==='FILE_TOO_LARGE'){
