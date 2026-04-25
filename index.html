@@ -398,8 +398,8 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <a href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" class="modal-primary" style="text-decoration:none;display:block;text-align:center" onclick="closeLimitModal()">
         💳 Buy 10 invoices — $5.00
       </a>
-      <button class="modal-secondary" onclick="showPage('login');setTab('signup');closeLimitModal()">Create free account instead</button>
-      <button class="modal-secondary" onclick="showPage('login');setTab('login');closeLimitModal()">Sign in to existing account</button>
+      <button class="modal-secondary" onclick="sessionStorage.setItem('postAuthIntent','app');showPage('login');setTab('signup');closeLimitModal()">Create free account instead</button>
+      <button class="modal-secondary" onclick="sessionStorage.setItem('postAuthIntent','app');showPage('login');setTab('login');closeLimitModal()">Sign in to existing account</button>
     </div>
   </div>
 </div>
@@ -840,6 +840,17 @@ async function setUser(user){
   // Background tasks — wrapped so any failure doesn't break the auth flow
   try { loadHistory(user.id); } catch(_) {}
   try { redeemPendingCredits(user); } catch(_) {}
+  // If they're sitting on the login page when auth completes (e.g. landed there
+  // from the email-verify link), get them out — to /extract or wherever they
+  // were trying to go.
+  try {
+    const onLogin = location.pathname === '/signin' || document.querySelector('#login.active');
+    if (onLogin) {
+      const intent = sessionStorage.getItem('postAuthIntent') || 'app';
+      sessionStorage.removeItem('postAuthIntent');
+      showPage(intent);
+    }
+  } catch(_) {}
 }
 
 // If someone bought credits on Gumroad before signing up (or used a different
@@ -949,8 +960,14 @@ async function doLogin(){
     }
     return showAuthMsg(error.message,'error');
   }
-  showAuthMsg('Signed in!','success');
-  setTimeout(()=>showPage('app'),800);
+  showAuthMsg('Signed in! Redirecting…','success');
+  // Use the post-auth intent if set (e.g. user came from the limit modal)
+  const intent = sessionStorage.getItem('postAuthIntent') || 'app';
+  sessionStorage.removeItem('postAuthIntent');
+  setTimeout(() => {
+    try { showPage(intent); }
+    catch (_) { showPage('app'); }
+  }, 800);
 }
 
 async function doSignup(){
@@ -979,7 +996,12 @@ async function doSignup(){
     el.innerHTML = '✉️ Check your inbox at <strong>' + email.replace(/[<>]/g,'') + '</strong> for the verification link, then sign in. <a onclick="doResendConfirmation()" style="color:var(--accent);cursor:pointer;margin-left:6px">Resend</a>';
   } else {
     showAuthMsg('Account created! Signing you in…','success');
-    setTimeout(()=>showPage('app'),900);
+    const intent = sessionStorage.getItem('postAuthIntent') || 'app';
+    sessionStorage.removeItem('postAuthIntent');
+    setTimeout(() => {
+      try { showPage(intent); }
+      catch (_) { showPage('app'); }
+    }, 900);
   }
 }
 
@@ -1444,11 +1466,80 @@ function showResults(email,apiResults){
 }
 
 function filterTable(q){document.querySelectorAll('#resBody tr').forEach(r=>{r.style.display=q===''||r.getAttribute('data-search').includes(q.toLowerCase())?'':'none'})}
-function sendResultEmail(){
-  const email=document.getElementById('erEmail').value;
-  if(!email||!email.includes('@')){alert('Please enter a valid email');return;}
+async function sendResultEmail(){
+  const email = document.getElementById('erEmail').value.trim();
+  if (!email || !email.includes('@')) { alert('Please enter a valid email'); return; }
+  if (!extractedData.length) { alert('No data to email — process an invoice first'); return; }
+
+  const btn = document.querySelector('.er-send');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  // Generate the Excel client-side (same logic as doDownload, kept consistent)
+  const requestedFields = templateColumns.length>0
+    ? templateColumns
+    : instr.value.split(',').map(f=>f.trim()).filter(Boolean);
+  let allRows=[];
+  extractedData.forEach(result=>{
+    if(splitLineItems&&result.lineRows&&result.lineRows.length>0){result.lineRows.forEach(row=>allRows.push({...row,_filename:result.filename}));}
+    else{allRows.push({...result.data,_filename:result.filename});}
+  });
+  const isMeta = k => k.startsWith('_');
+  const hasValue = v => v !== null && v !== undefined && v !== '';
+  const seen = new Set();
+  const allFields = [];
+  requestedFields.forEach(f => {
+    const lower = f.toLowerCase();
+    if (allRows.some(row => { const k = Object.keys(row).find(rk => !isMeta(rk) && rk.toLowerCase() === lower); return k && hasValue(row[k]); }) || requestedFields.length <= 8) {
+      seen.add(lower); allFields.push(f);
+    }
+  });
+  allRows.forEach(row => Object.keys(row).forEach(k => {
+    if (!isMeta(k) && !seen.has(k.toLowerCase()) && hasValue(row[k])) { seen.add(k.toLowerCase()); allFields.push(k); }
+  }));
+  const wsData = [['Source file', ...allFields], ...allRows.map(row => [row._filename || '', ...allFields.map(f => {
+    const k = Object.keys(row).find(x => x.toLowerCase() === f.toLowerCase());
+    return k ? row[k] ?? '' : '';
+  })])];
+  const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(wsData);
+  XLSX.utils.book_append_sheet(wb, ws, 'AlBills Extraction');
+  const xlsxArray = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  // Convert to base64
+  let binary = '';
+  const bytes = new Uint8Array(xlsxArray);
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  const base64Excel = btoa(binary);
+
+  let emailedOk = false;
+  try {
+    const r = await fetch('/api/email-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        filename: 'albills-extraction.xlsx',
+        rowCount: allRows.length,
+        base64Excel
+      })
+    });
+    const data = await r.json();
+    emailedOk = !!data.success;
+  } catch (_) { /* network error — fall through to download fallback */ }
+
+  // Always download the file as well so the user has it in hand regardless
+  const blob = new Blob([xlsxArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'albills-extraction.xlsx'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+
   document.getElementById('erForm').style.display='none';
-  document.getElementById('erSent').style.display='flex';
+  const sent = document.getElementById('erSent');
+  if (sent) {
+    sent.style.display = 'flex';
+    sent.textContent = emailedOk
+      ? `✅ Sent to ${email} — also downloaded for you`
+      : `📥 Excel downloaded — email delivery isn't enabled yet, so we saved your address for the next batch`;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Send now'; }
 }
 function doDownload(type){
   if(!extractedData.length){alert('No data to download');return;}

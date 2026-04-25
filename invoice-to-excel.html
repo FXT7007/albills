@@ -197,10 +197,18 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
-  document.getElementById('file-input').addEventListener('change', (e) => {
-    if (!e.target.files.length) return;
-    alert(`${e.target.files.length} invoice(s) selected. Wire this to /api/convert-invoice.`);
-  });
+  // When user drops/picks a file here, send them to the real extractor.
+  // We can't transfer the actual File via URL — they'll re-drop on /extract.
+  // Most users hit this page via Google search; the real tool lives at /extract.
+  function goToExtractor(){ window.location.href = '/extract'; }
+  document.getElementById('file-input').addEventListener('change', goToExtractor);
+  // Also make the dropzone primary CTA go straight to the extractor
+  const dz = document.querySelector('.dropzone');
+  if (dz) dz.setAttribute('onclick', "window.location.href='/extract'");
+  document.querySelectorAll('.btn-primary').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    goToExtractor();
+  }));
 </script>
 
 </body>

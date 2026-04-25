@@ -331,13 +331,19 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  // Placeholder upload handler — wire to your backend
-  document.getElementById('file-input').addEventListener('change', (e) => {
-    const files = e.target.files;
-    if (!files.length) return;
-    // TODO: replace with real upload to /api/convert
-    alert(`${files.length} file(s) selected. Connect this to your /api/convert endpoint.`);
+  // Send file pickers + dropzone clicks straight to the real extractor at /extract
+  function goToExtractor(){ window.location.href = '/extract'; }
+  document.getElementById('file-input').addEventListener('change', goToExtractor);
+  const dz = document.querySelector('.dropzone');
+  if (dz) dz.setAttribute('onclick', "window.location.href='/extract'");
+  document.querySelectorAll('.btn-primary, button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const t = (btn.textContent || '').toLowerCase();
+      if (t.includes('try') || t.includes('upload') || t.includes('choose') || t.includes('start') || t.includes('convert')) {
+        e.stopPropagation();
+        goToExtractor();
+      }
+    });
   });
 </script>
 
