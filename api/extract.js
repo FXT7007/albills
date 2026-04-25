@@ -341,24 +341,43 @@ export default async function handler(req, res) {
 
     const systemPrompt = buildSystemPrompt(splitLineItems);
 
-    // ---------- PRE-FLIGHT: free-tier limit check (anonymous only) ----------
-    // We do this BEFORE calling Anthropic so we don't burn tokens on requests
-    // that will be rejected anyway. We order by created_at desc and take the
-    // most recent row, which has the cumulative count.
+    // ---------- PRE-FLIGHT: limit / credit check (BEFORE Anthropic call) ----------
+    // Done before Anthropic so we don't burn tokens on requests we'll reject.
     let anonUsedSoFar = 0;
+    let liveUserCredits = null;
+
     if (userId === 'anonymous' && fingerprint && SUPABASE_KEY) {
+      // Free-tier (3 invoices for the lifetime of this fingerprint)
       try {
         const existing = await dbGet(
           `anonymous_usage?fingerprint=eq.${encodeURIComponent(fingerprint)}&select=count&order=created_at.desc&limit=1`
         );
         anonUsedSoFar = Array.isArray(existing) && existing[0] ? (existing[0].count || 0) : 0;
-      } catch (_) { /* if read fails, fall through and let server-side enforcement be best-effort */ }
+      } catch (_) { /* best-effort fallback */ }
       if (anonUsedSoFar + filesQueue.length > 3) {
         return res.status(403).json({
           error: 'FREE_LIMIT_REACHED',
           used: anonUsedSoFar,
           limit: 3,
           remaining: Math.max(0, 3 - anonUsedSoFar)
+        });
+      }
+    } else if (userId !== 'anonymous' && SUPABASE_KEY) {
+      // Logged-in user: must have enough credits to cover this batch.
+      try {
+        const profile = await dbGet(`profiles?id=eq.${encodeURIComponent(userId)}&select=credits&limit=1`);
+        liveUserCredits = Array.isArray(profile) && profile[0]
+          ? Math.max(0, profile[0].credits ?? 0)
+          : 0;
+      } catch (_) { /* if we can't read, deny rather than burn tokens */
+        return res.status(503).json({ error: 'CREDIT_CHECK_FAILED', message: 'Could not verify your credits — try again in a moment.' });
+      }
+      if (filesQueue.length > liveUserCredits) {
+        return res.status(403).json({
+          error: 'INSUFFICIENT_CREDITS',
+          credits: liveUserCredits,
+          requested: filesQueue.length,
+          message: `You have ${liveUserCredits} credit${liveUserCredits === 1 ? '' : 's'} but uploaded ${filesQueue.length} file${filesQueue.length === 1 ? '' : 's'}. Buy more credits or upload fewer files.`
         });
       }
     }
@@ -450,8 +469,21 @@ export default async function handler(req, res) {
 
     // ---------- Usage tracking (post-success) ----------
     let anonUsedAfter = anonUsedSoFar + fileResults.length;
+    let userCreditsAfter = null;
+
     if (userId !== 'anonymous' && SUPABASE_KEY) {
+      // Decrement profile.credits atomically — read-then-write off the
+      // pre-flight value (already validated above).
       try {
+        userCreditsAfter = Math.max(0, (liveUserCredits ?? 0) - fileResults.length);
+        await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ credits: userCreditsAfter })
+        });
         await dbPost('invoice_usage', {
           user_id: userId,
           invoice_count: fileResults.length,
@@ -459,7 +491,7 @@ export default async function handler(req, res) {
           credits_used: fileResults.length,
           created_at: new Date().toISOString()
         });
-      } catch (e) { /* non-fatal */ }
+      } catch (e) { /* non-fatal — log on server */ }
     } else if (fingerprint && SUPABASE_KEY) {
       // Pre-flight already enforced the limit. Just record the new cumulative count.
       try {
@@ -471,13 +503,12 @@ export default async function handler(req, res) {
       } catch (e) { /* non-fatal */ }
     }
 
-    // Echo the new anonymous-usage count back to the client so its localStorage
-    // can stay in sync with the source of truth (server). Avoids drift if the
-    // user clears localStorage or hops devices.
+    // Echo authoritative counts back so the client UI stays in sync.
     return res.status(200).json({
       results: fileResults,
       anon_used: userId === 'anonymous' ? anonUsedAfter : undefined,
-      anon_remaining: userId === 'anonymous' ? Math.max(0, 3 - anonUsedAfter) : undefined
+      anon_remaining: userId === 'anonymous' ? Math.max(0, 3 - anonUsedAfter) : undefined,
+      user_credits: userCreditsAfter
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });

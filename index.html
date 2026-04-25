@@ -643,13 +643,13 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <h2 class="auth-title">Welcome back</h2>
       <p class="auth-sub">Sign in to your AlBills account</p>
       <div class="atabs2"><button class="atab2 active" onclick="setTab('login')">Sign in</button><button class="atab2" onclick="setTab('signup')">Create account</button></div>
-      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="loginEmail" placeholder="you@company.com"></div>
+      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="loginEmail" placeholder="you@company.com" onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin();}"></div>
       <div class="fg">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <label class="fl" style="margin:0">Password</label>
           <a onclick="setTab('forgot')" style="color:var(--accent);font-size:12px;cursor:pointer;text-decoration:none">Forgot password?</a>
         </div>
-        <input class="fi" type="password" id="loginPass" placeholder="••••••••">
+        <input class="fi" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin();}">
       </div>
       <button class="auth-btn" id="loginBtn" onclick="doLogin()">Sign in to AlBills</button>
       <div class="auth-fn">No account? <a onclick="setTab('signup')">Sign up free</a></div>
@@ -659,11 +659,11 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <p class="auth-sub">Start with 3 free invoices — no card needed</p>
       <div class="atabs2"><button class="atab2" onclick="setTab('login')">Sign in</button><button class="atab2 active" onclick="setTab('signup')">Create account</button></div>
       <div class="frow2">
-        <div class="fg"><label class="fl">First name</label><input class="fi" type="text" id="signupFirst" placeholder="Mohammed"></div>
-        <div class="fg"><label class="fl">Last name</label><input class="fi" type="text" id="signupLast" placeholder="Al Rashidi"></div>
+        <div class="fg"><label class="fl">First name</label><input class="fi" type="text" id="signupFirst" placeholder="Mohammed" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
+        <div class="fg"><label class="fl">Last name</label><input class="fi" type="text" id="signupLast" placeholder="Al Rashidi" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
       </div>
-      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signupEmail" placeholder="you@company.com"></div>
-      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signupPass" placeholder="At least 8 characters"></div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signupEmail" placeholder="you@company.com" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signupPass" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter'){event.preventDefault();doSignup();}"></div>
       <button class="auth-btn" id="signupBtn" onclick="doSignup()">Create free account</button>
       <div class="auth-fn" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:8px">By creating an account you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>. We&rsquo;ll send a verification email — please confirm before signing in.</div>
       <div class="auth-fn">Already have an account? <a onclick="setTab('login')">Sign in</a></div>
@@ -671,7 +671,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
     <div id="fpf" style="display:none">
       <h2 class="auth-title">Reset your password</h2>
       <p class="auth-sub">We&rsquo;ll email you a secure link to set a new password.</p>
-      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="forgotEmail" placeholder="you@company.com"></div>
+      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="forgotEmail" placeholder="you@company.com" onkeydown="if(event.key==='Enter'){event.preventDefault();doForgotPassword();}"></div>
       <button class="auth-btn" id="forgotBtn" onclick="doForgotPassword()">Send reset link</button>
       <div class="auth-fn">Remembered it? <a onclick="setTab('login')">Back to sign in</a></div>
     </div>
@@ -1134,6 +1134,14 @@ async function startProc(){
   if(!currentUser){
     const used=getAnonUsed();
     if(used+files.length>3){document.getElementById('limitModal').classList.add('show');return;}
+  } else {
+    // Logged-in: pre-flight credit check so we don't even start the request
+    if (files.length > userCredits) {
+      const mt = document.getElementById('modalTitle'); if (mt) mt.textContent = `Not enough credits — you have ${userCredits}, you uploaded ${files.length}`;
+      const ms = document.getElementById('modalSub');  if (ms) ms.textContent = 'Buy 10 more credits ($5.00) or upload fewer files at once.';
+      document.getElementById('limitModal').classList.add('show');
+      return;
+    }
   }
   document.getElementById('uploadState').style.display='none';
   document.getElementById('procState').style.display='block';
@@ -1162,9 +1170,29 @@ async function startProc(){
     clearInterval(iv);fill.style.width='100%';
     if(data.error==='FREE_LIMIT_REACHED'){
       clearTimeout(watchdog);
-      // Sync localStorage with the server's authoritative used count
       if (typeof data.used === 'number') setAnonUsed(data.used);
       document.getElementById('limitModal').classList.add('show');
+      resetAll();
+      return;
+    }
+    if(data.error==='INSUFFICIENT_CREDITS'){
+      clearTimeout(watchdog);
+      // Re-show the limit modal but with credit-buy messaging instead of free-tier
+      const mt = document.getElementById('modalTitle'); if (mt) mt.textContent = `Not enough credits — you have ${data.credits ?? 0}, you uploaded ${data.requested ?? files.length}`;
+      const ms = document.getElementById('modalSub');  if (ms) ms.textContent = 'Buy 10 more credits ($5.00) or upload fewer files at once.';
+      document.getElementById('limitModal').classList.add('show');
+      // Sync displayed credit count with server truth
+      if (typeof data.credits === 'number') {
+        userCredits = data.credits;
+        document.getElementById('navCredits').textContent = data.credits + ' credits';
+        const pc = document.getElementById('profileCredits'); if (pc) pc.textContent = data.credits + ' credits';
+      }
+      resetAll();
+      return;
+    }
+    if(data.error==='CREDIT_CHECK_FAILED'){
+      clearTimeout(watchdog);
+      alert(data.message || 'Could not verify your credits — try again in a moment.');
       resetAll();
       return;
     }
@@ -1177,22 +1205,14 @@ async function startProc(){
         document.getElementById('freeText').textContent=left+' free invoices remaining';
         updateFreeDots(left);
       } else {
-        // Re-fetch latest credits to minimise the race window vs other tabs / Gumroad webhook writes.
-        // total_processed is no longer written here — invoice_usage is the single source of truth and the dashboard reads from it.
-        const {data:fresh} = await supa.from('profiles').select('credits').eq('id',currentUser.id).single();
-        const liveCredits = Math.max(0, fresh?.credits ?? userCredits);
-        const newC = Math.max(0, liveCredits - files.length);
-        await supa.from('profiles').update({credits:newC}).eq('id',currentUser.id);
-        await supa.from('invoice_usage').insert({
-          user_id: currentUser.id,
-          invoice_count: files.length,
-          fields_extracted: instr.value.split(',').length,
-          credits_used: files.length,
-          created_at: new Date().toISOString()
-        });
+        // Server already deducted credits + logged invoice_usage in /api/extract.
+        // We just sync the displayed value from the server's authoritative response.
+        const newC = (typeof data.user_credits === 'number')
+          ? data.user_credits
+          : Math.max(0, userCredits - files.length); // fallback for older server response
         userCredits = newC;
         document.getElementById('navCredits').textContent = newC+' credits';
-        document.getElementById('dashCredits').textContent = newC;
+        const dc = document.getElementById('dashCredits'); if (dc) dc.textContent = newC;
         const pc = document.getElementById('profileCredits'); if (pc) pc.textContent = newC+' credits';
       }
       msg.textContent='Done! Building your results...';
