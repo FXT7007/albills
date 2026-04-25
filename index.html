@@ -538,7 +538,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <div class="footer-brand"><h3>⚡ AlBills</h3><p>AI-powered invoice data extraction. Any document, any country, any language.</p><p style="margin-top:8px;font-size:12px;color:var(--text3)">🔒 Documents deleted after processing.</p><div style="margin-top:12px;display:flex;gap:10px"><a href="https://www.linkedin.com/in/albills/" target="_blank" rel="noopener" aria-label="LinkedIn" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(91,141,238,0.08);border:1px solid rgba(91,141,238,0.2);border-radius:8px;color:var(--accent);text-decoration:none"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z"/></svg></a><a href="https://uaevegas.com/" target="_blank" rel="noopener" aria-label="UAE Vegas" title="UAE Vegas — sister project" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(77,217,192,0.08);border:1px solid rgba(77,217,192,0.2);border-radius:8px;color:var(--green);text-decoration:none;font-size:14px">🇦🇪</a><a href="/about" aria-label="About" title="About AlBills" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(139,111,238,0.08);border:1px solid rgba(139,111,238,0.2);border-radius:8px;color:var(--accent2);text-decoration:none;font-size:14px">ℹ️</a></div></div>
       <div class="footer-col"><h4>Product</h4><a onclick="showPage('app')">Extract invoices</a><a onclick="showPage('demo')">Live demo</a><a onclick="showPage('home');goTo('features')">Features</a><a onclick="showPage('home');goTo('pricing')">Pricing</a></div>
       <div class="footer-col"><h4>Free Tools</h4><a href="/vat-calculator.html">VAT Calculator</a><a href="/gold-price-calculator.html">Gold Price</a><a href="/currency-converter.html">Currency Converter</a><a href="/loan-calculator.html">Loan Calculator</a><a href="/zakat-calculator.html">Zakat Calculator</a><a href="/profit-margin-calculator.html">Profit Margin</a><a href="/break-even-calculator.html">Break-Even</a><a href="/salary-calculator.html">Salary</a><a href="/uae-corporate-tax.html">UAE Corp Tax</a></div>
-      <div class="footer-col"><h4>Account</h4><a href="#" onclick="showPage('login');setTab('signup');return false">Sign up free</a><a href="#" onclick="showPage('login');setTab('login');return false">Sign in</a><a href="#" onclick="showPage('dashboard');return false">Dashboard</a><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms of Service</a><a href="mailto:intothestillnes@gmail.com">Support</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="#" onclick="showPage('login');setTab('signup');return false">Sign up free</a><a href="#" onclick="showPage('login');setTab('login');return false">Sign in</a><a href="#" onclick="showPage('dashboard');return false">Dashboard</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="mailto:intothestillnes@gmail.com">Support</a></div>
     </div>
     <div class="footer-bottom"><span>© 2026 <strong>AlBills</strong>. All rights reserved.</span><span>Powered by Claude AI · albills.com</span></div>
   </footer>
@@ -837,6 +837,17 @@ function showPage(id){
   window.scrollTo(0,0);
   if(id==='demo')buildDemo();
 }
+// Path-based bootstrap so /extract, /pricing, /features, /signin, /dashboard, /live-demo
+// (rewritten to / by Vercel) land on the correct in-app view.
+(function pathBootstrap(){
+  try {
+    const map={'/extract':['app'],'/dashboard':['dashboard'],'/signin':['login','login'],'/live-demo':['demo'],'/pricing':['home','pricing'],'/features':['home','features']};
+    const route=map[location.pathname];
+    if(!route)return;
+    const fire=()=>{showPage(route[0]);if(route[0]==='login'&&route[1])setTab(route[1]);if(route[0]==='home'&&route[1])goTo(route[1]);};
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fire);else fire();
+  }catch(e){}
+})();
 function goTo(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'})},80)}
 function setTab(t){
   document.getElementById('lf').style.display=t==='login'?'block':'none';
