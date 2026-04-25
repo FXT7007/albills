@@ -826,6 +826,46 @@ async function setUser(user){
   document.getElementById('profileCredits').textContent=userCredits+' credits';
   document.getElementById('profileJoined').textContent=new Date(user.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   loadHistory(user.id);
+  redeemPendingCredits(user);
+}
+
+// If someone bought credits on Gumroad before signing up (or used a different
+// email), the webhook stored them in pending_credits. On first sign-in for that
+// email we redeem any unredeemed rows here.
+async function redeemPendingCredits(user){
+  try {
+    const email = (user.email || '').toLowerCase();
+    const {data: pending} = await supa.from('pending_credits')
+      .select('id, credits')
+      .eq('email', email)
+      .is('redeemed_at', null);
+    if (!pending || pending.length === 0) return;
+    const total = pending.reduce((s,r)=>s + (r.credits||0), 0);
+    if (total <= 0) return;
+    // Mark redeemed first (atomic-ish — second tab can't double-claim if it sees them already redeemed)
+    const ids = pending.map(p=>p.id);
+    const {error: markErr} = await supa.from('pending_credits')
+      .update({redeemed_at: new Date().toISOString(), redeemed_user_id: user.id})
+      .in('id', ids)
+      .is('redeemed_at', null);
+    if (markErr) return;
+    // Re-fetch latest credits to avoid racing with Gumroad webhook
+    const {data: fresh} = await supa.from('profiles').select('credits').eq('id', user.id).single();
+    const live = Math.max(0, fresh?.credits ?? userCredits);
+    const newC = live + total;
+    await supa.from('profiles').update({credits: newC}).eq('id', user.id);
+    userCredits = newC;
+    document.getElementById('navCredits').textContent = newC + ' credits';
+    document.getElementById('dashCredits').textContent = newC;
+    const pc = document.getElementById('profileCredits'); if (pc) pc.textContent = newC + ' credits';
+    // Friendly toast via the auth message banner (visible on whichever page they landed)
+    const am = document.getElementById('authMsg');
+    if (am) {
+      am.className = 'auth-msg success';
+      am.textContent = '🎉 ' + total + ' credits redeemed from your previous purchase.';
+      setTimeout(() => { am.className = 'auth-msg'; }, 6000);
+    }
+  } catch (e) { /* non-fatal */ }
 }
 
 function clearUser(){
