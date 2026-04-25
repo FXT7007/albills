@@ -373,6 +373,8 @@ main{position:relative;z-index:1}
 .modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:36px 32px;max-width:420px;width:100%;text-align:center;position:relative}
 .modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
 .modal-icon{font-size:40px;margin-bottom:16px}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1;transition:all .15s}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
 .modal-title{font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:8px}
 .modal-sub{font-size:14px;color:var(--text3);margin-bottom:24px;line-height:1.6}
 .modal-btns{display:flex;flex-direction:column;gap:10px}
@@ -402,8 +404,9 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 <div class="bg-wrap"><div class="bg-grad"></div><div class="bg-grid"></div><div class="particles" id="particles"></div></div>
 
 <!-- LIMIT MODAL -->
-<div class="modal-overlay" id="limitModal">
+<div class="modal-overlay" id="limitModal" onclick="if(event.target===this)closeLimitModal()">
   <div class="modal-box">
+    <button class="modal-close" onclick="closeLimitModal()" aria-label="Close">×</button>
     <div class="modal-icon">⚡</div>
     <div class="modal-title" id="modalTitle">You've used your 3 free invoices</div>
     <div class="modal-sub" id="modalSub">Get 10 more invoice extractions instantly — any language, any country, clean Excel every time.</div>
@@ -1153,6 +1156,13 @@ function updateFreeDots(remaining){
   for(let i=0;i<3;i++){const d=document.createElement('div');d.className='fb-dot'+(i>=remaining?' used':'');dots.appendChild(d);}
 }
 function closeLimitModal(){const el=document.getElementById('limitModal');if(el)el.classList.remove('show')}
+// Close any open modal when the user presses Escape — standard accessibility expectation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const openModal = document.querySelector('.modal-overlay.show');
+    if (openModal) closeLimitModal();
+  }
+});
 
 let files=[],extractedData=[],splitLineItems=false,excelTemplateFile=null,templateColumns=[];
 const fi=document.getElementById('fi'),dz=document.getElementById('dropZone'),fl2=document.getElementById('fileList'),pb=document.getElementById('procBtn'),instr=document.getElementById('instructions');
