@@ -1087,7 +1087,16 @@ function setLineMode(split){
   document.getElementById('togCombined').classList.toggle('active',!split);
   document.getElementById('togSplit').classList.toggle('active',split);
 }
-function setChip(t){instr.value=t;updateBtn();instr.focus()}
+function setChip(t){
+  instr.value=t;
+  updateBtn();
+  // Auto-toggle Split mode when the preset clearly asks for line-level fields,
+  // so users don't have to know about the Combined/Split switch separately.
+  const lineSignals = ['line description','line quantity','line unit price','line tax','line total','quantity','unit price'];
+  const wantsLines = lineSignals.some(s => t.toLowerCase().includes(s));
+  setLineMode(wantsLines);
+  instr.focus();
+}
 
 function handleExcelTemplate(input){
   if(!input.files||!input.files[0])return;

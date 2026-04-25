@@ -105,9 +105,19 @@ NUMBERS YOU MUST GET RIGHT
 - tax_rate — percentage applied (5% UAE, 15% Saudi, 20% UK, etc.)
 
 LINE ITEMS
-Every product/service row, even if there's only one. Skip subtotal/tax/total summary rows.
-Each line item must include: line_description, line_quantity, line_unit_price,
-line_tax_rate, line_tax_amount, line_total. Use null for missing pieces.
+Every product/service row in the document, even if there's only one. Skip subtotal /
+tax / total summary rows.
+Field-name resolution for line items:
+  - If the user requested "line description / line quantity / line unit price / line
+    tax rate / line tax amount / line total", use THOSE exact names per row.
+  - If the user requested the shorter forms "description / quantity / unit price /
+    tax rate / tax amount / line total" (without the "line " prefix), still treat
+    them as line-item fields and produce ONE OBJECT/ROW PER LINE ITEM.
+  - If both header-level and line-level fields are mixed (e.g. user asked for both
+    "tax amount" as a header total AND "tax amount" per line), prefer producing
+    line rows in split mode and put the header tax in a separate "header_tax_amount"
+    field so they don't collide.
+Use null for missing pieces.
 
 PAYMENT DETAILS (when requested)
 bank_name, account_number, swift, iban, payment_terms — extract from the bank-details
