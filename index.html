@@ -35,10 +35,17 @@
     },
     {
       "@type": "Offer",
-      "name": "Pay As You Go",
+      "name": "Pro Plan",
       "price": "0.50",
       "priceCurrency": "USD",
-      "description": "Per invoice, no monthly fee"
+      "description": "Pay as you go — $0.50 per invoice, unlimited, no monthly fee"
+    },
+    {
+      "@type": "Offer",
+      "name": "Business Plan",
+      "priceCurrency": "USD",
+      "description": "Custom pricing for accounting firms and high-volume teams. Volume discounts from $0.20/invoice, multi-user accounts, API access, QuickBooks/Xero/Zoho export, priority queue, dedicated account manager.",
+      "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 500, "unitText": "invoices/month" }
     }
   ],
   "aggregateRating": {
@@ -138,13 +145,16 @@ main{position:relative;z-index:1}
 .feat-t{font-family:var(--font-d);font-size:14px;font-weight:600;margin-bottom:6px}
 .feat-d{font-size:13px;color:var(--text3);line-height:1.5}
 .feat-badge{display:inline-block;background:rgba(77,217,192,0.1);color:var(--green);font-size:10px;padding:2px 8px;border-radius:100px;border:1px solid rgba(77,217,192,0.2);margin-top:8px}
-.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:680px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1040px;margin:0 auto}
 .price-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px;position:relative;overflow:hidden}
 .price-card.featured{border-color:var(--accent)}
 .price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
 .pc-badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 11px;border-radius:100px;margin-bottom:14px}
 .badge-free{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2)}
 .badge-paid{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2)}
+.badge-biz{background:rgba(240,165,0,0.1);color:var(--amber);border:1px solid rgba(240,165,0,0.25)}
+.pc-price.biz-price{background:linear-gradient(135deg,var(--amber),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pfc-a{background:rgba(240,165,0,0.1);color:var(--amber);border:1px solid rgba(240,165,0,0.25)}
 .pc-title{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:5px}
 .pc-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
 .pc-price{font-family:var(--font-d);font-size:42px;font-weight:800;line-height:1;margin-bottom:4px}
@@ -160,6 +170,8 @@ main{position:relative;z-index:1}
 .pc-btn{width:100%;padding:13px;border:none;border-radius:10px;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .25s}
 .pc-btn-free{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.3)}
 .pc-btn-paid{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.pc-btn-biz{background:rgba(240,165,0,0.1);color:var(--amber);border:1px solid rgba(240,165,0,0.35);transition:all .2s}
+.pc-btn-biz:hover{background:rgba(240,165,0,0.18);border-color:var(--amber)}
 .security-banner{background:rgba(77,217,192,0.05);border:1px solid rgba(77,217,192,0.15);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:16px;max-width:760px;margin:0 auto}
 .tool-quick-card{text-decoration:none;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:18px;display:flex;align-items:flex-start;gap:13px;transition:all .25s;position:relative;overflow:hidden}
 .tool-quick-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .3s}
@@ -381,7 +393,8 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 .mobile-menu.open{display:flex}
 .mobile-menu a,.mobile-menu button{color:var(--text2);font-size:14px;padding:10px 14px;border-radius:8px;text-decoration:none;border:none;background:transparent;font-family:var(--font-b);cursor:pointer;text-align:left;transition:all .2s}
 .mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface);color:var(--text)}
-@media(max-width:768px){.feats{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}.summary-cards,.dash-cards{grid-template-columns:1fr 1fr}.nav-link{display:none}.hamburger{display:flex}.hero h1{font-size:32px}.stats{flex-wrap:wrap}.si{min-width:50%}.frow2{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr 1fr}.countries-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1000px){.pricing-grid{grid-template-columns:1fr;max-width:480px}}
+@media(max-width:768px){.feats{grid-template-columns:1fr}.summary-cards,.dash-cards{grid-template-columns:1fr 1fr}.nav-link{display:none}.hamburger{display:flex}.hero h1{font-size:32px}.stats{flex-wrap:wrap}.si{min-width:50%}.frow2{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr 1fr}.countries-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:480px){.summary-cards,.dash-cards{grid-template-columns:1fr 1fr}.hero-cta{flex-direction:column;align-items:center}.auth-card{padding:24px 18px}.countries-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -517,6 +530,22 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
         <div class="pc-price paid-price">$0.50</div><div class="pc-per">per invoice · no monthly fee</div>
         <ul class="pc-feats"><li><div class="pfc pfc-b">✓</div>Unlimited invoices</li><li><div class="pfc pfc-b">✓</div>All file formats & 50+ languages</li><li><div class="pfc pfc-b">✓</div>Upload your own Excel template</li><li><div class="pfc pfc-b">✓</div>Line-by-line extraction</li><li><div class="pfc pfc-b">✓</div>Excel & CSV download</li></ul>
         <button class="pc-btn pc-btn-paid" onclick="showPage('login');setTab('signup')">Get started — pay as you go</button>
+      </div>
+      <div class="price-card">
+        <div class="pc-badge badge-biz">💼 For teams &amp; firms</div><div class="pc-title">Business</div><div class="pc-sub">Accounting firms &amp; multi-branch operations</div>
+        <div class="pc-price biz-price">Custom</div><div class="pc-per">tailored to your volume — talk to us</div>
+        <ul class="pc-feats">
+          <li><div class="pfc pfc-a">✓</div>Volume discounts from <b>$0.20/invoice</b></li>
+          <li><div class="pfc pfc-a">✓</div>Multi-user team accounts</li>
+          <li><div class="pfc pfc-a">✓</div>Direct API access for automation</li>
+          <li><div class="pfc pfc-a">✓</div>QuickBooks, Xero, Zoho, Tally export</li>
+          <li><div class="pfc pfc-a">✓</div>Priority processing queue</li>
+          <li><div class="pfc pfc-a">✓</div>Up to 100 pages per file</li>
+          <li><div class="pfc pfc-a">✓</div>Saved per-vendor templates</li>
+          <li><div class="pfc pfc-a">✓</div>Dedicated account manager</li>
+          <li><div class="pfc pfc-a">✓</div>Audit trail for VAT compliance</li>
+        </ul>
+        <a class="pc-btn pc-btn-biz" href="mailto:intothestillnes@gmail.com?subject=AlBills%20Business%20plan%20inquiry&amp;body=Hi%20%E2%80%94%20I%27d%20like%20to%20know%20more%20about%20the%20Business%20plan%20for%20my%20%5Bcompany%2Fteam%5D.%20We%20process%20around%20%5BX%5D%20invoices%20per%20month.%0A%0AThanks%21" style="text-decoration:none;display:block;text-align:center">📩 Talk to us</a>
       </div>
     </div>
   </section>
