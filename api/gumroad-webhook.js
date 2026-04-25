@@ -77,12 +77,15 @@ export default async function handler(req, res) {
     // ---------- 1. Authenticate ----------
     // Accept the secret as body field, query string or header.
     if (SECRET) {
+      // Try every plausible location: body, Vercel-parsed query, raw URL, and headers.
       const provided =
         params.get('secret') ||
-        (req.headers['x-gumroad-secret'] || '') ||
-        ((req.url || '').match(/[?&]secret=([^&]+)/) || [])[1] ||
+        (req.query && req.query.secret) ||
+        ((req.url || '').match(/[?&]secret=([^&#]+)/) || [])[1] ||
+        (req.headers && (req.headers['x-gumroad-secret'] || req.headers['x-webhook-secret'])) ||
         '';
-      if (provided !== SECRET) {
+      const decoded = (() => { try { return decodeURIComponent(provided); } catch { return provided; } })();
+      if (decoded !== SECRET && provided !== SECRET) {
         return res.status(401).json({ error: 'Invalid or missing secret' });
       }
     }
