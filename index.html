@@ -670,7 +670,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
     <div class="dash-header">
       <div class="dash-greeting"><h2>Welcome back, <span id="dashName">there</span> 👋</h2><p id="dashEmail" style="color:var(--text3);font-size:13px"></p></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:rgba(77,217,192,0.1);border:1px solid rgba(77,217,192,0.3);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(77,217,192,0.18)'" onmouseout="this.style.background='rgba(77,217,192,0.1)'">💳 Buy 10 credits — $5.00</a>
+        <a id="dashBuyBtn" href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:rgba(77,217,192,0.1);border:1px solid rgba(77,217,192,0.3);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(77,217,192,0.18)'" onmouseout="this.style.background='rgba(77,217,192,0.1)'">💳 Buy 10 credits — $5.00</a>
         <button class="btn-p" onclick="showPage('app')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Extract invoices</button>
       </div>
     </div>
@@ -737,6 +737,18 @@ function getFingerprint(){
 function getAnonUsed(){return parseInt(localStorage.getItem('_abusd')||'0')}
 function setAnonUsed(n){localStorage.setItem('_abusd',n.toString())}
 
+// Pricing — single source of truth. If you change Gumroad pricing,
+// change this too (and the JSON-LD offer at line ~39 + the hardcoded
+// '$0.50' / '$5.00' strings on the homepage hero/pricing card).
+const PRICING = {
+  perInvoice: 0.50,         // USD per processed invoice
+  packCredits: 10,          // credits per Gumroad purchase
+  packPrice: 5.00,          // USD per pack
+  freeCredits: 3,           // free credits on signup
+  gumroadUrl: 'https://fxtwave.gumroad.com/l/albills-pro'
+};
+const fmtUSD = n => '$' + Number(n).toFixed(2);
+
 async function initAuth(){
   const{data:{session}}=await supa.auth.getSession();
   if(session?.user)await setUser(session.user);
@@ -748,31 +760,52 @@ async function initAuth(){
 
 async function setUser(user){
   currentUser=user;
-  const name=user.user_metadata?.first_name||user.email.split('@')[0];
-  const init=name.substring(0,1).toUpperCase();
+  const firstName = user.user_metadata?.first_name || user.email.split('@')[0];
+  const lastName  = user.user_metadata?.last_name  || '';
+  const fullName  = lastName ? (firstName + ' ' + lastName) : firstName;
+  const init = firstName.substring(0,1).toUpperCase();
   document.getElementById('navGuest').style.display='none';
-  document.getElementById('navUser').style.display='block';
+  document.getElementById('navUser').style.display='flex';
   document.getElementById('navAvatar').textContent=init;
   let{data:profile}=await supa.from('profiles').select('*').eq('id',user.id).single();
   if(!profile){
-    await supa.from('profiles').insert({id:user.id,first_name:name,credits:3,total_processed:0});
-    profile={first_name:name,credits:3,total_processed:0,created_at:new Date().toISOString()};
+    // First-time signup: persist names + start with 3 free credits. Supabase auth.users.created_at
+    // is the canonical signup time and is read on line ~777 — no need to duplicate here.
+    await supa.from('profiles').insert({
+      id: user.id,
+      first_name: firstName,
+      last_name:  lastName || null,
+      credits: 3,
+      total_processed: 0
+    });
+    profile = { first_name: firstName, last_name: lastName, credits: 3, total_processed: 0 };
   }
   userCredits=profile?.credits??3;
   document.getElementById('navCredits').textContent=userCredits+' credits';
   const buyBtn=document.getElementById('navBuyBtn');
-  if(buyBtn) buyBtn.style.display=userCredits<=0?'block':'none';
+  if(buyBtn){
+    buyBtn.href = PRICING.gumroadUrl;
+    buyBtn.textContent = userCredits<=0
+      ? `Out of credits — Buy ${PRICING.packCredits} for ${fmtUSD(PRICING.packPrice)}`
+      : `Buy credits`;
+    buyBtn.style.display = userCredits<=0?'block':'none';
+  }
+  const dashBuyBtn=document.getElementById('dashBuyBtn');
+  if(dashBuyBtn){
+    dashBuyBtn.href = PRICING.gumroadUrl;
+    dashBuyBtn.innerHTML = `💳 Buy ${PRICING.packCredits} credits — ${fmtUSD(PRICING.packPrice)}`;
+  }
   document.getElementById('freeText').textContent=userCredits+' credits remaining';
   document.getElementById('freeRight').innerHTML='<a onclick="showPage(\'dashboard\')" style="color:var(--accent);cursor:pointer">My Dashboard →</a>';
   updateFreeDots(Math.min(userCredits,3));
-  document.getElementById('dashName').textContent=name;
+  document.getElementById('dashName').textContent=firstName;
   document.getElementById('dashEmail').textContent=user.email;
   document.getElementById('dashCredits').textContent=userCredits;
   // dashTotal and dashSaved are filled by loadHistory() from the source-of-truth
   // invoice_usage table — no double-write from profile counter.
   document.getElementById('dashTotal').textContent='—';
   document.getElementById('dashSaved').textContent='—';
-  document.getElementById('profileName').textContent=name;
+  document.getElementById('profileName').textContent=fullName;
   document.getElementById('profileAvatar').textContent=init;
   document.getElementById('profileEmailDisplay').textContent=user.email;
   document.getElementById('profileEmailField').textContent=user.email;
@@ -922,7 +955,7 @@ function updateBtn(){
   const ok=files.length>0&&instr.value.trim()!=='';pb.disabled=!ok;
   if(ok){
     const used=getAnonUsed(),free=!currentUser?Math.max(0,3-used):0,paid=!currentUser?Math.max(0,files.length-free):files.length;
-    const cost=paid>0?'$'+(paid*0.50).toFixed(2):'Free!';
+    const cost=paid>0?fmtUSD(paid*PRICING.perInvoice):'Free!';
     pb.innerHTML=`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Extract ${files.length} invoice${files.length>1?'s':''} — ${cost}`;
   } else {
     pb.innerHTML=`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Extract data`;
@@ -998,13 +1031,23 @@ async function startProc(){
         document.getElementById('freeText').textContent=left+' free invoices remaining';
         updateFreeDots(left);
       } else {
-        const newC=Math.max(0,userCredits-files.length);
-        const oldTotal=parseInt(document.getElementById('dashTotal').textContent)||0;
-        await supa.from('profiles').update({credits:newC,total_processed:oldTotal+files.length}).eq('id',currentUser.id);
-        await supa.from('invoice_usage').insert({user_id:currentUser.id,invoice_count:files.length,fields_extracted:instr.value.split(',').length,created_at:new Date().toISOString()});
-        userCredits=newC;
-        document.getElementById('navCredits').textContent=newC+' credits';
-        document.getElementById('dashCredits').textContent=newC;
+        // Re-fetch latest credits to minimise the race window vs other tabs / Gumroad webhook writes.
+        // total_processed is no longer written here — invoice_usage is the single source of truth and the dashboard reads from it.
+        const {data:fresh} = await supa.from('profiles').select('credits').eq('id',currentUser.id).single();
+        const liveCredits = Math.max(0, fresh?.credits ?? userCredits);
+        const newC = Math.max(0, liveCredits - files.length);
+        await supa.from('profiles').update({credits:newC}).eq('id',currentUser.id);
+        await supa.from('invoice_usage').insert({
+          user_id: currentUser.id,
+          invoice_count: files.length,
+          fields_extracted: instr.value.split(',').length,
+          credits_used: files.length,
+          created_at: new Date().toISOString()
+        });
+        userCredits = newC;
+        document.getElementById('navCredits').textContent = newC+' credits';
+        document.getElementById('dashCredits').textContent = newC;
+        const pc = document.getElementById('profileCredits'); if (pc) pc.textContent = newC+' credits';
       }
       msg.textContent='Done! Building your results...';
       setTimeout(()=>showResults(document.getElementById('userEmail').value,data.results),600);
@@ -1024,7 +1067,7 @@ function showResults(email,apiResults){
     } else {allRows.push({...result.data,_filename:result.filename});}
   });
   const sc=document.getElementById('summaryCards');
-  sc.innerHTML=`<div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div><div class="scard"><div class="sc-val blue">${allRows.length}</div><div class="sc-label">Rows extracted</div></div><div class="scard"><div class="sc-val green">97%</div><div class="sc-label">Avg accuracy</div></div><div class="scard"><div class="sc-val amber">${currentUser?'$'+(files.length*0.50).toFixed(2):'Free'}</div><div class="sc-label">Cost</div></div>`;
+  sc.innerHTML=`<div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div><div class="scard"><div class="sc-val blue">${allRows.length}</div><div class="sc-label">Rows extracted</div></div><div class="scard"><div class="sc-val green">97%</div><div class="sc-label">Avg accuracy</div></div><div class="scard"><div class="sc-val amber">${currentUser?fmtUSD(files.length*PRICING.perInvoice):'Free'}</div><div class="sc-label">Cost</div></div>`;
   if(email)document.getElementById('erEmail').value=email;
   const head=document.getElementById('resHead'),body=document.getElementById('resBody');
   head.innerHTML='<th>#</th><th>Source file</th>'+allFields.map(f=>`<th>${f}</th>`).join('')+'<th>Confidence</th>';
