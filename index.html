@@ -1053,7 +1053,7 @@ function closeLimitModal(){document.getElementById('limitModal').classList.remov
 let files=[],extractedData=[],splitLineItems=false,excelTemplateFile=null,templateColumns=[];
 const fi=document.getElementById('fi'),dz=document.getElementById('dropZone'),fl2=document.getElementById('fileList'),pb=document.getElementById('procBtn'),instr=document.getElementById('instructions');
 
-fi.addEventListener('change',e=>addFiles(Array.from(e.target.files)));
+fi.addEventListener('change',e=>{addFiles(Array.from(e.target.files));e.target.value='';});
 instr.addEventListener('input',updateBtn);
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
 dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
@@ -1259,6 +1259,11 @@ function doDownload(type){
 function resetAll(){
   files=[];extractedData=[];
   if(fl2)fl2.innerHTML='';if(instr)instr.value='';
+  // Reset the file input itself, otherwise picking the same file twice
+  // doesn't fire a 'change' event and the button stays disabled.
+  if(fi)fi.value='';
+  const xt=document.getElementById('excelTemplate');if(xt)xt.value='';
+  removeExcelTemplate();
   const ue=document.getElementById('userEmail');if(ue)ue.value='';
   if(pb)pb.disabled=true;
   const us=document.getElementById('uploadState');if(us)us.style.display='block';
@@ -1267,6 +1272,8 @@ function resetAll(){
   const ef=document.getElementById('erForm');if(ef)ef.style.display='flex';
   const es=document.getElementById('erSent');if(es)es.style.display='none';
   ['tab1','tab2','tab3'].forEach((t,i)=>{const el=document.getElementById(t);if(el)el.className='atab'+(i===0?' active':'')});
+  splitLineItems=false;
+  setLineMode(false);
   updateBtn();showPage('app');
 }
 
