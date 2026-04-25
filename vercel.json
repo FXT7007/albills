@@ -1,13 +1,15 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/tools/:slug", "destination": "/:slug", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/extract", "destination": "/index.html" },
     { "source": "/pricing", "destination": "/index.html" },
     { "source": "/features", "destination": "/index.html" },
     { "source": "/live-demo", "destination": "/index.html" },
     { "source": "/dashboard", "destination": "/index.html" },
-    { "source": "/signin", "destination": "/index.html" },
-    { "source": "/tools/:slug", "destination": "/:slug.html" }
+    { "source": "/signin", "destination": "/index.html" }
   ]
 }
