@@ -321,6 +321,7 @@ main{position:relative;z-index:1}
 .auth-msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
 .auth-msg.error{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,107,122,0.2);display:block}
 .auth-msg.success{background:var(--green-bg);color:var(--green);border:1px solid rgba(77,217,192,0.2);display:block}
+.auth-msg.info{background:rgba(91,141,238,0.08);color:var(--accent);border:1px solid rgba(91,141,238,0.25);display:block}
 .auth-fn{text-align:center;font-size:12px;color:var(--text3);margin-top:18px}
 .auth-fn a{color:var(--accent);text-decoration:none;cursor:pointer}
 /* DASHBOARD */
@@ -667,7 +668,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
 <div id="dashboard" class="page">
   <div class="dash-wrap">
     <div class="dash-header">
-      <div class="dash-greeting"><h2>Welcome back, <span id="dashName">Mohammed</span> 👋</h2><p id="dashEmail" style="color:var(--text3);font-size:13px"></p></div>
+      <div class="dash-greeting"><h2>Welcome back, <span id="dashName">there</span> 👋</h2><p id="dashEmail" style="color:var(--text3);font-size:13px"></p></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <a href="https://fxtwave.gumroad.com/l/albills-pro" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:rgba(77,217,192,0.1);border:1px solid rgba(77,217,192,0.3);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(77,217,192,0.18)'" onmouseout="this.style.background='rgba(77,217,192,0.1)'">💳 Buy 10 credits — $5.00</a>
         <button class="btn-p" onclick="showPage('app')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Extract invoices</button>
@@ -677,7 +678,7 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <div class="dash-card green"><div class="dc-icon">⚡</div><div class="dc-val green" id="dashCredits">3</div><div class="dc-label">Credits remaining</div></div>
       <div class="dash-card blue"><div class="dc-icon">📄</div><div class="dc-val blue" id="dashTotal">0</div><div class="dc-label">Invoices processed</div></div>
       <div class="dash-card amber"><div class="dc-icon">📅</div><div class="dc-val amber" id="dashThisMonth">0</div><div class="dc-label">This month</div></div>
-      <div class="dash-card purple"><div class="dc-icon">💰</div><div class="dc-val purple" id="dashSaved">$0</div><div class="dc-label">Time saved (est.)</div></div>
+      <div class="dash-card purple"><div class="dc-icon">💰</div><div class="dc-val purple" id="dashSaved">$0</div><div class="dc-label">Money saved (est.)</div></div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:24px">
       <div style="padding:16px 20px;border-bottom:1px solid var(--border)"><div class="dash-sec-title">📋 Extraction history</div></div>
@@ -767,8 +768,10 @@ async function setUser(user){
   document.getElementById('dashName').textContent=name;
   document.getElementById('dashEmail').textContent=user.email;
   document.getElementById('dashCredits').textContent=userCredits;
-  document.getElementById('dashTotal').textContent=profile?.total_processed||0;
-  document.getElementById('dashSaved').textContent='$'+((profile?.total_processed||0)*2).toFixed(0);
+  // dashTotal and dashSaved are filled by loadHistory() from the source-of-truth
+  // invoice_usage table — no double-write from profile counter.
+  document.getElementById('dashTotal').textContent='—';
+  document.getElementById('dashSaved').textContent='—';
   document.getElementById('profileName').textContent=name;
   document.getElementById('profileAvatar').textContent=init;
   document.getElementById('profileEmailDisplay').textContent=user.email;
@@ -780,8 +783,28 @@ async function setUser(user){
 
 function clearUser(){
   currentUser=null;
+  userCredits=3;
   document.getElementById('navGuest').style.display='flex';
   document.getElementById('navUser').style.display='none';
+  // Reset dashboard fields so previous user's data isn't visible after sign-out
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('dashName','there');
+  set('dashEmail','');
+  set('dashCredits','—');
+  set('dashTotal','—');
+  set('dashThisMonth','—');
+  set('dashSaved','—');
+  set('profileName','—');
+  set('profileAvatar','?');
+  set('profileEmailDisplay','');
+  set('profileEmailField','—');
+  set('profileCredits','—');
+  set('profileJoined','—');
+  const tbody=document.getElementById('historyBody');
+  if(tbody)tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px">Sign in to see your extraction history.</td></tr>';
+  const ft=document.getElementById('freeText'); if(ft) ft.textContent='3 free invoices remaining';
+  const fr=document.getElementById('freeRight'); if(fr) fr.innerHTML='Free plan · <a onclick="showPage(\'login\');setTab(\'signup\')" style="color:var(--accent);cursor:pointer">Sign up for more →</a>';
+  updateFreeDots(Math.max(0,3-getAnonUsed()));
 }
 
 async function loadHistory(userId){
@@ -791,13 +814,19 @@ async function loadHistory(userId){
   tbody.innerHTML=data.map(r=>{
     const d=new Date(r.created_at);
     const ds=d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    return`<tr><td>${ds}</td><td>${r.invoice_count}</td><td>${r.fields_extracted||'—'}</td><td><span class="td-badge status-ok">✓ Done</span></td><td style="color:var(--accent)">${r.invoice_count}</td></tr>`;
+    const credits=Number(r.credits_used ?? r.invoice_count ?? 0);
+    const creditsCell=credits===0
+      ? '<span style="color:var(--green)">Free</span>'
+      : '<span style="color:var(--accent)">'+credits+'</span>';
+    return`<tr><td>${ds}</td><td>${r.invoice_count}</td><td>${r.fields_extracted||'—'}</td><td><span class="td-badge status-ok">✓ Done</span></td><td>${creditsCell}</td></tr>`;
   }).join('');
   const now=new Date();
+  const totalAll=data.reduce((s,r)=>s+(r.invoice_count||0),0);
   const thisMonth=data.filter(r=>{const d=new Date(r.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,r)=>s+(r.invoice_count||0),0);
   document.getElementById('dashThisMonth').textContent=thisMonth;
-  document.getElementById('dashTotal').textContent=data.reduce((s,r)=>s+(r.invoice_count||0),0);
-  document.getElementById('dashSaved').textContent='$'+(data.reduce((s,r)=>s+(r.invoice_count||0),0)*2).toFixed(0);
+  document.getElementById('dashTotal').textContent=totalAll;
+  // ~$2 of bookkeeper time per invoice (5 min × $24/hr)
+  document.getElementById('dashSaved').textContent='$'+(totalAll*2).toFixed(0);
 }
 
 async function doLogin(){
@@ -830,6 +859,13 @@ async function doSignOut(){await supa.auth.signOut();clearUser();showPage('home'
 function showAuthMsg(msg,type){const el=document.getElementById('authMsg');el.textContent=msg;el.className='auth-msg '+type;}
 
 function showPage(id){
+  // Guard: only signed-in users can see the dashboard. Otherwise route them to sign in.
+  if(id==='dashboard' && !currentUser){
+    showPage('login'); setTab('login');
+    const am=document.getElementById('authMsg');
+    if(am){am.textContent='Sign in to see your dashboard.';am.className='auth-msg info';}
+    return;
+  }
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none'});
   const pg=document.getElementById(id);if(!pg)return;
   pg.style.display='block';pg.classList.add('active');
