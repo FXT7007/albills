@@ -170,7 +170,11 @@ footer{border-top:1px solid var(--border);padding:32px 0 20px;position:relative;
       <span><a href="/" style="color:var(--accent);text-decoration:none">Invoice Extractor</a> · <a href="/tools" style="color:var(--accent);text-decoration:none">All Tools</a> · <a href="/privacy" style="color:var(--accent);text-decoration:none">Privacy</a></span>
     </div></div></footer>
 <script>
-const RATES = {'USD': 1, 'AED': 3.6725, 'SAR': 3.75, 'EUR': 0.92, 'GBP': 0.79, 'INR': 83.5, 'PKR': 278, 'BDT': 110, 'EGP': 30.9, 'KWD': 0.307, 'QAR': 3.64, 'OMR': 0.385, 'JPY': 149.5, 'CNY': 7.24, 'SGD': 1.34, 'AUD': 1.53, 'CAD': 1.36, 'CHF': 0.88, 'TRY': 32.1, 'NGN': 1580, 'ZAR': 18.9, 'MYR': 4.72, 'PHP': 56.5};
+// Static fallback — replaced as soon as /api/rates resolves.
+let RATES = {'USD': 1, 'AED': 3.6725, 'SAR': 3.75, 'EUR': 0.92, 'GBP': 0.79, 'INR': 83.5, 'PKR': 278, 'BDT': 110, 'EGP': 30.9, 'KWD': 0.307, 'QAR': 3.64, 'OMR': 0.385, 'JPY': 149.5, 'CNY': 7.24, 'SGD': 1.34, 'AUD': 1.53, 'CAD': 1.36, 'CHF': 0.88, 'TRY': 32.1, 'NGN': 1580, 'ZAR': 18.9, 'MYR': 4.72, 'PHP': 56.5};
+let rateSource = 'indicative';
+let rateUpdated = null;
+
 function calcCC(){
   const amt=parseFloat(document.getElementById('cc-amt').value)||0;
   const from=document.getElementById('cc-from').value;
@@ -178,9 +182,32 @@ function calcCC(){
   const rate=(RATES[to]||1)/(RATES[from]||1);
   const result=amt*rate;
   document.getElementById('cc-result').textContent=result.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:4})+' '+to;
-  document.getElementById('cc-rate').textContent='1 '+from+' = '+rate.toFixed(4)+' '+to+' (indicative rate)';
+  const tag = rateSource === 'live' ? (rateUpdated ? 'live · ' + rateUpdated : 'live') : 'indicative rate';
+  document.getElementById('cc-rate').textContent='1 '+from+' = '+rate.toFixed(4)+' '+to+' ('+tag+')';
 }
+
+async function fetchLiveRates(){
+  try {
+    const r = await fetch('/api/rates', { cache: 'no-store' });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data && data.fx && data.fx.rates) {
+      RATES = { ...RATES, ...data.fx.rates };
+      RATES.USD = 1;
+      if (data.fx.source && data.fx.source !== 'fallback') {
+        rateSource = 'live';
+        if (data.fx.updated) {
+          const d = new Date(data.fx.updated * 1000);
+          rateUpdated = d.toUTCString().replace(':00 GMT', ' GMT');
+        }
+      }
+      calcCC();
+    }
+  } catch(_) { /* keep fallback */ }
+}
+
 calcCC();
+fetchLiveRates();
 </script>
 </body>
 </html>

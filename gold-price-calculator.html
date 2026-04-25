@@ -159,9 +159,12 @@ footer{border-top:1px solid var(--border);padding:32px 0 20px;position:relative;
       <span><a href="/" style="color:var(--accent);text-decoration:none">Invoice Extractor</a> · <a href="/tools" style="color:var(--accent);text-decoration:none">All Tools</a> · <a href="/privacy" style="color:var(--accent);text-decoration:none">Privacy</a></span>
     </div></div></footer>
 <script>
-const goldPrice = 2385;
-const rates = {1:1, 3.6725:3.6725, 3.75:3.75, 0.79:0.79, 0.92:0.92, 83.5:83.5, 278:278};
+// Static fallback — replaced as soon as /api/rates resolves.
+let goldPrice = 2385;
+let goldSource = 'indicative';
+let goldUpdated = null;
 const syms = {1:'$', 3.6725:'AED ', 3.75:'SAR ', 0.79:'£', 0.92:'€', 83.5:'₹', 278:'₨'};
+
 function calcGold(){
   const w=parseFloat(document.getElementById('g-weight').value)||0;
   const u=parseFloat(document.getElementById('g-unit').value)||1;
@@ -170,8 +173,41 @@ function calcGold(){
   const val=w*u*p*goldPrice*r;
   const sym=syms[document.getElementById('g-currency').value]||'$';
   document.getElementById('g-result').textContent=sym+val.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-  document.getElementById('g-sub').textContent=w+' '+document.getElementById('g-unit').options[document.getElementById('g-unit').selectedIndex].text.split('(')[0].trim()+' at '+document.getElementById('g-purity').options[document.getElementById('g-purity').selectedIndex].text;
+  const unitTxt = document.getElementById('g-unit').options[document.getElementById('g-unit').selectedIndex].text.split('(')[0].trim();
+  const purityTxt = document.getElementById('g-purity').options[document.getElementById('g-purity').selectedIndex].text;
+  const tag = goldSource === 'live' ? (goldUpdated ? '🟢 Live · spot $' + goldPrice.toFixed(2) + '/oz · ' + goldUpdated : '🟢 Live · spot $' + goldPrice.toFixed(2) + '/oz') : 'indicative · spot $' + goldPrice.toFixed(2) + '/oz';
+  document.getElementById('g-sub').textContent = w + ' ' + unitTxt + ' at ' + purityTxt + ' · ' + tag;
 }
+
+async function fetchLiveGold(){
+  try {
+    const r = await fetch('/api/rates', { cache: 'no-store' });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data && data.gold && data.gold.usd_per_oz && data.gold.source !== 'fallback') {
+      goldPrice = Number(data.gold.usd_per_oz);
+      goldSource = 'live';
+      goldUpdated = data.gold.updated || null;
+      // Also refresh FX-driven currency choice values to live rates
+      if (data.fx && data.fx.rates) {
+        const sel = document.getElementById('g-currency');
+        const map = { 'AED': 3.6725, 'SAR': 3.75, 'GBP': 0.79, 'EUR': 0.92, 'INR': 83.5, 'PKR': 278 };
+        for (const opt of sel.options) {
+          const txt = opt.textContent;
+          for (const code of Object.keys(map)) {
+            if (txt.includes(code) && data.fx.rates[code]) {
+              opt.value = String(data.fx.rates[code]);
+              break;
+            }
+          }
+        }
+      }
+      calcGold();
+    }
+  } catch(_) { /* keep fallback */ }
+}
+
+fetchLiveGold();
 </script>
 </body>
 </html>
