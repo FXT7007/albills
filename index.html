@@ -764,11 +764,19 @@ const PRICING = {
 const fmtUSD = n => '$' + Number(n).toFixed(2);
 
 async function initAuth(){
-  const{data:{session}}=await supa.auth.getSession();
-  if(session?.user)await setUser(session.user);
+  try {
+    const{data:{session}}=await supa.auth.getSession();
+    if(session?.user) {
+      try { await setUser(session.user); } catch(e) { console.error('setUser on init failed:', e); }
+    }
+  } catch(e) { console.error('getSession failed:', e); }
   supa.auth.onAuthStateChange(async(event,session)=>{
-    if(session?.user)await setUser(session.user);
-    else clearUser();
+    try {
+      if(session?.user) await setUser(session.user);
+      else clearUser();
+    } catch(e) {
+      console.error('Auth state change handler failed:', e);
+    }
   });
 }
 
@@ -795,38 +803,43 @@ async function setUser(user){
     profile = { first_name: firstName, last_name: lastName, credits: 3, total_processed: 0 };
   }
   userCredits=profile?.credits??3;
-  document.getElementById('navCredits').textContent=userCredits+' credits';
-  const buyBtn=document.getElementById('navBuyBtn');
-  if(buyBtn){
+  // Null-safe DOM helpers — every element access in this function is wrapped
+  // so a missing element anywhere never breaks the whole sign-in chain.
+  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const setHTML = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+  setText('navCredits', userCredits + ' credits');
+  const buyBtn = document.getElementById('navBuyBtn');
+  if (buyBtn) {
     buyBtn.href = PRICING.gumroadUrl;
-    buyBtn.textContent = userCredits<=0
+    buyBtn.textContent = userCredits <= 0
       ? `Out of credits — Buy ${PRICING.packCredits} for ${fmtUSD(PRICING.packPrice)}`
       : `Buy credits`;
-    buyBtn.style.display = userCredits<=0?'block':'none';
+    buyBtn.style.display = userCredits <= 0 ? 'block' : 'none';
   }
-  const dashBuyBtn=document.getElementById('dashBuyBtn');
-  if(dashBuyBtn){
+  const dashBuyBtn = document.getElementById('dashBuyBtn');
+  if (dashBuyBtn) {
     dashBuyBtn.href = PRICING.gumroadUrl;
     dashBuyBtn.innerHTML = `💳 Buy ${PRICING.packCredits} credits — ${fmtUSD(PRICING.packPrice)}`;
   }
-  document.getElementById('freeText').textContent=userCredits+' credits remaining';
-  document.getElementById('freeRight').innerHTML='<a onclick="showPage(\'dashboard\')" style="color:var(--accent);cursor:pointer">My Dashboard →</a>';
-  updateFreeDots(Math.min(userCredits,3));
-  document.getElementById('dashName').textContent=firstName;
-  document.getElementById('dashEmail').textContent=user.email;
-  document.getElementById('dashCredits').textContent=userCredits;
-  // dashTotal and dashSaved are filled by loadHistory() from the source-of-truth
-  // invoice_usage table — no double-write from profile counter.
-  document.getElementById('dashTotal').textContent='—';
-  document.getElementById('dashSaved').textContent='—';
-  document.getElementById('profileName').textContent=fullName;
-  document.getElementById('profileAvatar').textContent=init;
-  document.getElementById('profileEmailDisplay').textContent=user.email;
-  document.getElementById('profileEmailField').textContent=user.email;
-  document.getElementById('profileCredits').textContent=userCredits+' credits';
-  document.getElementById('profileJoined').textContent=new Date(user.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  loadHistory(user.id);
-  redeemPendingCredits(user);
+  setText('freeText', userCredits + ' credits remaining');
+  setHTML('freeRight', '<a onclick="showPage(\'dashboard\')" style="color:var(--accent);cursor:pointer">My Dashboard →</a>');
+  updateFreeDots(Math.min(userCredits, 3));
+  setText('dashName', firstName);
+  setText('dashEmail', user.email);
+  setText('dashCredits', userCredits);
+  setText('dashTotal', '—');
+  setText('dashSaved', '—');
+  setText('profileName', fullName);
+  setText('profileAvatar', init);
+  setText('profileEmailDisplay', user.email);
+  setText('profileEmailField', user.email);
+  setText('profileCredits', userCredits + ' credits');
+  if (user.created_at) {
+    try { setText('profileJoined', new Date(user.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})); } catch(_) { setText('profileJoined','—'); }
+  }
+  // Background tasks — wrapped so any failure doesn't break the auth flow
+  try { loadHistory(user.id); } catch(_) {}
+  try { redeemPendingCredits(user); } catch(_) {}
 }
 
 // If someone bought credits on Gumroad before signing up (or used a different
@@ -994,7 +1007,16 @@ async function doForgotPassword(){
   el.innerHTML = '✉️ If an account exists for <strong>' + email.replace(/[<>]/g,'') + '</strong>, we&rsquo;ve sent a password reset link. Check your inbox.';
 }
 
-async function doSignOut(){await supa.auth.signOut();clearUser();showPage('home');}
+async function doSignOut(){
+  try {
+    await supa.auth.signOut();
+  } catch(e) {
+    console.error('Sign out network error:', e);
+  }
+  // Always clear local state and navigate, even if Supabase call hiccupped
+  try { clearUser(); } catch(e) { console.error('clearUser failed:', e); currentUser = null; }
+  showPage('home');
+}
 function showAuthMsg(msg,type){const el=document.getElementById('authMsg');el.textContent=msg;el.className='auth-msg '+type;}
 
 function showPage(id){
@@ -1045,10 +1067,12 @@ function setTab(t){
   document.getElementById('authMsg').className='auth-msg';
 }
 function updateFreeDots(remaining){
-  const dots=document.getElementById('freeDots');dots.innerHTML='';
+  const dots=document.getElementById('freeDots');
+  if (!dots) return; // element only exists on the extract page; bail safely elsewhere
+  dots.innerHTML='';
   for(let i=0;i<3;i++){const d=document.createElement('div');d.className='fb-dot'+(i>=remaining?' used':'');dots.appendChild(d);}
 }
-function closeLimitModal(){document.getElementById('limitModal').classList.remove('show')}
+function closeLimitModal(){const el=document.getElementById('limitModal');if(el)el.classList.remove('show')}
 
 let files=[],extractedData=[],splitLineItems=false,excelTemplateFile=null,templateColumns=[];
 const fi=document.getElementById('fi'),dz=document.getElementById('dropZone'),fl2=document.getElementById('fileList'),pb=document.getElementById('procBtn'),instr=document.getElementById('instructions');
