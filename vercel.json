@@ -8,21 +8,6 @@
     { "source": "/live-demo", "destination": "/index.html" },
     { "source": "/dashboard", "destination": "/index.html" },
     { "source": "/signin", "destination": "/index.html" },
-    { "source": "/tools", "destination": "/tools.html" },
-    { "source": "/tools/vat-calculator", "destination": "/vat-calculator.html" },
-    { "source": "/tools/uae-corporate-tax", "destination": "/uae-corporate-tax.html" },
-    { "source": "/tools/zakat-calculator", "destination": "/zakat-calculator.html" },
-    { "source": "/tools/currency-converter", "destination": "/currency-converter.html" },
-    { "source": "/tools/gold-price-calculator", "destination": "/gold-price-calculator.html" },
-    { "source": "/tools/loan-calculator", "destination": "/loan-calculator.html" },
-    { "source": "/tools/break-even-calculator", "destination": "/break-even-calculator.html" },
-    { "source": "/tools/profit-margin-calculator", "destination": "/profit-margin-calculator.html" },
-    { "source": "/tools/salary-calculator", "destination": "/salary-calculator.html" },
-    { "source": "/tools/late-payment-calculator", "destination": "/late-payment-calculator.html" },
-    { "source": "/tools/invoice-due-date", "destination": "/invoice-due-date.html" },
-    { "source": "/tools/invoice-number-generator", "destination": "/invoice-number-generator.html" },
-    { "source": "/tools/invoice-to-excel", "destination": "/invoice-to-excel.html" },
-    { "source": "/tools/pdf-to-excel", "destination": "/pdf-to-excel.html" },
-    { "source": "/tools/scanned-pdf-to-excel", "destination": "/scanned-pdf-to-excel.html" }
+    { "source": "/tools/:slug", "destination": "/:slug.html" }
   ]
 }
