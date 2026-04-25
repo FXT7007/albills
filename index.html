@@ -644,7 +644,13 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <p class="auth-sub">Sign in to your AlBills account</p>
       <div class="atabs2"><button class="atab2 active" onclick="setTab('login')">Sign in</button><button class="atab2" onclick="setTab('signup')">Create account</button></div>
       <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="loginEmail" placeholder="you@company.com"></div>
-      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="loginPass" placeholder="••••••••"></div>
+      <div class="fg">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <label class="fl" style="margin:0">Password</label>
+          <a onclick="setTab('forgot')" style="color:var(--accent);font-size:12px;cursor:pointer;text-decoration:none">Forgot password?</a>
+        </div>
+        <input class="fi" type="password" id="loginPass" placeholder="••••••••">
+      </div>
       <button class="auth-btn" id="loginBtn" onclick="doLogin()">Sign in to AlBills</button>
       <div class="auth-fn">No account? <a onclick="setTab('signup')">Sign up free</a></div>
     </div>
@@ -659,7 +665,15 @@ footer{border-top:1px solid var(--border);padding:32px 1.5rem;position:relative;
       <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signupEmail" placeholder="you@company.com"></div>
       <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signupPass" placeholder="At least 8 characters"></div>
       <button class="auth-btn" id="signupBtn" onclick="doSignup()">Create free account</button>
+      <div class="auth-fn" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:8px">By creating an account you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>. We&rsquo;ll send a verification email — please confirm before signing in.</div>
       <div class="auth-fn">Already have an account? <a onclick="setTab('login')">Sign in</a></div>
+    </div>
+    <div id="fpf" style="display:none">
+      <h2 class="auth-title">Reset your password</h2>
+      <p class="auth-sub">We&rsquo;ll email you a secure link to set a new password.</p>
+      <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="forgotEmail" placeholder="you@company.com"></div>
+      <button class="auth-btn" id="forgotBtn" onclick="doForgotPassword()">Send reset link</button>
+      <div class="auth-fn">Remembered it? <a onclick="setTab('login')">Back to sign in</a></div>
     </div>
   </div>
 </div>
@@ -869,7 +883,19 @@ async function doLogin(){
   const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Signing in...';
   const{error}=await supa.auth.signInWithPassword({email,password:pass});
   btn.disabled=false;btn.textContent='Sign in to AlBills';
-  if(error)return showAuthMsg(error.message,'error');
+  if(error){
+    // Friendlier message for the most common case — email not confirmed yet
+    const msg = /confirm|not confirmed|verify/i.test(error.message)
+      ? 'Please verify your email first. Check your inbox for the confirmation link, or '
+      : null;
+    if (msg) {
+      const el = document.getElementById('authMsg');
+      el.className = 'auth-msg error';
+      el.innerHTML = msg + '<a onclick="doResendConfirmation()" style="color:var(--accent);cursor:pointer;text-decoration:underline">resend it</a>.';
+      return;
+    }
+    return showAuthMsg(error.message,'error');
+  }
   showAuthMsg('Signed in!','success');
   setTimeout(()=>showPage('app'),800);
 }
@@ -882,10 +908,50 @@ async function doSignup(){
   if(!first||!email||!pass)return showAuthMsg('Please fill in all fields','error');
   if(pass.length<8)return showAuthMsg('Password must be at least 8 characters','error');
   const btn=document.getElementById('signupBtn');btn.disabled=true;btn.textContent='Creating account...';
-  const{error}=await supa.auth.signUp({email,password:pass,options:{data:{first_name:first,last_name:last}}});
+  const{data,error}=await supa.auth.signUp({
+    email,
+    password:pass,
+    options:{
+      data:{first_name:first,last_name:last},
+      emailRedirectTo: window.location.origin + '/'
+    }
+  });
   btn.disabled=false;btn.textContent='Create free account';
   if(error)return showAuthMsg(error.message,'error');
-  showAuthMsg('Account created! Check your email to confirm, then sign in.','success');
+  // If "Confirm email" is enabled in Supabase, session is null and identities is empty until confirmed
+  const needsConfirm = !data.session;
+  if (needsConfirm) {
+    const el = document.getElementById('authMsg');
+    el.className = 'auth-msg success';
+    el.innerHTML = '✉️ Check your inbox at <strong>' + email.replace(/[<>]/g,'') + '</strong> for the verification link, then sign in. <a onclick="doResendConfirmation()" style="color:var(--accent);cursor:pointer;margin-left:6px">Resend</a>';
+  } else {
+    showAuthMsg('Account created! Signing you in…','success');
+    setTimeout(()=>showPage('app'),900);
+  }
+}
+
+async function doResendConfirmation(){
+  const email = (document.getElementById('loginEmail').value || document.getElementById('signupEmail').value || '').trim();
+  if (!email) return showAuthMsg('Enter your email above first, then click resend.','error');
+  const {error} = await supa.auth.resend({type:'signup', email, options:{emailRedirectTo: window.location.origin + '/'}});
+  if (error) return showAuthMsg(error.message,'error');
+  showAuthMsg('Verification email re-sent. Check your inbox (and spam folder).','success');
+}
+
+async function doForgotPassword(){
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) return showAuthMsg('Please enter your email','error');
+  const btn = document.getElementById('forgotBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  const {error} = await supa.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-password'
+  });
+  btn.disabled = false; btn.textContent = 'Send reset link';
+  if (error) return showAuthMsg(error.message,'error');
+  // Don't reveal whether the email exists — same message either way (security best practice)
+  const el = document.getElementById('authMsg');
+  el.className = 'auth-msg success';
+  el.innerHTML = '✉️ If an account exists for <strong>' + email.replace(/[<>]/g,'') + '</strong>, we&rsquo;ve sent a password reset link. Check your inbox.';
 }
 
 async function doSignOut(){await supa.auth.signOut();clearUser();showPage('home');}
@@ -911,16 +977,31 @@ function showPage(id){
 (function pathBootstrap(){
   try {
     const map={'/extract':['app'],'/dashboard':['dashboard'],'/signin':['login','login'],'/live-demo':['demo'],'/pricing':['home','pricing'],'/features':['home','features']};
-    const route=map[location.pathname];
+    const params = new URLSearchParams(location.search);
+    let route = map[location.pathname];
+    // ?signin=1 forces login modal (used after password reset)
+    if (params.get('signin') === '1') route = ['login','login'];
     if(!route)return;
-    const fire=()=>{showPage(route[0]);if(route[0]==='login'&&route[1])setTab(route[1]);if(route[0]==='home'&&route[1])goTo(route[1]);};
+    const fire=()=>{
+      showPage(route[0]);
+      if(route[0]==='login'&&route[1]) setTab(route[1]);
+      if(route[0]==='home'&&route[1])  goTo(route[1]);
+      if(params.get('signin') === '1'){
+        const el = document.getElementById('authMsg');
+        if(el){el.className='auth-msg success';el.textContent='Password updated. Sign in with your new password.';}
+        // Clean the URL so refresh doesn't re-trigger the message
+        history.replaceState({}, '', '/');
+      }
+    };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fire);else fire();
   }catch(e){}
 })();
 function goTo(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'})},80)}
 function setTab(t){
-  document.getElementById('lf').style.display=t==='login'?'block':'none';
-  document.getElementById('sf').style.display=t==='signup'?'block':'none';
+  document.getElementById('lf').style.display = t==='login'  ? 'block' : 'none';
+  document.getElementById('sf').style.display = t==='signup' ? 'block' : 'none';
+  const fpf = document.getElementById('fpf');
+  if (fpf) fpf.style.display = t==='forgot' ? 'block' : 'none';
   document.getElementById('authMsg').className='auth-msg';
 }
 function updateFreeDots(remaining){
