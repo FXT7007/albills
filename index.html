@@ -1187,17 +1187,60 @@ async function startProc(){
 
 function showResults(email,apiResults){
   extractedData=apiResults||[];
-  const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
-  const lineFields=splitLineItems?['line_description','line_quantity','line_unit_price','line_tax_rate','line_tax_amount','line_total']:[];
-  const allFields=[...new Set([...(templateColumns.length>0?templateColumns:fields),...lineFields])];
+  const requestedFields = templateColumns.length>0
+    ? templateColumns
+    : instr.value.split(',').map(f=>f.trim()).filter(Boolean);
+
   let allRows=[];
   extractedData.forEach(result=>{
     if(splitLineItems&&result.lineRows&&result.lineRows.length>0){
-      result.lineRows.forEach(row=>allRows.push({...row,_filename:result.filename}));
-    } else {allRows.push({...result.data,_filename:result.filename});}
+      result.lineRows.forEach(row=>allRows.push({...row,_filename:result.filename,_confidence:result.confidence}));
+    } else {allRows.push({...result.data,_filename:result.filename,_confidence:result.confidence});}
   });
+
+  // Build the column list dynamically: requested fields first (in user's order),
+  // then any extra keys the model returned that have data in at least one row
+  // (e.g. document_type, validation_warnings). Skip empty columns.
+  const isMeta = k => k.startsWith('_');
+  const hasValue = v => v !== null && v !== undefined && v !== '' && v !== '—';
+  const seen = new Set();
+  const orderedFields = [];
+
+  // 1. Requested fields, in the user's order — only if they have data anywhere
+  requestedFields.forEach(f => {
+    const lower = f.toLowerCase();
+    const anyValue = allRows.some(row => {
+      const k = Object.keys(row).find(rk => !isMeta(rk) && rk.toLowerCase() === lower);
+      return k !== undefined && hasValue(row[k]);
+    });
+    if (anyValue || requestedFields.length <= 8) {
+      // For short requests (<=8 fields) keep all requested columns even if empty,
+      // so users can SEE what was missing. For long requests, drop empty ones.
+      seen.add(lower);
+      orderedFields.push(f);
+    }
+  });
+
+  // 2. Extra keys returned by the model that aren't already in the list
+  allRows.forEach(row => {
+    Object.keys(row).forEach(k => {
+      if (isMeta(k)) return;
+      if (seen.has(k.toLowerCase())) return;
+      if (hasValue(row[k])) {
+        seen.add(k.toLowerCase());
+        orderedFields.push(k);
+      }
+    });
+  });
+
+  const allFields = orderedFields;
+
   const sc=document.getElementById('summaryCards');
-  sc.innerHTML=`<div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div><div class="scard"><div class="sc-val blue">${allRows.length}</div><div class="sc-label">Rows extracted</div></div><div class="scard"><div class="sc-val green">97%</div><div class="sc-label">Avg accuracy</div></div><div class="scard"><div class="sc-val amber">${currentUser?fmtUSD(files.length*PRICING.perInvoice):'Free'}</div><div class="sc-label">Cost</div></div>`;
+  // Average confidence across rows (falls back to 97 if no data)
+  const avgConf = allRows.length > 0
+    ? Math.round(allRows.reduce((s,r)=>s+(Number(r._confidence)||97),0) / allRows.length)
+    : 97;
+  sc.innerHTML=`<div class="scard"><div class="sc-val green">${files.length}</div><div class="sc-label">Invoices processed</div></div><div class="scard"><div class="sc-val blue">${allRows.length}</div><div class="sc-label">Rows extracted</div></div><div class="scard"><div class="sc-val green">${avgConf}%</div><div class="sc-label">Avg accuracy</div></div><div class="scard"><div class="sc-val amber">${currentUser?fmtUSD(files.length*PRICING.perInvoice):'Free'}</div><div class="sc-label">Cost</div></div>`;
   if(email)document.getElementById('erEmail').value=email;
   const head=document.getElementById('resHead'),body=document.getElementById('resBody');
   head.innerHTML='<th>#</th><th>Source file</th>'+allFields.map(f=>`<th>${f}</th>`).join('')+'<th>Confidence</th>';
@@ -1208,11 +1251,12 @@ function showResults(email,apiResults){
     let cells=`<td style="color:var(--text3);font-size:11px">${i+1}</td><td style="color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row._filename||''}</td>`;
     allFields.forEach(f=>{
       const key=Object.keys(row).find(k=>k.toLowerCase()===f.toLowerCase())||f;
-      const v=row[key]||'—';
+      const v=row[key];
       const isAmt=f.toLowerCase().includes('amount')||f.toLowerCase().includes('total')||f.toLowerCase().includes('price');
-      cells+=`<td ${isAmt?'class="td-amt"':''}>${v}</td>`;
+      cells+=`<td ${isAmt?'class="td-amt"':''}>${(v!==null&&v!==undefined&&v!=='')?v:'—'}</td>`;
     });
-    cells+=`<td><div class="conf"><div class="conf-bar"><div class="conf-fill" style="width:97%"></div></div><span class="conf-val">97%</span></div></td>`;
+    const conf = Number(row._confidence) || 97;
+    cells+=`<td><div class="conf"><div class="conf-bar"><div class="conf-fill" style="width:${conf}%"></div></div><span class="conf-val">${conf}%</span></div></td>`;
     tr.innerHTML=cells;body.appendChild(tr);
   });
   document.getElementById('rowCount').textContent=allRows.length+' row'+(allRows.length!==1?'s':'');
@@ -1228,13 +1272,39 @@ function sendResultEmail(){
 }
 function doDownload(type){
   if(!extractedData.length){alert('No data to download');return;}
-  const fields=instr.value.split(',').map(f=>f.trim()).filter(Boolean);
-  const lineFields=splitLineItems?['line_description','line_quantity','line_unit_price','line_tax_rate','line_tax_amount','line_total']:[];
-  const allFields=[...new Set([...(templateColumns.length>0?templateColumns:fields),...lineFields])];
+  const requestedFields = templateColumns.length>0
+    ? templateColumns
+    : instr.value.split(',').map(f=>f.trim()).filter(Boolean);
   let allRows=[];
   extractedData.forEach(result=>{
     if(splitLineItems&&result.lineRows&&result.lineRows.length>0){result.lineRows.forEach(row=>allRows.push({...row,_filename:result.filename}));}
     else{allRows.push({...result.data,_filename:result.filename});}
+  });
+  // Same dynamic-columns logic as showResults — never emit empty columns
+  const isMeta = k => k.startsWith('_');
+  const hasValue = v => v !== null && v !== undefined && v !== '';
+  const seen = new Set();
+  const allFields = [];
+  requestedFields.forEach(f => {
+    const lower = f.toLowerCase();
+    const anyValue = allRows.some(row => {
+      const k = Object.keys(row).find(rk => !isMeta(rk) && rk.toLowerCase() === lower);
+      return k !== undefined && hasValue(row[k]);
+    });
+    if (anyValue || requestedFields.length <= 8) {
+      seen.add(lower);
+      allFields.push(f);
+    }
+  });
+  allRows.forEach(row => {
+    Object.keys(row).forEach(k => {
+      if (isMeta(k)) return;
+      if (seen.has(k.toLowerCase())) return;
+      if (hasValue(row[k])) {
+        seen.add(k.toLowerCase());
+        allFields.push(k);
+      }
+    });
   });
   if(type==='excel'){
     const wsData=[['#','Source File',...allFields,'Confidence']];
@@ -1274,6 +1344,17 @@ function resetAll(){
   ['tab1','tab2','tab3'].forEach((t,i)=>{const el=document.getElementById(t);if(el)el.className='atab'+(i===0?' active':'')});
   splitLineItems=false;
   setLineMode(false);
+  // Refresh the remaining-credits indicator so the green dots reflect the real
+  // number of credits left — without this, after running an extraction the
+  // dots can stay at their pre-run state until next page load.
+  if (currentUser) {
+    document.getElementById('freeText').textContent = userCredits + ' credits remaining';
+    updateFreeDots(Math.min(userCredits, 3));
+  } else {
+    const left = Math.max(0, 3 - getAnonUsed());
+    document.getElementById('freeText').textContent = left + ' free invoices remaining';
+    updateFreeDots(left);
+  }
   updateBtn();showPage('app');
 }
 
